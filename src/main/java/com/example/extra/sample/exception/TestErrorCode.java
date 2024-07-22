@@ -1,6 +1,6 @@
 package com.example.extra.sample.exception;
 
-import com.mju.lighthouseai.global.exception.ErrorCode;
+import com.example.extra.global.exception.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

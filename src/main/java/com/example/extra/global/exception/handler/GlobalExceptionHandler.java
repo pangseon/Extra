@@ -1,10 +1,11 @@
 package com.example.extra.global.exception.handler;
 
-import com.mju.lighthouseai.global.exception.CustomException;
-import com.mju.lighthouseai.global.exception.ErrorCode;
-import com.mju.lighthouseai.global.exception.dto.BeanValidationExceptionResponseDto;
-import com.mju.lighthouseai.global.exception.dto.CustomExceptionResponseDto;
-import com.mju.lighthouseai.global.exception.dto.FieldErrorResponseDto;
+
+import com.example.extra.global.exception.CustomException;
+import com.example.extra.global.exception.ErrorCode;
+import com.example.extra.global.exception.dto.BeanValidationExceptionResponseDto;
+import com.example.extra.global.exception.dto.CustomExceptionResponseDto;
+import com.example.extra.global.exception.dto.FieldErrorResponseDto;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

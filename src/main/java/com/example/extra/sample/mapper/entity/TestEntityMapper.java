@@ -1,8 +1,9 @@
 package com.example.extra.sample.mapper.entity;
 
-import com.mju.lighthouseai.sample.dto.service.TestCreateServiceRequestDto;
-import com.mju.lighthouseai.sample.dto.service.TestReadResponseDto;
-import com.mju.lighthouseai.sample.entity.Test;
+
+import com.example.extra.sample.dto.service.TestCreateServiceRequestDto;
+import com.example.extra.sample.dto.service.TestReadResponseDto;
+import com.example.extra.sample.entity.Test;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants.ComponentModel;

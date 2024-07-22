@@ -1,8 +1,8 @@
 package com.example.extra.sample.mapper.dto;
 
 
-import com.mju.lighthouseai.sample.dto.controller.TestCreateControllerRequestDto;
-import com.mju.lighthouseai.sample.dto.service.TestCreateServiceRequestDto;
+import com.example.extra.sample.dto.controller.TestCreateControllerRequestDto;
+import com.example.extra.sample.dto.service.TestCreateServiceRequestDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants.ComponentModel;
 

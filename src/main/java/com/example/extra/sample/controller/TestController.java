@@ -1,11 +1,11 @@
 package com.example.extra.sample.controller;
 
-import com.mju.lighthouseai.global.security.UserDetailsImpl;
-import com.mju.lighthouseai.sample.dto.controller.TestCreateControllerRequestDto;
-import com.mju.lighthouseai.sample.dto.service.TestCreateServiceRequestDto;
-import com.mju.lighthouseai.sample.dto.service.TestReadResponseDto;
-import com.mju.lighthouseai.sample.mapper.dto.TestDtoMapper;
-import com.mju.lighthouseai.sample.service.TestService;
+
+import com.example.extra.sample.dto.controller.TestCreateControllerRequestDto;
+import com.example.extra.sample.dto.service.TestCreateServiceRequestDto;
+import com.example.extra.sample.dto.service.TestReadResponseDto;
+import com.example.extra.sample.mapper.dto.TestDtoMapper;
+import com.example.extra.sample.service.TestService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -47,12 +47,11 @@ public class TestController {
 
     @PostMapping("/tests")
     public ResponseEntity<Void> create(
-        @RequestBody TestCreateControllerRequestDto controllerRequestDto,
-        @AuthenticationPrincipal UserDetailsImpl userDetailsImpl
+        @RequestBody TestCreateControllerRequestDto controllerRequestDto
     ) {
         TestCreateServiceRequestDto serviceRequestDto = testDtoMapper.toTestServiceRequestDto(
             controllerRequestDto);
-        testService.create(serviceRequestDto, userDetailsImpl.user());
+        testService.create(serviceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

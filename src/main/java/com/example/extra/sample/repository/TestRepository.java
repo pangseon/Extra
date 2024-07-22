@@ -1,6 +1,6 @@
 package com.example.extra.sample.repository;
 
-import com.mju.lighthouseai.sample.entity.Test;
+import com.example.extra.sample.entity.Test;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;

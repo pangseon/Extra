@@ -1,8 +1,8 @@
 package com.example.extra.sample.exception;
 
 
-import com.mju.lighthouseai.global.exception.CustomException;
-import com.mju.lighthouseai.global.exception.ErrorCode;
+import com.example.extra.global.exception.CustomException;
+import com.example.extra.global.exception.ErrorCode;
 
 public class AlreadyExistsTestException extends CustomException {
 
