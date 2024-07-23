@@ -1,5 +1,6 @@
 package com.example.extra.domain.memberterms.entity;
 
+import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.terms.entity.Terms;
 import com.example.extra.global.common.BaseEntity;
 import jakarta.persistence.Column;

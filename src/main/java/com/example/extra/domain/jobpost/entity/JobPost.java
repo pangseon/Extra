@@ -1,5 +1,6 @@
 package com.example.extra.domain.jobpost.entity;
 
+import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.role.entity.Role;
 import com.example.extra.domain.schedule.entity.Schedule;
 import com.example.extra.global.entity.BaseEntity;
@@ -55,15 +56,15 @@ public class JobPost extends BaseEntity {
     @Column
     private Category category;
 
-/*    @ManyToOne
+    @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "company_id",nullable = false)
-    private Company company;*/
+    private Company company;
 
-    @OneToMany(mappedBy = "jobpost",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "jobPost",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Schedule> scheduleList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "jobpost",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "jobPost",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Role> roleList = new ArrayList<>();
 
     @Builder

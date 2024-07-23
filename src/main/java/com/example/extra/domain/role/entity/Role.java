@@ -1,5 +1,6 @@
 package com.example.extra.domain.role.entity;
 
+import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.domain.schedule.entity.Schedule;
 import com.example.extra.global.entity.BaseEntity;
 import com.example.extra.global.enums.Season;
@@ -52,9 +53,8 @@ public class Role extends BaseEntity {
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "schedule_id",nullable = false)
-    private Schedule schedule;
-
+    @JoinColumn(name = "job_post_id",nullable = false)
+    private JobPost jobPost;
     @Builder
     public Role(
         String  roleName,
@@ -64,7 +64,7 @@ public class Role extends BaseEntity {
         Integer limitPersonnel,
         Integer currentPersonnel,
         Season season,
-        Schedule schedule
+        JobPost jobPost
     ){
         this.roleName = roleName;
         this.costume = costume;
@@ -73,7 +73,7 @@ public class Role extends BaseEntity {
         this.limitPersonnel = limitPersonnel;
         this.currentPersonnel = currentPersonnel;
         this.season = season;
-        this.schedule = schedule;
+        this.jobPost = jobPost;
     }
 
 }

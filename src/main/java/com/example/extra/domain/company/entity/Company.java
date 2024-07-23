@@ -1,5 +1,6 @@
 package com.example.extra.domain.company.entity;
 
+import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.global.common.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

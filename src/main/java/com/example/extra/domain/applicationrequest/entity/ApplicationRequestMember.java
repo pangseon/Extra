@@ -1,5 +1,7 @@
 package com.example.extra.domain.applicationrequest.entity;
 
+import com.example.extra.domain.member.entity.Member;
+import com.example.extra.domain.role.entity.Role;
 import com.example.extra.global.common.BaseEntity;
 import com.example.extra.global.enums.ApplyStatus;
 import jakarta.persistence.Column;

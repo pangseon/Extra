@@ -40,8 +40,6 @@ public class Schedule extends BaseEntity {
     @JoinColumn(name = "jobpost_id",nullable = false)
     private JobPost jobPost;
 
-    @OneToMany(mappedBy = "schedule",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<Role> roleList = new ArrayList<>();
 
     @Builder
     public Schedule(
