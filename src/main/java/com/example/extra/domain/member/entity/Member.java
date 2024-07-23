@@ -1,12 +1,23 @@
 package com.example.extra.domain.member.entity;
 
+import com.example.extra.domain.applicationrequest.entity.ApplicationRequestCompany;
+import com.example.extra.domain.applicationrequest.entity.ApplicationRequestMember;
+import com.example.extra.domain.attendancemanagement.entity.AttendanceManagement;
+import com.example.extra.domain.costumeapprovalboard.entity.CostumeApprovalBoard;
+import com.example.extra.domain.memberterms.entity.MemberTerms;
+import com.example.extra.domain.tattoo.entity.Tattoo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -58,6 +69,24 @@ public class Member {
     @Column
     private String pros;
 
+    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
+    private Tattoo tattoo;
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private final List<ApplicationRequestCompany> applicationRequestCompanyList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private final List<ApplicationRequestMember> applicationRequestMemberList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private final List<AttendanceManagement> attendanceManagementList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private final List<CostumeApprovalBoard> costumeApprovalBoardList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private final List<MemberTerms> memberTermsList = new ArrayList<>();
+
     @Builder
     public Member(
         String email,
@@ -71,7 +100,8 @@ public class Member {
         String phone,
         String introduction,
         String license,
-        String pros
+        String pros,
+        Tattoo tattoo
     ) {
         this.email = email;
         this.password = password;
@@ -85,5 +115,6 @@ public class Member {
         this.introduction = introduction;
         this.license = license;
         this.pros = pros;
+        this.tattoo = tattoo;
     }
 }
