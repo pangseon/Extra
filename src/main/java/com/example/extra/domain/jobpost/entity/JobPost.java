@@ -1,6 +1,6 @@
 package com.example.extra.domain.jobpost.entity;
 
-import com.example.extra.domain.company.entity.Company;
+import com.example.extra.domain.role.entity.Role;
 import com.example.extra.domain.schedule.entity.Schedule;
 import com.example.extra.global.entity.BaseEntity;
 import com.example.extra.global.enums.Category;
@@ -55,13 +55,16 @@ public class JobPost extends BaseEntity {
     @Column
     private Category category;
 
-    @ManyToOne
+/*    @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "company_id",nullable = false)
-    private Company company;
+    private Company company;*/
 
     @OneToMany(mappedBy = "jobpost",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Schedule> scheduleList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "jobpost",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Role> roleList = new ArrayList<>();
 
     @Builder
     public JobPost(
@@ -71,8 +74,7 @@ public class JobPost extends BaseEntity {
         final String imageUrl,
         final Boolean status,
         final Integer hourPay,
-        final Category category,
-        final Company company
+        final Category category
     ){
         this.dramaTitle = dramaTitle;
         this.gatheringLocation = gatheringLocation;
@@ -81,7 +83,6 @@ public class JobPost extends BaseEntity {
         this.status = status;
         this.hourPay = hourPay;
         this.category = category;
-        this.company = company;
 
     }
 
