@@ -2,6 +2,7 @@ package com.example.extra.domain.schedule.entity;
 
 import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.domain.role.entity.Role;
+import com.example.extra.global.entity.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,7 +27,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "TB_SCHEDULE")
 @Entity
-public class Schedule {
+public class Schedule extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
