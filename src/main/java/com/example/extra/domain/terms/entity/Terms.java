@@ -29,7 +29,6 @@ public class Terms extends BaseEntity {
 
     private Boolean optional;
 
-    // 양방향 매핑 필요 없어 보여서 반영 안함
     @Builder
     public Terms(
         String title,
