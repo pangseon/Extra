@@ -6,6 +6,7 @@ import com.example.extra.domain.attendancemanagement.entity.AttendanceManagement
 import com.example.extra.domain.costumeapprovalboard.entity.CostumeApprovalBoard;
 import com.example.extra.domain.memberterms.entity.MemberTerms;
 import com.example.extra.domain.tattoo.entity.Tattoo;
+import com.example.extra.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,7 +28,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "TB_MEMBER")
 @Entity
-public class Member {
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
