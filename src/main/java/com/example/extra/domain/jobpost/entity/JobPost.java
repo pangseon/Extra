@@ -75,7 +75,8 @@ public class JobPost extends BaseEntity {
         final String imageUrl,
         final Boolean status,
         final Integer hourPay,
-        final Category category
+        final Category category,
+        final Company company
     ){
         this.dramaTitle = dramaTitle;
         this.gatheringLocation = gatheringLocation;
@@ -84,6 +85,7 @@ public class JobPost extends BaseEntity {
         this.status = status;
         this.hourPay = hourPay;
         this.category = category;
+        this.company = company;
 
     }
 
