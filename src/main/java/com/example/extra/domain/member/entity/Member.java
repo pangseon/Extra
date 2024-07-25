@@ -124,4 +124,8 @@ public class Member extends BaseEntity {
         this.pros = pros;
         this.tattoo = tattoo;
     }
+
+    public void updateTattoo(Tattoo tattoo) {
+        this.tattoo = tattoo;
+    }
 }
