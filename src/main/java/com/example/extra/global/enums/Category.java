@@ -1,5 +1,7 @@
 package com.example.extra.global.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public enum Category {
     ROMANCE,
     COMEDY,
@@ -20,5 +22,9 @@ public enum Category {
     SPORTS,
     LEGAL,
     MEDICAL,
-    POLITICAL
+    POLITICAL;
+    @JsonCreator
+    public static Category fromString(String inputValue) {
+        return EnumUtils.fromString(Category.class, inputValue);
+    }
 }
