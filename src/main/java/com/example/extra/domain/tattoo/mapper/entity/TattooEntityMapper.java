@@ -2,7 +2,8 @@ package com.example.extra.domain.tattoo.mapper.entity;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
-import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
+import com.example.extra.domain.member.entity.Member;
+import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import com.example.extra.domain.tattoo.entity.Tattoo;
 import org.mapstruct.Mapper;
 
@@ -10,6 +11,8 @@ import org.mapstruct.Mapper;
 public interface TattooEntityMapper {
 
     Tattoo toTattoo(
-        MemberCreateServiceRequestDto memberCreateServiceRequestDto);
+        TattooCreateServiceRequestDto tattooCreateServiceRequestDto,
+        Member member
+    );
 
 }
