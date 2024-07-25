@@ -7,6 +7,7 @@ import com.example.extra.domain.costumeapprovalboard.entity.CostumeApprovalBoard
 import com.example.extra.domain.memberterms.entity.MemberTerms;
 import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.global.entity.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -70,7 +71,12 @@ public class Member extends BaseEntity {
     @Column
     private String pros;
 
-    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
+    @OneToOne(
+        mappedBy = "member",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    @ToString.Exclude
     private Tattoo tattoo;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)

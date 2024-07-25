@@ -50,7 +50,7 @@ public class Tattoo extends BaseEntity {
 
     private String etc;
 
-    @OneToOne(optional = false)
+    @OneToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
