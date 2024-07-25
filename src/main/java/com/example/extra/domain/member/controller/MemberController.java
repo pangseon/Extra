@@ -27,8 +27,8 @@ public class MemberController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(
-        @Valid @RequestPart(name = "memberCreateControllerRequestDto") MemberCreateControllerRequestDto memberCreateControllerRequestDto,
-        @Valid @RequestPart(name = "tattooCreateControllerRequestDto") TattooCreateControllerRequestDto tattooCreateControllerRequestDto
+        @Valid @RequestPart(value = "memberCreateControllerRequestDto") MemberCreateControllerRequestDto memberCreateControllerRequestDto,
+        @Valid @RequestPart(value = "tattooCreateControllerRequestDto") TattooCreateControllerRequestDto tattooCreateControllerRequestDto
     ) {
         MemberCreateServiceRequestDto memberCreateServiceRequestDto
             = memberDtoMapper.toMemberCreateServiceRequestDto(memberCreateControllerRequestDto);
