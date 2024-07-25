@@ -47,7 +47,7 @@ public class Member extends BaseEntity {
     private Boolean sex;
 
     @Column
-    private LocalDate birthDay;
+    private LocalDate birthday;
 
     @Column
     private String home;
@@ -94,7 +94,7 @@ public class Member extends BaseEntity {
         String password,
         String name,
         Boolean sex,
-        LocalDate birthDay,
+        LocalDate birthday,
         String home,
         Float height,
         Float weight,
@@ -108,7 +108,7 @@ public class Member extends BaseEntity {
         this.password = password;
         this.name = name;
         this.sex = sex;
-        this.birthDay = birthDay;
+        this.birthday = birthday;
         this.home = home;
         this.height = height;
         this.weight = weight;
