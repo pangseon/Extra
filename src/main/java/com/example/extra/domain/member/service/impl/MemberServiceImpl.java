@@ -9,14 +9,18 @@ import com.example.extra.domain.member.service.MemberService;
 import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.domain.tattoo.mapper.entity.TattooEntityMapper;
+import com.example.extra.domain.tattoo.repository.TattooRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+    private final TattooRepository tattooRepository;
     private final MemberEntityMapper memberEntityMapper;
     private final TattooEntityMapper tattooEntityMapper;
 
@@ -25,11 +29,19 @@ public class MemberServiceImpl implements MemberService {
         final MemberCreateServiceRequestDto memberCreateServiceRequestDto,
         final TattooCreateServiceRequestDto tattooCreateServiceRequestDto
     ) {
-        Tattoo tattoo = tattooEntityMapper.toTattoo(memberCreateServiceRequestDto);
-        Member member = memberEntityMapper.toMember(memberCreateServiceRequestDto, tattoo);
 
-        Member signupMember = memberRepository.save(member);
+        Member member = memberEntityMapper.toMember(memberCreateServiceRequestDto);
+        Tattoo tattoo = tattooEntityMapper.toTattoo(tattooCreateServiceRequestDto, member);
 
-        return memberEntityMapper.toMemberCreateServiceResponseDto(signupMember);
+        tattooRepository.save(tattoo);
+        member.updateTattoo(tattoo);
+        memberRepository.save(member);
+
+        MemberCreateServiceResponseDto memberCreateServiceResponseDto
+            = new MemberCreateServiceResponseDto(
+            memberRepository.findById(member.getId()).get().getId()
+        );
+
+        return memberCreateServiceResponseDto;
     }
 }
