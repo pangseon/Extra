@@ -1,6 +1,7 @@
 package com.example.extra.domain.member.service.impl;
 
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
+import com.example.extra.domain.member.dto.service.request.MemberLoginServiceRequestDto;
 import com.example.extra.domain.member.dto.service.response.MemberCreateServiceResponseDto;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.exception.MemberErrorCode;
@@ -71,7 +72,21 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public void login(
+        HttpServletResponse res,
+        MemberLoginServiceRequestDto memberLoginServiceRequestDto
+    ) {
+        Member member = memberRepository.findByEmail(memberLoginServiceRequestDto.email())
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
-    }
+
+        if (!passwordEncoder.matches(
+            memberLoginServiceRequestDto.password(),
+            member.getPassword()
+        )) {
+            throw new IllegalArgumentException("비밀번호 불일치");
+        }
+
+        String token = jwtUtil.createToken(member.getUsername(), member.getUserRole());
+        jwtUtil.addJwtCookie(token, res);
     }
 }
