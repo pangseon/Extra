@@ -1,0 +1,47 @@
+package com.example.extra.domain.member.service.impl;
+
+import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
+import com.example.extra.domain.member.dto.service.response.MemberCreateServiceResponseDto;
+import com.example.extra.domain.member.entity.Member;
+import com.example.extra.domain.member.mapper.entity.MemberEntityMapper;
+import com.example.extra.domain.member.repository.MemberRepository;
+import com.example.extra.domain.member.service.MemberService;
+import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
+import com.example.extra.domain.tattoo.entity.Tattoo;
+import com.example.extra.domain.tattoo.mapper.entity.TattooEntityMapper;
+import com.example.extra.domain.tattoo.repository.TattooRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@RequiredArgsConstructor
+@Service
+@Transactional
+public class MemberServiceImpl implements MemberService {
+
+    private final MemberRepository memberRepository;
+    private final TattooRepository tattooRepository;
+    private final MemberEntityMapper memberEntityMapper;
+    private final TattooEntityMapper tattooEntityMapper;
+
+    @Override
+    public MemberCreateServiceResponseDto signup(
+        final MemberCreateServiceRequestDto memberCreateServiceRequestDto,
+        final TattooCreateServiceRequestDto tattooCreateServiceRequestDto
+    ) {
+
+        Member member = memberEntityMapper.toMember(memberCreateServiceRequestDto);
+        Tattoo tattoo = tattooEntityMapper.toTattoo(tattooCreateServiceRequestDto, member);
+
+        tattooRepository.save(tattoo);
+        member.updateTattoo(tattoo);
+        memberRepository.save(member);
+
+        MemberCreateServiceResponseDto memberCreateServiceResponseDto
+            = new MemberCreateServiceResponseDto(
+            memberRepository.findById(member.getId()).get().getId()
+        );
+
+        return memberCreateServiceResponseDto;
+    }
+}

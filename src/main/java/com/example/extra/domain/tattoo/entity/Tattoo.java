@@ -1,7 +1,7 @@
 package com.example.extra.domain.tattoo.entity;
 
 import com.example.extra.domain.member.entity.Member;
-import com.example.extra.global.common.BaseEntity;
+import com.example.extra.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,12 +14,15 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "TB_TATTOO")
 @Entity
+@ToString
 public class Tattoo extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -50,7 +53,7 @@ public class Tattoo extends BaseEntity {
 
     private String etc;
 
-    @OneToOne(optional = false)
+    @OneToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
@@ -66,7 +69,7 @@ public class Tattoo extends BaseEntity {
         Boolean feet,
         String etc,
         Member member
-    ){
+    ) {
         this.face = face;
         this.chest = chest;
         this.arm = arm;
