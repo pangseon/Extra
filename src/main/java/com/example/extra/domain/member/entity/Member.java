@@ -37,31 +37,34 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(
+        nullable = false,
+        unique = true
+    )
     private String email;
 
-    @Column
+    @Column(nullable = false)
     private String password;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = false)
     private Boolean sex;
 
-    @Column
+    @Column(nullable = false)
     private LocalDate birthday;
 
-    @Column
+    @Column(nullable = false)
     private String home;
 
-    @Column
+    @Column(nullable = false)
     private Float height;
 
-    @Column
+    @Column(nullable = false)
     private Float weight;
 
-    @Column
+    @Column(nullable = false)
     private String phone;
 
     @Column
