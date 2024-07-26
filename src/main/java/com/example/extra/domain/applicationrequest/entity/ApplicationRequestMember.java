@@ -30,4 +30,7 @@ public class ApplicationRequestMember extends ApplicationRequest{
         this.member = member;
         this.role = role;
     }
+    public void updateStatusTo(ApplyStatus applyStatus){
+        this.applyStatus = applyStatus;
+    }
 }
