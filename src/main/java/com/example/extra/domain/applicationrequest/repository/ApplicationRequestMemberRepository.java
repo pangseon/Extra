@@ -20,4 +20,10 @@ public interface ApplicationRequestMemberRepository extends JpaRepository<Applic
         ApplyStatus applyStatus,
         Pageable page
     );
+
+    Slice<ApplicationRequestMember> findAllByRoleId(
+        Long roleId,
+        Pageable page
+    );
+
 }
