@@ -141,4 +141,8 @@ public class Member extends BaseEntity {
     public void updateTattoo(Tattoo tattoo) {
         this.tattoo = tattoo;
     }
+
+    public void encodePassword(String password) {
+        this.password = password;
+    }
 }
