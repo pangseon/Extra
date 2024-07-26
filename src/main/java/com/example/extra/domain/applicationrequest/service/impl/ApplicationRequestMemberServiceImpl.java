@@ -60,14 +60,10 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
     @Override
     @Transactional(readOnly = true)
     public List<ApplicationRequestMemberReadServiceResponseDto> getAppliedRoles(Pageable pageable) {
-        // TODO - token 통해 id 얻기
-        Member member = memberRepository.findById(1L).orElseThrow(
-            // TODO - member의 NOT EXIST exception 으로 변경
-            ()-> new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST)
-        );
+        Long memberId = 1L;
         Slice<ApplicationRequestMember> applicationRequestMemberSlice =
-            applicationRequestMemberRepository.findAllByMember(
-                member,
+            applicationRequestMemberRepository.findAllByMemberId(
+                memberId,
                 pageable
             );
 
@@ -85,14 +81,10 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
         final ApplyStatus applyStatus,
         Pageable pageable
     ) {
-        // TODO - token 통해 id 얻기
-        Member member = memberRepository.findById(1L).orElseThrow(
-            // TODO - member의 NOT EXIST exception 으로 변경
-            ()-> new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST)
-        );
+        Long memberId = 1L;
         Slice<ApplicationRequestMember> applicationRequestMemberSlice =
-            applicationRequestMemberRepository.findAllByMemberAndApplyStatus(
-                member,
+            applicationRequestMemberRepository.findAllByMemberIdAndApplyStatus(
+                memberId,
                 applyStatus,
                 pageable
             );
@@ -105,19 +97,15 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
     // 출연자가 지원 요청을 취소할 때
     @Override
     public void deleteApplicationRequestMember(Long roleId) {
-        // TODO - token 통해 id 얻기
-        Member member = memberRepository.findById(1L).orElseThrow(
-            // TODO - member의 NOT EXIST exception 으로 변경
-            ()-> new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST)
-        );
         Role role = roleRepository.findById(roleId).orElseThrow(
             // TODO - role의 NOT EXIST exception 으로 변경
             ()-> new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST)
         );
+        Long memberId = 1L;
         Optional<ApplicationRequestMember> applicationRequestMember =
-            applicationRequestMemberRepository.findByMemberAndRole(
-                member,
-                role
+            applicationRequestMemberRepository.findByMemberIdAndRoleId(
+                memberId,
+                roleId
             );
         // 지우려 했는데 없으면 예외 발생.
         applicationRequestMember.orElseThrow(
@@ -153,24 +141,30 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
     }
 
     @Override
+    public List<ApplicationRequestCompanyReadServiceResponseDto> getApprovedMembersByRole(
+        final long roleId, final Pageable pageable) {
+        Slice<ApplicationRequestMember> applicationRequestMemberSlice =
+            applicationRequestMemberRepository.findAllByRoleIdAndApplyStatus(
+                roleId,
+                ApplyStatus.APPROVED,
+                pageable
+            );
+        List<Member> memberList = applicationRequestMemberSlice.stream()
+            .map(ApplicationRequestMember::getMember)
+            .toList();
+        return applicationRequestDtoMapper.toApplicationRequestCompanyReadServiceResponseDtoList(memberList);
+    }
+
+    @Override
     public void updateStatus(
         final Long roleId,
         final Long memberId,
         final ApplyStatus applyStatus
     ) {
-        Role role = roleRepository.findById(roleId).orElseThrow(
-            // TODO - role의 NOT EXIST exception 으로 변경
-            ()-> new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST)
-        );
-
-        Member member = memberRepository.findById(memberId).orElseThrow(
-            // TODO - member의 NOT EXIST exception 으로 변경
-            ()-> new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST)
-        );
         Optional<ApplicationRequestMember> applicationRequestMember =
-            applicationRequestMemberRepository.findByMemberAndRole(
-                member,
-                role
+            applicationRequestMemberRepository.findByMemberIdAndRoleId(
+                memberId,
+                roleId
             );
         // 지원 상태 업데이트 하려 했는데 없으면 예외 발생.
         applicationRequestMember.orElseThrow(
