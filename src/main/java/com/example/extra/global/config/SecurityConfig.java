@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -64,6 +65,10 @@ public class SecurityConfig {
                 .defaultSuccessUrl("/api/v1/members/")
                 .permitAll()
         );
+
+        httpSecurity.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
+        httpSecurity.addFilterBefore(jwtAuthenticationFilter(),
+            UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }
