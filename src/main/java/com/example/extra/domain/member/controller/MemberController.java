@@ -1,7 +1,9 @@
 package com.example.extra.domain.member.controller;
 
 import com.example.extra.domain.member.dto.controller.MemberCreateControllerRequestDto;
+import com.example.extra.domain.member.dto.controller.MemberLoginControllerRequestDto;
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
+import com.example.extra.domain.member.dto.service.request.MemberLoginServiceRequestDto;
 import com.example.extra.domain.member.mapper.dto.MemberDtoMapper;
 import com.example.extra.domain.member.service.MemberService;
 import com.example.extra.domain.tattoo.dto.controller.TattooCreateControllerRequestDto;
@@ -47,4 +49,19 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(
+        HttpServletResponse res,
+        @Valid @RequestBody MemberLoginControllerRequestDto memberLoginControllerRequestDto
+    ) {
+        MemberLoginServiceRequestDto memberLoginServiceRequestDto
+            = memberDtoMapper.toMemberLoginServiceRequestDto(memberLoginControllerRequestDto);
+
+        memberService.login(
+            res,
+            memberLoginServiceRequestDto
+        );
+        
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }
