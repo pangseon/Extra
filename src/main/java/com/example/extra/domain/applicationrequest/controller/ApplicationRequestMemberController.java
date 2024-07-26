@@ -45,9 +45,11 @@ public class ApplicationRequestMemberController {
 
     @GetMapping("/roles/{status}")
     public ResponseEntity<?> readAllApplicationRequestMemberByStatus(
-        @PathVariable(name = "status") ApplyStatus applyStatus,
+        @PathVariable(name = "status") String applyStatusString,
         @PageableDefault(size = 10, sort = "createdAt", direction = Direction.DESC) Pageable pageable
     ){
+        ApplyStatus applyStatus = ApplyStatus.fromString(applyStatusString);
+
         List<ApplicationRequestMemberReadServiceResponseDto> appliedRoleList =
             applicationRequestMemberService.getAppliedRolesByStatus(
                 applyStatus,

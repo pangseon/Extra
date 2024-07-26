@@ -8,9 +8,8 @@ public class EnumUtils {
         if (inputValue == null) {
             return null;
         }
-
         return Stream.of(enumClass.getEnumConstants())
-            .filter(e -> e.toString().equals(inputValue))
+            .filter(e -> e.toString().equalsIgnoreCase(inputValue))
             .findFirst()
             .orElse(null);
     }
