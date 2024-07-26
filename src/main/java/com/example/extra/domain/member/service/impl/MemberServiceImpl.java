@@ -12,6 +12,9 @@ import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRe
 import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.domain.tattoo.mapper.entity.TattooEntityMapper;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
+import com.example.extra.global.enums.UserRole;
+import com.example.extra.global.security.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,9 +30,13 @@ public class MemberServiceImpl implements MemberService {
     private final MemberEntityMapper memberEntityMapper;
     private final TattooEntityMapper tattooEntityMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+
+    private final String ADMIN_TOKEN = "admintoken";
 
     @Override
-    public MemberCreateServiceResponseDto signup(
+    public void signup(
+        HttpServletResponse res,
         final MemberCreateServiceRequestDto memberCreateServiceRequestDto,
         final TattooCreateServiceRequestDto tattooCreateServiceRequestDto
     ) {
@@ -46,6 +53,12 @@ public class MemberServiceImpl implements MemberService {
 
         member.updateTattoo(tattoo);
         member.encodePassword(passwordEncoder.encode(member.getPassword()));
+        if (memberCreateServiceRequestDto.isAdmin()) {
+            if (!ADMIN_TOKEN.equals(memberCreateServiceRequestDto.adminToken())) {
+                throw new IllegalArgumentException("관리자 암호 아님");
+            }
+            member.updateRole();
+        }
         memberRepository.save(member);
 
         MemberCreateServiceResponseDto memberCreateServiceResponseDto
@@ -53,7 +66,9 @@ public class MemberServiceImpl implements MemberService {
             memberRepository.findById(member.getId()).get().getId()
         );
 
-        return memberCreateServiceResponseDto;
+        String token = jwtUtil.createToken("Robbie", UserRole.ROLE_USER);
+        jwtUtil.addJwtCookie(token, res);
+    }
 
     @Override
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));

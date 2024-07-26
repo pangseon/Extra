@@ -14,6 +14,8 @@ public record MemberCreateServiceRequestDto(
     Float weight,
     String bank,
     String accountNumber,
+    Boolean isAdmin,
+    String adminToken
 
     /**
      * 약관 동의 내용 필요
