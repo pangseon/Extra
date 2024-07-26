@@ -68,6 +68,11 @@ public class Member extends BaseEntity {
     @Column
     private String pros;
 
+    @Column
+    private String bank;
+
+    @Column
+    private String accountNumber;
 
     // 계정 권한 설정
     // 공고글의 Role과 이름이 겹칠 것 같아 다른 네이밍 생각 필요 ex) authority | auth
@@ -111,7 +116,9 @@ public class Member extends BaseEntity {
         String introduction,
         String license,
         String pros,
-        Tattoo tattoo
+        Tattoo tattoo,
+        String bank,
+        String accountNumber
     ) {
         this.email = email;
         this.password = password;
@@ -126,6 +133,9 @@ public class Member extends BaseEntity {
         this.license = license;
         this.pros = pros;
         this.tattoo = tattoo;
+        this.bank = bank;
+        this.accountNumber = accountNumber;
+        this.userRole = UserRole.USER;
     }
 
     public void updateTattoo(Tattoo tattoo) {
