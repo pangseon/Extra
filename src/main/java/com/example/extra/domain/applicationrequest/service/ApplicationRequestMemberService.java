@@ -20,6 +20,11 @@ public interface ApplicationRequestMemberService {
         Pageable pageable
     );
 
+    List<ApplicationRequestCompanyReadServiceResponseDto> getApprovedMembersByRole(
+        final long roleId,
+        Pageable pageable
+    );
+
     void updateStatus(
         Long roleId,
         Long memberId,
