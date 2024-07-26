@@ -13,8 +13,6 @@ import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.domain.tattoo.mapper.entity.TattooEntityMapper;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class MemberServiceImpl implements MemberService, UserDetailsService {
+public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final TattooRepository tattooRepository;
@@ -58,8 +56,6 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         return memberCreateServiceResponseDto;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return memberRepository.findByEmail(username)
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
     }
     }
