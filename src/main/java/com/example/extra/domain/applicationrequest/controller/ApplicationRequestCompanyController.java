@@ -21,6 +21,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ApplicationRequestCompanyController {
     private final ApplicationRequestMemberService applicationRequestMemberService;
+    // 해당 역할에 출연 확정된 출연자들
+    @GetMapping("/{roleId}/approved-members")
+    public ResponseEntity<?> readAllApplicationRequestMemberByApprovedStatus(
+        @PathVariable(name = "roleId") Long roleId,
+        @PageableDefault(size = 10, sort = "createdAt", direction = Direction.ASC) Pageable pageable
+    ){
+        List<ApplicationRequestCompanyReadServiceResponseDto> approvedMemberList =
+            applicationRequestMemberService.getApprovedMembersByRole(
+                roleId,
+                pageable
+            );
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(approvedMemberList);
+    }
     // 해당 역할에 지원한 출연자들
     @GetMapping("/{roleId}/members")
     public ResponseEntity<?> readAllApplicationRequestMemberByStatus(
@@ -41,8 +55,11 @@ public class ApplicationRequestCompanyController {
         @PathVariable(name = "roleId") Long roleId,
         @PathVariable(name = "memberId") Long memberId,
         @PathVariable(name = "status") String applyStatusString
-    ){
+    ) {
         ApplyStatus applyStatus = ApplyStatus.fromString(applyStatusString);
+        if (applyStatus == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
         applicationRequestMemberService.updateStatus(
             roleId,
             memberId,

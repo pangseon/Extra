@@ -49,7 +49,9 @@ public class ApplicationRequestMemberController {
         @PageableDefault(size = 10, sort = "createdAt", direction = Direction.DESC) Pageable pageable
     ){
         ApplyStatus applyStatus = ApplyStatus.fromString(applyStatusString);
-
+        if (applyStatus == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
         List<ApplicationRequestMemberReadServiceResponseDto> appliedRoleList =
             applicationRequestMemberService.getAppliedRolesByStatus(
                 applyStatus,
