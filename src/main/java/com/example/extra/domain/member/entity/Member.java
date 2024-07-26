@@ -6,6 +6,8 @@ import com.example.extra.global.enums.UserRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -83,6 +85,7 @@ public class Member extends BaseEntity implements UserDetails {
     // 계정 권한 설정
     // 공고글의 Role과 이름이 겹칠 것 같아 다른 네이밍 생각 필요 ex) authority | auth
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
     @OneToOne(
@@ -141,11 +144,15 @@ public class Member extends BaseEntity implements UserDetails {
         this.tattoo = tattoo;
         this.bank = bank;
         this.accountNumber = accountNumber;
-        this.userRole = UserRole.USER;
+        this.userRole = UserRole.ROLE_USER;
     }
 
     public void updateTattoo(Tattoo tattoo) {
         this.tattoo = tattoo;
+    }
+
+    public void updateRole() {
+        this.userRole = UserRole.ROLE_ADMIN;
     }
 
     public void encodePassword(String password) {
