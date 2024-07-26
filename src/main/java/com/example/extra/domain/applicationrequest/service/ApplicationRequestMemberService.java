@@ -1,5 +1,6 @@
 package com.example.extra.domain.applicationrequest.service;
 
+import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestCompanyReadServiceResponseDto;
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestMemberReadServiceResponseDto;
 import com.example.extra.global.enums.ApplyStatus;
 import java.util.List;
@@ -12,6 +13,17 @@ public interface ApplicationRequestMemberService {
     List<ApplicationRequestMemberReadServiceResponseDto> getAppliedRolesByStatus(
         final ApplyStatus applyStatus,
         Pageable pageable
+    );
+
+    List<ApplicationRequestCompanyReadServiceResponseDto> getAppliedMembersByRole(
+        final long roleId,
+        Pageable pageable
+    );
+
+    void updateStatus(
+        Long roleId,
+        Long memberId,
+        ApplyStatus applyStatus
     );
 
     void deleteApplicationRequestMember(Long roleId);
