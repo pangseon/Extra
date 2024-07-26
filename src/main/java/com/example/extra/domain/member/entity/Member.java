@@ -68,6 +68,12 @@ public class Member extends BaseEntity {
     @Column
     private String pros;
 
+
+    // 계정 권한 설정
+    // 공고글의 Role과 이름이 겹칠 것 같아 다른 네이밍 생각 필요 ex) authority | auth
+    @Column(nullable = false)
+    private UserRole userRole;
+
     @OneToOne(
         mappedBy = "member",
         cascade = CascadeType.ALL,
