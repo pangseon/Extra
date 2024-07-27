@@ -31,7 +31,6 @@ public class MemberController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(
-        HttpServletResponse res,
         @Valid @RequestPart(value = "memberCreateControllerRequestDto") MemberCreateControllerRequestDto memberCreateControllerRequestDto,
         @Valid @RequestPart(value = "tattooCreateControllerRequestDto") TattooCreateControllerRequestDto tattooCreateControllerRequestDto
     ) {
@@ -41,7 +40,6 @@ public class MemberController {
             = tattooDtoMapper.toTattooCreateServiceRequestDto(tattooCreateControllerRequestDto);
 
         memberService.signup(
-            res,
             memberCreateServiceRequestDto,
             tattooCreateServiceRequestDto
         );

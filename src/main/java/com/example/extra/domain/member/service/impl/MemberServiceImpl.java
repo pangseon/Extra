@@ -2,7 +2,6 @@ package com.example.extra.domain.member.service.impl;
 
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
 import com.example.extra.domain.member.dto.service.request.MemberLoginServiceRequestDto;
-import com.example.extra.domain.member.dto.service.response.MemberCreateServiceResponseDto;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.exception.MemberErrorCode;
 import com.example.extra.domain.member.exception.MemberException;
@@ -37,7 +36,6 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public void signup(
-        HttpServletResponse res,
         final MemberCreateServiceRequestDto memberCreateServiceRequestDto,
         final TattooCreateServiceRequestDto tattooCreateServiceRequestDto
     ) {
@@ -61,14 +59,9 @@ public class MemberServiceImpl implements MemberService {
             member.updateRole();
         }
         memberRepository.save(member);
+    }
 
-        MemberCreateServiceResponseDto memberCreateServiceResponseDto
-            = new MemberCreateServiceResponseDto(
-            memberRepository.findById(member.getId()).get().getId()
-        );
 
-        String token = jwtUtil.createToken("Robbie", UserRole.ROLE_USER);
-        jwtUtil.addJwtCookie(token, res);
     }
 
     @Override

@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 public interface MemberService {
 
     void signup(
-        HttpServletResponse res,
         final MemberCreateServiceRequestDto memberCreateServiceRequestDto,
         final TattooCreateServiceRequestDto tattooCreateServiceRequestDto
     );
