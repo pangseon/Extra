@@ -21,7 +21,6 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Arrays;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -57,20 +56,18 @@ public class JwtUtil {
     public String getJwtTokenFromRequest(HttpServletRequest httpServletRequest)
         throws IOException, ServletException {
         Cookie[] cookies = httpServletRequest.getCookies();
-        if (cookies == null) {
-            return null;
-        }
-
-        return Arrays.stream(cookies)
-            .filter(cookie -> cookie.getName().equals(AUTHORIZATION_HEADER))
-            .findFirst()
-            .map(cookie -> {
-                try {
-                    return URLDecoder.decode(cookie.getValue(), "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    return null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
+                    try {
+                        return URLDecoder.decode(cookie.getValue(), "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        return null;
+                    }
                 }
-            }).orElse(null);
+            }
+        }
+        return null;
     }
 
     public String getUserName(String token) {
