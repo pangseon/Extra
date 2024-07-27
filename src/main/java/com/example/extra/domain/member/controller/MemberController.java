@@ -12,9 +12,9 @@ import com.example.extra.domain.tattoo.dto.controller.TattooCreateControllerRequ
 import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import com.example.extra.domain.tattoo.mapper.dto.TattooDtoMapper;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,11 +65,17 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(memberLoginServiceResponseDto);
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<MemberReadServiceResponseDto> getUserInfo(
+        Principal principal,
         @NotNull HttpServletRequest request
     ) {
-        MemberReadServiceResponseDto memberInfo = memberService.getMemberInfo(request);
+        MemberReadServiceResponseDto memberInfo =
+            memberService.getMemberInfo(
+                principal,
+                request
+            );
+
         return ResponseEntity.status(HttpStatus.OK).body(memberInfo);
     }
 

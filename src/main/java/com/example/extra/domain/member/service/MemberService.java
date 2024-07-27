@@ -6,7 +6,7 @@ import com.example.extra.domain.member.dto.service.response.MemberLoginServiceRe
 import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.security.Principal;
 
 public interface MemberService {
 
@@ -19,5 +19,8 @@ public interface MemberService {
         final MemberLoginServiceRequestDto memberLoginServiceRequestDto
     );
 
-    MemberReadServiceResponseDto getMemberInfo(final HttpServletRequest request);
+    MemberReadServiceResponseDto getMemberInfo(
+        final Principal principal,
+        final HttpServletRequest request
+    );
 }

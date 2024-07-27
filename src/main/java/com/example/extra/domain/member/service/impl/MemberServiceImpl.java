@@ -16,6 +16,7 @@ import com.example.extra.domain.tattoo.mapper.entity.TattooEntityMapper;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
 import com.example.extra.global.security.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -91,5 +92,14 @@ public class MemberServiceImpl implements MemberService {
         String token = jwtUtil.createToken(member.getUsername(), member.getUserRole());
         log.info("jwt 토큰: " + token);
         return new MemberLoginServiceResponseDto(token);
+    }
+
+    @Override
+    public MemberReadServiceResponseDto getMemberInfo(
+        final Principal principal,
+        final HttpServletRequest request
+    ) {
+        Member member = findByEmail(principal.getName());
+        return memberEntityMapper.toMemberReadServiceResponseDto(member);
     }
 }
