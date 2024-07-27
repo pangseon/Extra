@@ -162,7 +162,12 @@ public class Member extends BaseEntity implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorityList = new ArrayList<>();
-        authorityList.add(new SimpleGrantedAuthority(this.getUserRole().toString()));
+        authorityList.add(
+            new SimpleGrantedAuthority(
+                this.getUserRole().getRole()
+            )
+        );
+
         return authorityList;
     }
 

@@ -66,21 +66,10 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MemberReadServiceResponseDto getMemberInfo(final HttpServletRequest request) {
-        Member member = (Member) request.getAttribute("user");
-        return memberEntityMapper.toMemberReadServiceResponseDto(member);
-    }
-
-    private Member getMemberForTest() {
-        return memberRepository.findById(1L)
-            .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
-    }
-
     public MemberLoginServiceResponseDto login(
         final MemberLoginServiceRequestDto memberLoginServiceRequestDto
     ) {
-        Member member = memberRepository.findByEmail(memberLoginServiceRequestDto.email())
-            .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
+        Member member = findByEmail(memberLoginServiceRequestDto.email());
 
         if (!passwordEncoder.matches(
             memberLoginServiceRequestDto.password(),
@@ -101,5 +90,15 @@ public class MemberServiceImpl implements MemberService {
     ) {
         Member member = findByEmail(principal.getName());
         return memberEntityMapper.toMemberReadServiceResponseDto(member);
+    }
+
+    private Member findByEmail(String name) {
+        return memberRepository.findByEmail(name)
+            .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
+    }
+
+    private Member getMemberForTest() {
+        return memberRepository.findById(1L)
+            .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
     }
 }
