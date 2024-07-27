@@ -1,8 +1,11 @@
 package com.example.extra.domain.applicationrequest.controller;
 
+import com.example.extra.domain.applicationrequest.dto.controller.ApplicationRequestMemberUpdateControllerRequestDto;
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestCompanyReadServiceResponseDto;
+import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestMemberUpdateServiceRequestDto;
+import com.example.extra.domain.applicationrequest.mapper.dto.ApplicationRequestDtoMapper;
 import com.example.extra.domain.applicationrequest.service.ApplicationRequestMemberService;
-import com.example.extra.global.enums.ApplyStatus;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ApplicationRequestCompanyController {
     private final ApplicationRequestMemberService applicationRequestMemberService;
+    private final ApplicationRequestDtoMapper applicationRequestDtoMapper;
     // 해당 역할에 출연 확정된 출연자들
     @GetMapping("/{roleId}/approved-members")
     public ResponseEntity<?> readAllApplicationRequestMemberByApprovedStatus(
@@ -50,20 +55,22 @@ public class ApplicationRequestCompanyController {
             .body(appliedMemberList);
     }
     // 요청 승인 및 거절
-    @PutMapping("{roleId}/{memberId}/{status}")
+    @PutMapping("{roleId}/{memberId}")
     public ResponseEntity<?> updateApplicationRequestMemberStatusToRejected(
         @PathVariable(name = "roleId") Long roleId,
         @PathVariable(name = "memberId") Long memberId,
-        @PathVariable(name = "status") String applyStatusString
+        @Valid @RequestPart(name = "applicationRequestMemberUpdateControllerRequestDto")
+        ApplicationRequestMemberUpdateControllerRequestDto applicationRequestMemberUpdateControllerRequestDto
     ) {
-        ApplyStatus applyStatus = ApplyStatus.fromString(applyStatusString);
-        if (applyStatus == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto =
+            applicationRequestDtoMapper.toApplicationRequestMemberUpdateServiceRequestDto(
+                applicationRequestMemberUpdateControllerRequestDto
+            );
         applicationRequestMemberService.updateStatus(
             roleId,
             memberId,
-            applyStatus
+            applicationRequestMemberUpdateServiceRequestDto
+            // applicationRequestMemberUpdateControllerRequestDto.applyStatus() 로 안한 이유 : sample 코드 규격 따르기 위함
         );
         return ResponseEntity.status(HttpStatus.OK).build();
     }

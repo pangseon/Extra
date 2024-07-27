@@ -2,16 +2,17 @@ package com.example.extra.domain.applicationrequest.service.impl;
 
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestCompanyReadServiceResponseDto;
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestMemberReadServiceResponseDto;
+import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestMemberUpdateServiceRequestDto;
 import com.example.extra.domain.applicationrequest.entity.ApplicationRequestMember;
 import com.example.extra.domain.applicationrequest.exception.ApplicationRequestErrorCode;
 import com.example.extra.domain.applicationrequest.exception.NotAbleToCancelApplicationRequestMemberException;
 import com.example.extra.domain.applicationrequest.exception.NotFoundApplicationRequestCompanyException;
 import com.example.extra.domain.applicationrequest.exception.NotFoundApplicationRequestMemberException;
-import com.example.extra.domain.applicationrequest.mapper.entity.ApplicationRequestDtoMapper;
+import com.example.extra.domain.applicationrequest.mapper.entity.ApplicationRequestEntityMapper;
 import com.example.extra.domain.applicationrequest.repository.ApplicationRequestMemberRepository;
 import com.example.extra.domain.applicationrequest.service.ApplicationRequestMemberService;
 import com.example.extra.domain.member.entity.Member;
-import com.example.extra.domain.member.entity.MemberRepository;
+import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.role.entity.Role;
 import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.global.enums.ApplyStatus;
@@ -32,7 +33,7 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
     private final ApplicationRequestMemberRepository applicationRequestMemberRepository;
     private final RoleRepository roleRepository;
     private final MemberRepository memberRepository;
-    private final ApplicationRequestDtoMapper applicationRequestDtoMapper;
+    private final ApplicationRequestEntityMapper applicationRequestEntityMapper;
 
     // 출연자가 특정 역할에 지원할 때
     @Override
@@ -71,7 +72,7 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
             .map(ApplicationRequestMember::getRole)
             .toList();
 
-        return applicationRequestDtoMapper.toApplicationRequestMemberReadServiceResponseDtoList(roleList);
+        return applicationRequestEntityMapper.toApplicationRequestMemberReadServiceResponseDtoList(roleList);
     }
 
     // 출연자가 특정 상태(지원중, 미승인, 승인)에 따라 본인이 지원한 역할들 보려 할 때
@@ -91,7 +92,7 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
         List<Role> roleList = applicationRequestMemberSlice.stream()
             .map(ApplicationRequestMember::getRole)
             .toList();
-        return applicationRequestDtoMapper.toApplicationRequestMemberReadServiceResponseDtoList(roleList);
+        return applicationRequestEntityMapper.toApplicationRequestMemberReadServiceResponseDtoList(roleList);
     }
 
     // 출연자가 지원 요청을 취소할 때
@@ -137,7 +138,7 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
         List<Member> memberList = applicationRequestMemberSlice.stream()
             .map(ApplicationRequestMember::getMember)
             .toList();
-        return applicationRequestDtoMapper.toApplicationRequestCompanyReadServiceResponseDtoList(memberList);
+        return applicationRequestEntityMapper.toApplicationRequestCompanyReadServiceResponseDtoList(memberList);
     }
 
     @Override
@@ -152,14 +153,14 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
         List<Member> memberList = applicationRequestMemberSlice.stream()
             .map(ApplicationRequestMember::getMember)
             .toList();
-        return applicationRequestDtoMapper.toApplicationRequestCompanyReadServiceResponseDtoList(memberList);
+        return applicationRequestEntityMapper.toApplicationRequestCompanyReadServiceResponseDtoList(memberList);
     }
 
     @Override
     public void updateStatus(
         final Long roleId,
         final Long memberId,
-        final ApplyStatus applyStatus
+        final ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
     ) {
         Optional<ApplicationRequestMember> applicationRequestMember =
             applicationRequestMemberRepository.findByMemberIdAndRoleId(
@@ -172,6 +173,7 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
                 ApplicationRequestErrorCode.NOT_FOUND_APPLICATION_REQUEST_COMPANY
             )
         );
-        applicationRequestMember.get().updateStatusTo(applyStatus);
+        applicationRequestMember.get()
+            .updateStatusTo(applicationRequestMemberUpdateServiceRequestDto.applyStatus());
     }
 }

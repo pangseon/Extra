@@ -2,6 +2,7 @@ package com.example.extra.domain.applicationrequest.service;
 
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestCompanyReadServiceResponseDto;
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestMemberReadServiceResponseDto;
+import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestMemberUpdateServiceRequestDto;
 import com.example.extra.global.enums.ApplyStatus;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +29,7 @@ public interface ApplicationRequestMemberService {
     void updateStatus(
         Long roleId,
         Long memberId,
-        ApplyStatus applyStatus
+        ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
     );
 
     void deleteApplicationRequestMember(Long roleId);
