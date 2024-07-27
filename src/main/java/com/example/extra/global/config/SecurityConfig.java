@@ -54,16 +54,9 @@ public class SecurityConfig {
 
         httpSecurity.authorizeHttpRequests((authorizeHttpRequests) ->
             authorizeHttpRequests
-                .requestMatchers("/api/v1/members/signup")
-                .permitAll()
+                .requestMatchers("/api/v1/members/signup").permitAll()
+                .requestMatchers("/api/v1/members/login").permitAll()
                 .anyRequest().authenticated()
-        );
-
-        httpSecurity.formLogin((formLogin) ->
-            formLogin
-                .loginProcessingUrl("/api/v1/members/login")
-                .defaultSuccessUrl("/api/v1/members/")
-                .permitAll()
         );
 
         httpSecurity.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
