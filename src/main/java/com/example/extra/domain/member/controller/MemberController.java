@@ -11,13 +11,14 @@ import com.example.extra.domain.member.service.MemberService;
 import com.example.extra.domain.tattoo.dto.controller.TattooCreateControllerRequestDto;
 import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import com.example.extra.domain.tattoo.mapper.dto.TattooDtoMapper;
+import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -67,12 +68,12 @@ public class MemberController {
 
     @GetMapping("")
     public ResponseEntity<MemberReadServiceResponseDto> getUserInfo(
-        Principal principal,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @NotNull HttpServletRequest request
     ) {
         MemberReadServiceResponseDto memberReadServiceResponseDto =
             memberService.getMemberInfo(
-                principal,
+                userDetails,
                 request
             );
 

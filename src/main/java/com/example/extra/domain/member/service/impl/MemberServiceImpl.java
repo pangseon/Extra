@@ -15,8 +15,8 @@ import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.domain.tattoo.mapper.entity.TattooEntityMapper;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
 import com.example.extra.global.security.JwtUtil;
+import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
-import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -85,11 +85,14 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberReadServiceResponseDto getMemberInfo(
-        final Principal principal,
+        final UserDetailsImpl userDetails,
         final HttpServletRequest request
     ) {
-        Member member = findByEmail(principal.getName());
-        return memberEntityMapper.toMemberReadServiceResponseDto(member);
+        Member member = findByEmail(userDetails.getUsername());
+        log.info(member.toString());
+        MemberReadServiceResponseDto memberReadServiceResponseDto =
+            memberEntityMapper.toMemberReadServiceResponseDto(member);
+        return memberReadServiceResponseDto;
     }
 
     private Member findByEmail(String name) {
