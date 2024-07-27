@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Authentication authResult
     ) throws IOException, ServletException {
         log.info("로그인 성공 & jwt 생성 완료");
-        String username = ((Member) authResult.getPrincipal()).getUsername();
+        String username = ((Member) authResult.getPrincipal()).getEmail();
         UserRole role = ((Member) authResult.getPrincipal()).getUserRole();
 
         String token = jwtUtil.createToken(username, role);

@@ -1,5 +1,6 @@
 package com.example.extra.global.security;
 
+import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.exception.MemberErrorCode;
 import com.example.extra.domain.member.exception.MemberException;
 import com.example.extra.domain.member.repository.MemberRepository;
@@ -20,7 +21,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("사용자 아이디 " + username);
-        return memberRepository.findByEmail(username)
+        Member member = memberRepository.findByEmail(username)
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
+        return new UserDetailsImpl(member);
     }
 }

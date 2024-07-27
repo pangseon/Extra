@@ -78,7 +78,7 @@ public class MemberServiceImpl implements MemberService {
             throw new MemberException(MemberErrorCode.NOT_MATCH_PASSWORD);
         }
 
-        String token = jwtUtil.createToken(member.getUsername(), member.getUserRole());
+        String token = jwtUtil.createToken(member.getEmail(), member.getUserRole());
         log.info("jwt 토큰: " + token);
         return new MemberLoginServiceResponseDto(token);
     }
