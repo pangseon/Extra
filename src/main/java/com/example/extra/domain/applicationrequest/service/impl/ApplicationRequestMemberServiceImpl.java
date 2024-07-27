@@ -125,6 +125,7 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
     }
 
     // 업체가 해당 역할에 지원한 출연자를 확인할 때
+    @Transactional(readOnly = true)
     @Override
     public List<ApplicationRequestCompanyReadServiceResponseDto> getAppliedMembersByRole(
         final long roleId,
@@ -140,7 +141,7 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
             .toList();
         return applicationRequestEntityMapper.toApplicationRequestCompanyReadServiceResponseDtoList(memberList);
     }
-
+    @Transactional(readOnly = true)
     @Override
     public List<ApplicationRequestCompanyReadServiceResponseDto> getApprovedMembersByRole(
         final long roleId, final Pageable pageable) {
