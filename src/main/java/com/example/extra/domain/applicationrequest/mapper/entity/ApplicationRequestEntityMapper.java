@@ -11,7 +11,7 @@ import org.mapstruct.MappingConstants.ComponentModel;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = ComponentModel.SPRING, unmappedSourcePolicy = ReportingPolicy.IGNORE)
-public interface ApplicationRequestDtoMapper {
+public interface ApplicationRequestEntityMapper {
     @Mapping(source = "id", target = "id")
     ApplicationRequestMemberReadServiceResponseDto toApplicationRequestMemberReadServiceResponseDto(Role role);
 
@@ -19,5 +19,5 @@ public interface ApplicationRequestDtoMapper {
 
     @Mapping(source = "id", target = "id")
     ApplicationRequestCompanyReadServiceResponseDto toApplicationRequestCompanyReadServiceResponseDto(Member member);
-    List<ApplicationRequestCompanyReadServiceResponseDto> toApplicationRequestCompanyReadServiceResponseDtoList(List<Member> member);
+    List<ApplicationRequestCompanyReadServiceResponseDto> toApplicationRequestCompanyReadServiceResponseDtoList(List<Member> memberList);
 }
