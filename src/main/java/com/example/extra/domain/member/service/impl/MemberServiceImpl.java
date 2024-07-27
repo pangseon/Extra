@@ -2,6 +2,7 @@ package com.example.extra.domain.member.service.impl;
 
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
 import com.example.extra.domain.member.dto.service.request.MemberLoginServiceRequestDto;
+import com.example.extra.domain.member.dto.service.response.MemberLoginServiceResponseDto;
 import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.exception.MemberErrorCode;
@@ -15,7 +16,6 @@ import com.example.extra.domain.tattoo.mapper.entity.TattooEntityMapper;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
 import com.example.extra.global.security.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -75,9 +75,7 @@ public class MemberServiceImpl implements MemberService {
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
     }
 
-    @Override
-    public void login(
-        HttpServletResponse res,
+    public MemberLoginServiceResponseDto login(
         final MemberLoginServiceRequestDto memberLoginServiceRequestDto
     ) {
         Member member = memberRepository.findByEmail(memberLoginServiceRequestDto.email())
@@ -92,6 +90,6 @@ public class MemberServiceImpl implements MemberService {
 
         String token = jwtUtil.createToken(member.getUsername(), member.getUserRole());
         log.info("jwt 토큰: " + token);
-        jwtUtil.addJwtCookie(token, res);
+        return new MemberLoginServiceResponseDto(token);
     }
 }
