@@ -12,10 +12,10 @@ import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRe
 import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.domain.tattoo.mapper.entity.TattooEntityMapper;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
-import com.example.extra.global.enums.UserRole;
 import com.example.extra.global.security.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 @Transactional
+@Slf4j
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
@@ -67,7 +68,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void login(
         HttpServletResponse res,
-        MemberLoginServiceRequestDto memberLoginServiceRequestDto
+        final MemberLoginServiceRequestDto memberLoginServiceRequestDto
     ) {
         Member member = memberRepository.findByEmail(memberLoginServiceRequestDto.email())
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
@@ -76,10 +77,11 @@ public class MemberServiceImpl implements MemberService {
             memberLoginServiceRequestDto.password(),
             member.getPassword()
         )) {
-            throw new IllegalArgumentException("비밀번호 불일치");
+            throw new MemberException(MemberErrorCode.NOT_MATCH_PASSWORD);
         }
 
         String token = jwtUtil.createToken(member.getUsername(), member.getUserRole());
+        log.info("jwt 토큰: " + token);
         jwtUtil.addJwtCookie(token, res);
     }
 }
