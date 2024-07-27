@@ -4,6 +4,7 @@ import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
 import com.example.extra.domain.member.dto.service.response.MemberCreateServiceResponseDto;
+import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.member.entity.Member;
 import org.mapstruct.Mapper;
 
@@ -15,6 +16,10 @@ public interface MemberEntityMapper {
     );
 
     MemberCreateServiceResponseDto toMemberCreateServiceResponseDto(
+        Member member
+    );
+
+    MemberReadServiceResponseDto toMemberReadServiceResponseDto(
         Member member
     );
 
