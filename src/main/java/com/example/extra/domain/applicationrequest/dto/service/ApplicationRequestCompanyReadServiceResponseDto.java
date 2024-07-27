@@ -6,7 +6,7 @@ public record ApplicationRequestCompanyReadServiceResponseDto(
     Long id,
     String name,
     Boolean sex,
-    LocalDate birthDay,
+    LocalDate birthday,
     String home,
     Float height,
     Float weight,
