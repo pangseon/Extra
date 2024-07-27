@@ -67,12 +67,12 @@ public class MemberController {
     }
 
     @GetMapping("")
-    public ResponseEntity<MemberReadServiceResponseDto> getUserInfo(
+    public ResponseEntity<MemberReadServiceResponseDto> readUser(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @NotNull HttpServletRequest request
     ) {
         MemberReadServiceResponseDto memberReadServiceResponseDto =
-            memberService.getMemberInfo(
+            memberService.readUser(
                 userDetails,
                 request
             );

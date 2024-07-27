@@ -43,6 +43,7 @@ public class MemberServiceImpl implements MemberService {
         final MemberCreateServiceRequestDto memberCreateServiceRequestDto,
         final TattooCreateServiceRequestDto tattooCreateServiceRequestDto
     ) {
+        // 이메일 중복 검사
         String email = memberCreateServiceRequestDto.email();
         memberRepository.findByEmail(email)
             .ifPresent(m -> {
@@ -56,12 +57,15 @@ public class MemberServiceImpl implements MemberService {
 
         member.updateTattoo(tattoo);
         member.encodePassword(passwordEncoder.encode(member.getPassword()));
+
+        // role 변경 (ROLE_USER -> ROLE_ADMIN)
         if (memberCreateServiceRequestDto.isAdmin()) {
             if (!ADMIN_TOKEN.equals(memberCreateServiceRequestDto.adminToken())) {
                 throw new IllegalArgumentException("관리자 암호 아님");
             }
             member.updateRole();
         }
+
         memberRepository.save(member);
     }
 
@@ -75,16 +79,17 @@ public class MemberServiceImpl implements MemberService {
             memberLoginServiceRequestDto.password(),
             member.getPassword()
         )) {
-            throw new MemberException(MemberErrorCode.NOT_MATCH_PASSWORD);
+            throw new MemberException(MemberErrorCode.INVALID_PASSWORD);
         }
 
+        // jwt 토큰 생성
         String token = jwtUtil.createToken(member.getEmail(), member.getUserRole());
         log.info("jwt 토큰: " + token);
         return new MemberLoginServiceResponseDto(token);
     }
 
     @Override
-    public MemberReadServiceResponseDto getMemberInfo(
+    public MemberReadServiceResponseDto readUser(
         final UserDetailsImpl userDetails,
         final HttpServletRequest request
     ) {
@@ -100,6 +105,7 @@ public class MemberServiceImpl implements MemberService {
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
     }
 
+    // 테스트용 유저 받아오기
     private Member getMemberForTest() {
         return memberRepository.findById(1L)
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));

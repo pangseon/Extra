@@ -54,8 +54,8 @@ public class SecurityConfig {
 
         httpSecurity.authorizeHttpRequests((authorizeHttpRequests) ->
             authorizeHttpRequests
-                .requestMatchers("/api/v1/members/signup").permitAll()
-                .requestMatchers("/api/v1/members/login").permitAll()
+                .requestMatchers("/api/v1/members/signup").permitAll()  // 회원 가입
+                .requestMatchers("/api/v1/members/login").permitAll()   // 로그인
                 .anyRequest().authenticated()
         );
 

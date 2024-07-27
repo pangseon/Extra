@@ -19,7 +19,7 @@ public interface MemberService {
         final MemberLoginServiceRequestDto memberLoginServiceRequestDto
     );
 
-    MemberReadServiceResponseDto getMemberInfo(
+    MemberReadServiceResponseDto readUser(
         final UserDetailsImpl userDetails,
         final HttpServletRequest request
     );
