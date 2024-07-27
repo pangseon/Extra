@@ -39,10 +39,10 @@ public class MemberController {
         @Valid @RequestPart(value = "memberCreateControllerRequestDto") MemberCreateControllerRequestDto memberCreateControllerRequestDto,
         @Valid @RequestPart(value = "tattooCreateControllerRequestDto") TattooCreateControllerRequestDto tattooCreateControllerRequestDto
     ) {
-        MemberCreateServiceRequestDto memberCreateServiceRequestDto
-            = memberDtoMapper.toMemberCreateServiceRequestDto(memberCreateControllerRequestDto);
-        TattooCreateServiceRequestDto tattooCreateServiceRequestDto
-            = tattooDtoMapper.toTattooCreateServiceRequestDto(tattooCreateControllerRequestDto);
+        MemberCreateServiceRequestDto memberCreateServiceRequestDto =
+            memberDtoMapper.toMemberCreateServiceRequestDto(memberCreateControllerRequestDto);
+        TattooCreateServiceRequestDto tattooCreateServiceRequestDto =
+            tattooDtoMapper.toTattooCreateServiceRequestDto(tattooCreateControllerRequestDto);
 
         memberService.signup(
             memberCreateServiceRequestDto,
@@ -56,11 +56,11 @@ public class MemberController {
     public ResponseEntity<?> login(
         @Valid @RequestBody MemberLoginControllerRequestDto memberLoginControllerRequestDto
     ) {
-        MemberLoginServiceRequestDto memberLoginServiceRequestDto
-            = memberDtoMapper.toMemberLoginServiceRequestDto(memberLoginControllerRequestDto);
+        MemberLoginServiceRequestDto memberLoginServiceRequestDto =
+            memberDtoMapper.toMemberLoginServiceRequestDto(memberLoginControllerRequestDto);
 
-        MemberLoginServiceResponseDto memberLoginServiceResponseDto
-            = memberService.login(memberLoginServiceRequestDto);
+        MemberLoginServiceResponseDto memberLoginServiceResponseDto =
+            memberService.login(memberLoginServiceRequestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(memberLoginServiceResponseDto);
     }
@@ -70,13 +70,12 @@ public class MemberController {
         Principal principal,
         @NotNull HttpServletRequest request
     ) {
-        MemberReadServiceResponseDto memberInfo =
+        MemberReadServiceResponseDto memberReadServiceResponseDto =
             memberService.getMemberInfo(
                 principal,
                 request
             );
 
-        return ResponseEntity.status(HttpStatus.OK).body(memberInfo);
+        return ResponseEntity.status(HttpStatus.OK).body(memberReadServiceResponseDto);
     }
-
 }

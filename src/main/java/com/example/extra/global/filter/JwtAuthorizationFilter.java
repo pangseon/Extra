@@ -16,12 +16,10 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j(topic = "JWT 인증 & 인가")
-@Component
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
@@ -38,21 +36,26 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
         String token = jwtUtil.getJwtTokenFromRequest(request);
-        if (StringUtils.hasText(token)) {
+        log.info("추출된 토큰: {}", token);
 
+        if (StringUtils.hasText(token)) {
             token = jwtUtil.substringToken(token);
-            log.info(token);
+            log.info("Token after Bearer removal: {}", token);
+
             if (!jwtUtil.validateToken(token)) {
-                log.error("Token Error");
+                log.error("Token validation failed");
                 return;
             }
+
             Claims info = jwtUtil.getUserInfoFromToken(token);
+            log.info("Claims from token: {}", info);
+
             try {
                 setAuthentication(info.getSubject());
+                log.info("Authentication set for user: {}", info.getSubject());
             } catch (Exception e) {
-                log.error(e.getMessage());
+                log.error("Error processing token: {}", e.getMessage());
                 return;
             }
         }
@@ -60,6 +63,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     public void setAuthentication(String username) {
+        log.info("Setting authentication for user: {}", username);
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         Authentication authentication = createAuthentication(username);
         context.setAuthentication(authentication);
@@ -67,13 +71,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private Authentication createAuthentication(String username) {
+        log.info("Loading user details for username: {}", username);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        log.info("User details loaded: {}", userDetails.getUsername());
         return new UsernamePasswordAuthenticationToken(
             userDetails,
             null,
             userDetails.getAuthorities()
         );
     }
-
-
 }

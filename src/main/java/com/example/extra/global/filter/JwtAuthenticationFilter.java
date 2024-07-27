@@ -16,10 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
 
 @Slf4j(topic = "로그인 & JWT 생성")
-@Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -61,8 +59,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         log.info("로그인 성공 & jwt 생성 완료");
         String username = ((Member) authResult.getPrincipal()).getEmail();
         UserRole role = ((Member) authResult.getPrincipal()).getUserRole();
-
-        String token = jwtUtil.createToken(username, role);
+        jwtUtil.createToken(username, role);
     }
 
     @Override
