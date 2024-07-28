@@ -83,6 +83,16 @@ public class JwtUtil {
         }
     }
 
+    public Boolean isExpired(String token) {
+        long expireTime = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token)
+            .getBody()
+            .getExpiration()
+            .getTime();
+        long now = new Date().getTime();
+
+        return ((expireTime - now) % 1000) + 1 >= 0;
+    }
+
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
