@@ -49,8 +49,8 @@ dependencies {
     implementation 'org.json:json:20240303'
 
     // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'com.auth0:java-jwt:4.4.0'
-    implementation 'org.springframework.data:spring-data-redis:3.3.2'
 }
 
 tasks.named('test') {
