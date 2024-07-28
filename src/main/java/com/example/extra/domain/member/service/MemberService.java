@@ -6,7 +6,9 @@ import com.example.extra.domain.member.dto.service.response.MemberLoginServiceRe
 import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import com.example.extra.global.security.UserDetailsImpl;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 public interface MemberService {
 
@@ -20,6 +22,11 @@ public interface MemberService {
     );
 
     MemberReadServiceResponseDto readUser(
+        final UserDetailsImpl userDetails,
+        final HttpServletRequest request
+    );
+
+    void deleteUser(
         final UserDetailsImpl userDetails,
         final HttpServletRequest request
     );

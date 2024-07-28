@@ -130,6 +130,16 @@ public class MemberServiceImpl implements MemberService {
         );
     }
 
+    @Override
+    @Transactional
+    public void deleteUser(
+        final UserDetailsImpl userDetails,
+        final HttpServletRequest request
+    ) {
+        Member member = findByEmail(userDetails.getUsername());
+        memberRepository.delete(member);
+    }
+
     private Member findByEmail(String name) {
         return memberRepository.findByEmail(name)
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
