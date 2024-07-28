@@ -96,8 +96,7 @@ public class MemberServiceImpl implements MemberService {
         refreshTokenRepository.save(
             new RefreshToken(
                 member.getId(),
-                refreshToken,
-                accessToken)
+                refreshToken)
         );
 
         return new MemberLoginServiceResponseDto(accessToken);
