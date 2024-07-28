@@ -18,7 +18,9 @@ import com.example.extra.global.security.JwtUtil;
 import com.example.extra.global.security.UserDetailsImpl;
 import com.example.extra.global.security.repository.RefreshTokenRepository;
 import com.example.extra.global.security.token.RefreshToken;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
-@Transactional
 @Slf4j
 public class MemberServiceImpl implements MemberService {
 
@@ -44,6 +45,7 @@ public class MemberServiceImpl implements MemberService {
     private final String ADMIN_TOKEN = "admintoken";
 
     @Override
+    @Transactional
     public void signup(
         final MemberCreateServiceRequestDto memberCreateServiceRequestDto,
         final TattooCreateServiceRequestDto tattooCreateServiceRequestDto
@@ -75,6 +77,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public MemberLoginServiceResponseDto login(
         final MemberLoginServiceRequestDto memberLoginServiceRequestDto
     ) {
