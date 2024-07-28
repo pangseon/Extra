@@ -8,29 +8,29 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 
 public interface ApplicationRequestMemberService {
-    void createApplicationRequestMember(Long roleId);
-    List<ApplicationRequestMemberReadServiceResponseDto> getAppliedRoles(Pageable pageable);
+    void createApplicationRequestMember(final Long roleId);
+    List<ApplicationRequestMemberReadServiceResponseDto> getAppliedRoles(final Pageable pageable);
 
     List<ApplicationRequestMemberReadServiceResponseDto> getAppliedRolesByStatus(
         final ApplyStatus applyStatus,
-        Pageable pageable
+        final Pageable pageable
     );
 
     List<ApplicationRequestCompanyReadServiceResponseDto> getAppliedMembersByRole(
         final long roleId,
-        Pageable pageable
+        final Pageable pageable
     );
 
     List<ApplicationRequestCompanyReadServiceResponseDto> getApprovedMembersByRole(
         final long roleId,
-        Pageable pageable
+        final Pageable pageable
     );
 
     void updateStatus(
-        Long roleId,
-        Long memberId,
-        ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
+        final Long roleId,
+        final Long memberId,
+        final ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
     );
 
-    void deleteApplicationRequestMember(Long roleId);
+    void deleteApplicationRequestMember(final Long roleId);
 }
