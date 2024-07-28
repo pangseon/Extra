@@ -35,18 +35,31 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
     private final MemberRepository memberRepository;
     private final ApplicationRequestEntityMapper applicationRequestEntityMapper;
 
-    // 출연자가 특정 역할에 지원할 때
-    @Override
-    public void createApplicationRequestMember(Long roleId) {
+    private Member getMember(){
         // TODO - token 통해 id 얻기
-        Member member = memberRepository.findById(1L).orElseThrow(
+        return memberRepository.findById(1L).orElseThrow(
             // TODO - member의 NOT EXIST exception 으로 변경
             ()-> new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST)
         );
-        Role role = roleRepository.findById(roleId).orElseThrow(
+    }
+    private Role getRoleById(final Long roleId){
+        return roleRepository.findById(roleId).orElseThrow(
             // TODO - role의 NOT EXIST exception 으로 변경
             ()-> new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST)
         );
+    }
+    private Member getMemberByIdForCompany(final Long memberId){
+        return memberRepository.findById(memberId).orElseThrow(
+            // TODO - member의 NOT EXIST exception 으로 변경
+            ()-> new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST)
+        );
+    }
+
+    // 출연자가 특정 역할에 지원할 때
+    @Override
+    public void createApplicationRequestMember(final Long roleId) {
+        Member member = getMember();
+        Role role = getRoleById(roleId);
         applicationRequestMemberRepository.save(
             ApplicationRequestMember.builder()
                 .applyStatus(ApplyStatus.APPLIED)
@@ -60,14 +73,13 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
     // 출연자가 본인이 지원한 역할들 확인할 때
     @Override
     @Transactional(readOnly = true)
-    public List<ApplicationRequestMemberReadServiceResponseDto> getAppliedRoles(Pageable pageable) {
-        Long memberId = 1L;
+    public List<ApplicationRequestMemberReadServiceResponseDto> getAppliedRoles(final Pageable pageable) {
+        Member member = getMember();
         Slice<ApplicationRequestMember> applicationRequestMemberSlice =
-            applicationRequestMemberRepository.findAllByMemberId(
-                memberId,
+            applicationRequestMemberRepository.findAllByMember(
+                member,
                 pageable
             );
-
         List<Role> roleList = applicationRequestMemberSlice.stream()
             .map(ApplicationRequestMember::getRole)
             .toList();
@@ -80,12 +92,12 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
     @Transactional(readOnly = true)
     public List<ApplicationRequestMemberReadServiceResponseDto> getAppliedRolesByStatus(
         final ApplyStatus applyStatus,
-        Pageable pageable
+        final Pageable pageable
     ) {
-        Long memberId = 1L;
+        Member member = getMember();
         Slice<ApplicationRequestMember> applicationRequestMemberSlice =
-            applicationRequestMemberRepository.findAllByMemberIdAndApplyStatus(
-                memberId,
+            applicationRequestMemberRepository.findAllByMemberAndApplyStatus(
+                member,
                 applyStatus,
                 pageable
             );
@@ -97,16 +109,13 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
 
     // 출연자가 지원 요청을 취소할 때
     @Override
-    public void deleteApplicationRequestMember(Long roleId) {
-        Role role = roleRepository.findById(roleId).orElseThrow(
-            // TODO - role의 NOT EXIST exception 으로 변경
-            ()-> new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST)
-        );
-        Long memberId = 1L;
+    public void deleteApplicationRequestMember(final Long roleId) {
+        Member member = getMember();
+        Role role = getRoleById(roleId);
         Optional<ApplicationRequestMember> applicationRequestMember =
-            applicationRequestMemberRepository.findByMemberIdAndRoleId(
-                memberId,
-                roleId
+            applicationRequestMemberRepository.findByMemberAndRole(
+                member,
+                role
             );
         // 지우려 했는데 없으면 예외 발생.
         applicationRequestMember.orElseThrow(
@@ -124,16 +133,17 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
         role.subtractOneToCurrentPersonnel();
     }
 
-    // 업체가 해당 역할에 지원한 출연자를 확인할 때
+    // 업체가 해당 역할에 지원한 출연자를 확인할 때(지원 상태와 무관)
     @Transactional(readOnly = true)
     @Override
     public List<ApplicationRequestCompanyReadServiceResponseDto> getAppliedMembersByRole(
         final long roleId,
         final Pageable pageable
     ) {
+        Role role = getRoleById(roleId);
         Slice<ApplicationRequestMember> applicationRequestMemberSlice =
-            applicationRequestMemberRepository.findAllByRoleId(
-                roleId,
+            applicationRequestMemberRepository.findAllByRole(
+                role,
                 pageable
             );
         List<Member> memberList = applicationRequestMemberSlice.stream()
@@ -141,13 +151,17 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
             .toList();
         return applicationRequestEntityMapper.toApplicationRequestCompanyReadServiceResponseDtoList(memberList);
     }
+    // 업체가 해당 역할에 출연 확정된 출연자를 확인할 때
     @Transactional(readOnly = true)
     @Override
     public List<ApplicationRequestCompanyReadServiceResponseDto> getApprovedMembersByRole(
-        final long roleId, final Pageable pageable) {
+        final long roleId,
+        final Pageable pageable
+    ) {
+        Role role = getRoleById(roleId);
         Slice<ApplicationRequestMember> applicationRequestMemberSlice =
-            applicationRequestMemberRepository.findAllByRoleIdAndApplyStatus(
-                roleId,
+            applicationRequestMemberRepository.findAllByRoleAndApplyStatus(
+                role,
                 ApplyStatus.APPROVED,
                 pageable
             );
@@ -156,17 +170,19 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
             .toList();
         return applicationRequestEntityMapper.toApplicationRequestCompanyReadServiceResponseDtoList(memberList);
     }
-
+    // 업체가 해당 역할에 지원한 출연자들에 대해 승인/거절할 때
     @Override
     public void updateStatus(
         final Long roleId,
         final Long memberId,
         final ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
     ) {
+        Role role = getRoleById(roleId);
+        Member member = getMemberByIdForCompany(memberId);
         Optional<ApplicationRequestMember> applicationRequestMember =
-            applicationRequestMemberRepository.findByMemberIdAndRoleId(
-                memberId,
-                roleId
+            applicationRequestMemberRepository.findByMemberAndRole(
+                member,
+                role
             );
         // 지원 상태 업데이트 하려 했는데 없으면 예외 발생.
         applicationRequestMember.orElseThrow(
