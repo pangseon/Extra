@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMemberService {
     private final ApplicationRequestMemberRepository applicationRequestMemberRepository;
@@ -48,15 +47,9 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
             ()-> new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST)
         );
     }
-    private Member getMemberByIdForCompany(final Long memberId){
-        return memberRepository.findById(memberId).orElseThrow(
-            // TODO - member의 NOT EXIST exception 으로 변경
-            ()-> new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST)
-        );
-    }
-
     // 출연자가 특정 역할에 지원할 때
     @Override
+    @Transactional
     public void createApplicationRequestMember(final Long roleId) {
         Member member = getMember();
         Role role = getRoleById(roleId);
@@ -80,11 +73,7 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
                 member,
                 pageable
             );
-        List<Role> roleList = applicationRequestMemberSlice.stream()
-            .map(ApplicationRequestMember::getRole)
-            .toList();
-
-        return applicationRequestEntityMapper.toApplicationRequestMemberReadServiceResponseDtoList(roleList);
+        return applicationRequestEntityMapper.toApplicationRequestMemberReadServiceResponseDtoList(applicationRequestMemberSlice);
     }
 
     // 출연자가 특정 상태(지원중, 미승인, 승인)에 따라 본인이 지원한 역할들 보려 할 때
@@ -101,21 +90,16 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
                 applyStatus,
                 pageable
             );
-        List<Role> roleList = applicationRequestMemberSlice.stream()
-            .map(ApplicationRequestMember::getRole)
-            .toList();
-        return applicationRequestEntityMapper.toApplicationRequestMemberReadServiceResponseDtoList(roleList);
+        return applicationRequestEntityMapper.toApplicationRequestMemberReadServiceResponseDtoList(applicationRequestMemberSlice);
     }
 
     // 출연자가 지원 요청을 취소할 때
     @Override
-    public void deleteApplicationRequestMember(final Long roleId) {
-        Member member = getMember();
-        Role role = getRoleById(roleId);
+    @Transactional
+    public void deleteApplicationRequestMember(final Long applicationRequestId) {
         Optional<ApplicationRequestMember> applicationRequestMember =
-            applicationRequestMemberRepository.findByMemberAndRole(
-                member,
-                role
+            applicationRequestMemberRepository.findById(
+                applicationRequestId
             );
         // 지우려 했는데 없으면 예외 발생.
         applicationRequestMember.orElseThrow(
@@ -129,13 +113,14 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
                 ApplicationRequestErrorCode.NOT_ABLE_TO_CANCEL_APPLICATION_REQUEST_MEMBER
             );
         }
+        Role role = applicationRequestMember.get().getRole();
         applicationRequestMemberRepository.delete(applicationRequestMember.get());
         role.subtractOneToCurrentPersonnel();
     }
 
     // 업체가 해당 역할에 지원한 출연자를 확인할 때(지원 상태와 무관)
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public List<ApplicationRequestCompanyReadServiceResponseDto> getAppliedMembersByRole(
         final long roleId,
         final Pageable pageable
@@ -146,14 +131,12 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
                 role,
                 pageable
             );
-        List<Member> memberList = applicationRequestMemberSlice.stream()
-            .map(ApplicationRequestMember::getMember)
-            .toList();
-        return applicationRequestEntityMapper.toApplicationRequestCompanyReadServiceResponseDtoList(memberList);
+        return applicationRequestEntityMapper.toApplicationRequestCompanyReadServiceResponseDtoList(applicationRequestMemberSlice);
     }
+
     // 업체가 해당 역할에 출연 확정된 출연자를 확인할 때
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public List<ApplicationRequestCompanyReadServiceResponseDto> getApprovedMembersByRole(
         final long roleId,
         final Pageable pageable
@@ -165,24 +148,19 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
                 ApplyStatus.APPROVED,
                 pageable
             );
-        List<Member> memberList = applicationRequestMemberSlice.stream()
-            .map(ApplicationRequestMember::getMember)
-            .toList();
-        return applicationRequestEntityMapper.toApplicationRequestCompanyReadServiceResponseDtoList(memberList);
+        return applicationRequestEntityMapper.toApplicationRequestCompanyReadServiceResponseDtoList(applicationRequestMemberSlice);
     }
+
     // 업체가 해당 역할에 지원한 출연자들에 대해 승인/거절할 때
     @Override
+    @Transactional
     public void updateStatus(
-        final Long roleId,
-        final Long memberId,
+        final Long applicationRequestId,
         final ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
     ) {
-        Role role = getRoleById(roleId);
-        Member member = getMemberByIdForCompany(memberId);
         Optional<ApplicationRequestMember> applicationRequestMember =
-            applicationRequestMemberRepository.findByMemberAndRole(
-                member,
-                role
+            applicationRequestMemberRepository.findById(
+                applicationRequestId
             );
         // 지원 상태 업데이트 하려 했는데 없으면 예외 발생.
         applicationRequestMember.orElseThrow(

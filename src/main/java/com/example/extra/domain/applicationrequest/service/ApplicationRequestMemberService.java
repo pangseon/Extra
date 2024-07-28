@@ -27,10 +27,9 @@ public interface ApplicationRequestMemberService {
     );
 
     void updateStatus(
-        final Long roleId,
-        final Long memberId,
+        final Long applicationRequestId,
         final ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
     );
 
-    void deleteApplicationRequestMember(final Long roleId);
+    void deleteApplicationRequestMember(final Long applicationRequestId);
 }
