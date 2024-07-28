@@ -1,6 +1,5 @@
 package com.example.extra.global.config;
 
-import com.example.extra.global.filter.JwtAuthenticationFilter;
 import com.example.extra.global.filter.JwtAuthorizationFilter;
 import com.example.extra.global.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -23,19 +22,11 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
-    private final AuthenticationConfiguration authenticationConfiguration;
 
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
         throws Exception {
         return configuration.getAuthenticationManager();
-    }
-
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil);
-        filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
-        return filter;
     }
 
     @Bean
@@ -59,11 +50,9 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
         );
 
-        httpSecurity.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
-        httpSecurity.addFilterBefore(jwtAuthenticationFilter(),
+        httpSecurity.addFilterBefore(jwtAuthorizationFilter(),
             UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }
-
 }

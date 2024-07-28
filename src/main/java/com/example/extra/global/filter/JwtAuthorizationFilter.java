@@ -32,20 +32,15 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         @NotNull HttpServletResponse response,
         @NotNull FilterChain filterChain
     ) throws ServletException, IOException {
-        if (request.getRequestURI().equals("/api/v1/members/signup")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        String token = jwtUtil.getJwtTokenFromRequest(request);
-        log.info("추출된 토큰: {}", token);
         String token = jwtUtil.getTokenFromRequest(request);
+        log.info("Http Header Authorization 추출: {}", token);
 
         if (StringUtils.hasText(token)) {
             token = jwtUtil.substringToken(token);
-            log.info("Token after Bearer removal: {}", token);
+            log.info("Bearer 제거: {}", token);
 
-            if (!jwtUtil.validateToken(token)) {
-                log.error("Token validation failed");
+            if (!jwtUtil.validateToken(token, response)) {
+                log.error("Token validation 실패");
                 return;
             }
 
@@ -64,7 +59,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     public void setAuthentication(String username) {
-        log.info("Setting authentication for user: {}", username);
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         Authentication authentication = createAuthentication(username);
         context.setAuthentication(authentication);
@@ -72,9 +66,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private Authentication createAuthentication(String username) {
-        log.info("Loading user details for username: {}", username);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        log.info("User details loaded: {}", userDetails.getUsername());
         return new UsernamePasswordAuthenticationToken(
             userDetails,
             null,
