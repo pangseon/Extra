@@ -105,6 +105,20 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
+    public void logout(
+        final UserDetailsImpl userDetails,
+        final HttpServletRequest request
+    ) throws ServletException, IOException {
+        String token = jwtUtil.getTokenFromRequest(request);
+
+        RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(token)
+            .orElseThrow(() -> new MemberException(MemberErrorCode.UNAUTHORIZED));
+        refreshTokenRepository.delete(refreshToken);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public MemberReadServiceResponseDto readUser(
         final UserDetailsImpl userDetails,
         final HttpServletRequest request

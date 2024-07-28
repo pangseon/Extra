@@ -23,4 +23,9 @@ public interface MemberService {
         final UserDetailsImpl userDetails,
         final HttpServletRequest request
     );
+
+    void logout(
+        final UserDetailsImpl userDetails,
+        final HttpServletRequest request
+    ) throws ServletException, IOException;
 }
