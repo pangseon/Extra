@@ -1,8 +1,9 @@
 package com.example.extra.domain.member.dto.service.response;
 
-import com.example.extra.domain.tattoo.entity.Tattoo;
 import java.time.LocalDate;
+import lombok.Builder;
 
+@Builder
 public record MemberReadServiceResponseDto(
     String name,
     Boolean sex,
@@ -13,7 +14,15 @@ public record MemberReadServiceResponseDto(
     String introduction,
     String license,
     String pros,
-    Tattoo tattoo
+    Boolean face,
+    Boolean chest,
+    Boolean arm,
+    Boolean leg,
+    Boolean shoulder,
+    Boolean back,
+    Boolean hand,
+    Boolean feet,
+    String etc
 ) {
 
 }

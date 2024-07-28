@@ -108,10 +108,10 @@ public class MemberServiceImpl implements MemberService {
         final HttpServletRequest request
     ) {
         Member member = findByEmail(userDetails.getUsername());
-        log.info(member.toString());
-        MemberReadServiceResponseDto memberReadServiceResponseDto =
-            memberEntityMapper.toMemberReadServiceResponseDto(member);
-        return memberReadServiceResponseDto;
+        return memberEntityMapper.toMemberReadServiceResponseDto(
+            member,
+            member.getTattoo()
+        );
     }
 
     private Member findByEmail(String name) {
