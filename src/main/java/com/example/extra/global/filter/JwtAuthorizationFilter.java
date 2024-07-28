@@ -38,6 +38,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
         String token = jwtUtil.getJwtTokenFromRequest(request);
         log.info("추출된 토큰: {}", token);
+        String token = jwtUtil.getTokenFromRequest(request);
 
         if (StringUtils.hasText(token)) {
             token = jwtUtil.substringToken(token);

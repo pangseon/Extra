@@ -54,7 +54,7 @@ public class JwtUtil {
         key = Keys.hmacShaKeyFor(bytes);
     }
 
-    public String getJwtTokenFromRequest(HttpServletRequest httpServletRequest)
+    public String getTokenFromRequest(HttpServletRequest httpServletRequest)
         throws IOException, ServletException {
         return httpServletRequest.getHeader(AUTHORIZATION_HEADER);
     }
