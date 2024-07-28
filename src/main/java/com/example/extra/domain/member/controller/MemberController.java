@@ -73,6 +73,15 @@ public class MemberController {
             .build();
     }
 
+    @PutMapping("/logout")
+    public ResponseEntity<?> logout(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @NotNull HttpServletRequest request
+    ) throws ServletException, IOException {
+        memberService.logout(userDetails, request);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("")
     public ResponseEntity<MemberReadServiceResponseDto> readUser(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
