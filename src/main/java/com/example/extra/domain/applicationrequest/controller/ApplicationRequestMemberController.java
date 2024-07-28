@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ApplicationRequestMemberController {
     private final ApplicationRequestMemberService applicationRequestMemberService;
-
+    // 사용자가 특정 역할에 지원
     @PostMapping("/role/{roleId}")
     public ResponseEntity<?> createApplicationRequestMember(
         @PathVariable(name = "roleId") Long roleId
@@ -31,18 +31,18 @@ public class ApplicationRequestMemberController {
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
+    // 사용자가 지원한 역할들과 지원 상태 확인
     @GetMapping("/roles")
     public ResponseEntity<?> readAllApplicationRequestMember(
         @PageableDefault(size = 10, sort = "createdAt", direction = Direction.DESC) Pageable pageable
     ){
-        List<ApplicationRequestMemberReadServiceResponseDto> appliedRoleList =
+        List<ApplicationRequestMemberReadServiceResponseDto> ApplicationRequestMemberReadServiceResponseDtoList =
             applicationRequestMemberService.getAppliedRoles(pageable);
 
         return ResponseEntity.status(HttpStatus.OK)
-            .body(appliedRoleList);
+            .body(ApplicationRequestMemberReadServiceResponseDtoList);
     }
-
+    // 사용자가 지원한 역할들 중 특정 상태인 것들만 확인
     @GetMapping("/roles/{status}")
     public ResponseEntity<?> readAllApplicationRequestMemberByStatus(
         @PathVariable(name = "status") String applyStatusString,
@@ -60,12 +60,12 @@ public class ApplicationRequestMemberController {
         return ResponseEntity.status(HttpStatus.OK)
             .body(appliedRoleList);
     }
-
-    @DeleteMapping("role/{roleId}")
+    // 특정 역할에 지원 취소
+    @DeleteMapping("{applicationRequestId}")
     public ResponseEntity<?> deleteApplicationRequestMember(
-        @PathVariable(name = "roleId") Long roleId
+        @PathVariable(name = "applicationRequestId") Long applicationRequestId
     ){
-        applicationRequestMemberService.deleteApplicationRequestMember(roleId);
+        applicationRequestMemberService.deleteApplicationRequestMember(applicationRequestId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

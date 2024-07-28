@@ -26,7 +26,42 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApplicationRequestCompanyController {
     private final ApplicationRequestMemberService applicationRequestMemberService;
     private final ApplicationRequestDtoMapper applicationRequestDtoMapper;
-    // 해당 역할에 출연 확정된 출연자들
+
+    // 해당 역할에 지원한 출연자들(지원현황 화면)
+    @GetMapping("/{roleId}/members")
+    public ResponseEntity<?> readAllApplicationRequestMemberByStatus(
+        @PathVariable(name = "roleId") Long roleId,
+        @PageableDefault(size = 10, sort = "createdAt", direction = Direction.ASC) Pageable pageable
+    ){
+        List<ApplicationRequestCompanyReadServiceResponseDto> applicationRequestCompanyReadServiceResponseDtoList =
+            applicationRequestMemberService.getAppliedMembersByRole(
+                roleId,
+                pageable
+            );
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(applicationRequestCompanyReadServiceResponseDtoList);
+    }
+    // 요청 승인 및 거절(지원현황 화면)
+    @PutMapping("{applicationRequestId}")
+    public ResponseEntity<?> updateApplicationRequestMemberStatusToRejected(
+        @PathVariable(name = "applicationRequestId") Long applicationRequestId,
+        @Valid @RequestPart(name = "applicationRequestMemberUpdateControllerRequestDto")
+        ApplicationRequestMemberUpdateControllerRequestDto applicationRequestMemberUpdateControllerRequestDto
+    ) {
+        ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto =
+            applicationRequestDtoMapper.toApplicationRequestMemberUpdateServiceRequestDto(
+                applicationRequestMemberUpdateControllerRequestDto
+            );
+        applicationRequestMemberService.updateStatus(
+            applicationRequestId,
+            applicationRequestMemberUpdateServiceRequestDto
+            // applicationRequestMemberUpdateControllerRequestDto.applyStatus() 로 안한 이유 : sample 코드 규격 따르기 위함
+        );
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    // 해당 역할에 출연 확정된 출연자들(현장관리-출연자 목록 화면)
+    // TODO - 지원현황 화면과 출연자 목록 화면은 보여줄 내용이 달라서 response dto를 따로 작성해야 할 수 있다.
     @GetMapping("/{roleId}/approved-members")
     public ResponseEntity<?> readAllApplicationRequestMemberByApprovedStatus(
         @PathVariable(name = "roleId") Long roleId,
@@ -39,39 +74,5 @@ public class ApplicationRequestCompanyController {
             );
         return ResponseEntity.status(HttpStatus.OK)
             .body(approvedMemberList);
-    }
-    // 해당 역할에 지원한 출연자들
-    @GetMapping("/{roleId}/members")
-    public ResponseEntity<?> readAllApplicationRequestMemberByStatus(
-        @PathVariable(name = "roleId") Long roleId,
-        @PageableDefault(size = 10, sort = "createdAt", direction = Direction.ASC) Pageable pageable
-    ){
-        List<ApplicationRequestCompanyReadServiceResponseDto> appliedMemberList =
-            applicationRequestMemberService.getAppliedMembersByRole(
-                roleId,
-                pageable
-            );
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(appliedMemberList);
-    }
-    // 요청 승인 및 거절
-    @PutMapping("{roleId}/{memberId}")
-    public ResponseEntity<?> updateApplicationRequestMemberStatusToRejected(
-        @PathVariable(name = "roleId") Long roleId,
-        @PathVariable(name = "memberId") Long memberId,
-        @Valid @RequestPart(name = "applicationRequestMemberUpdateControllerRequestDto")
-        ApplicationRequestMemberUpdateControllerRequestDto applicationRequestMemberUpdateControllerRequestDto
-    ) {
-        ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto =
-            applicationRequestDtoMapper.toApplicationRequestMemberUpdateServiceRequestDto(
-                applicationRequestMemberUpdateControllerRequestDto
-            );
-        applicationRequestMemberService.updateStatus(
-            roleId,
-            memberId,
-            applicationRequestMemberUpdateServiceRequestDto
-            // applicationRequestMemberUpdateControllerRequestDto.applyStatus() 로 안한 이유 : sample 코드 규격 따르기 위함
-        );
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
