@@ -65,7 +65,7 @@ public class JobPostServiceImpl implements JobPostService {
             jobPostUpdateServiceRequestDto.category());
         jobPostRepository.save(jobPost);
     }
-/*    public void deleteJobPost(
+    public void deleteJobPost(
         Long jobPost_id
         //,Company company
     ){
@@ -74,5 +74,5 @@ public class JobPostServiceImpl implements JobPostService {
         JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id,company)
             .orElseThrow(()-> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
         jobPostRepository.delete(jobPost);
-    }*/
+    }
 }

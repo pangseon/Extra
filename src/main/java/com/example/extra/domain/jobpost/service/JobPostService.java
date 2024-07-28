@@ -14,10 +14,8 @@ public interface JobPostService {
         Long jobPost_id,
         final JobPostUpdateServiceRequestDto jobPostUpdateServiceRequestDto
     );
-/*
     void deleteJobPost(
         Long jobPost_id
     );
-*/
 
 }
