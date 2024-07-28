@@ -34,6 +34,7 @@ public class MemberController {
     private final MemberService memberService;
     private final MemberDtoMapper memberDtoMapper;
     private final TattooDtoMapper tattooDtoMapper;
+    public static final String AUTHORIZATION_HEADER = "Authorization";
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(
@@ -63,7 +64,13 @@ public class MemberController {
         MemberLoginServiceResponseDto memberLoginServiceResponseDto =
             memberService.login(memberLoginServiceRequestDto);
 
-        return ResponseEntity.status(HttpStatus.OK).body(memberLoginServiceResponseDto);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .header(
+                AUTHORIZATION_HEADER,
+                memberLoginServiceResponseDto.token()
+            )
+            .build();
     }
 
     @GetMapping("")
