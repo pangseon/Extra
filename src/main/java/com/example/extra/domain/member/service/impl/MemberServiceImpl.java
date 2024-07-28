@@ -16,6 +16,8 @@ import com.example.extra.domain.tattoo.mapper.entity.TattooEntityMapper;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
 import com.example.extra.global.security.JwtUtil;
 import com.example.extra.global.security.UserDetailsImpl;
+import com.example.extra.global.security.repository.RefreshTokenRepository;
+import com.example.extra.global.security.token.RefreshToken;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +35,11 @@ public class MemberServiceImpl implements MemberService {
     private final TattooRepository tattooRepository;
     private final MemberEntityMapper memberEntityMapper;
     private final TattooEntityMapper tattooEntityMapper;
+
+    // security
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     private final String ADMIN_TOKEN = "admintoken";
 
@@ -83,9 +88,19 @@ public class MemberServiceImpl implements MemberService {
         }
 
         // jwt 토큰 생성
-        String token = jwtUtil.createToken(member.getEmail(), member.getUserRole());
-        log.info("jwt 토큰: " + token);
-        return new MemberLoginServiceResponseDto(token);
+        String accessToken = jwtUtil.createToken(member.getEmail(), member.getUserRole());
+        String refreshToken = jwtUtil.createRefreshToken();
+        log.info("access token: " + accessToken);
+        log.info("refresh token: " + refreshToken);
+
+        refreshTokenRepository.save(
+            new RefreshToken(
+                member.getId(),
+                refreshToken,
+                accessToken)
+        );
+
+        return new MemberLoginServiceResponseDto(accessToken);
     }
 
     @Override
