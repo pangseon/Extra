@@ -1,6 +1,14 @@
 package com.example.extra.global.security;
 
+import com.example.extra.domain.member.entity.Member;
+import com.example.extra.domain.member.exception.MemberErrorCode;
+import com.example.extra.domain.member.exception.MemberException;
+import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.global.enums.UserRole;
+import com.example.extra.global.security.exception.TokenErrorCode;
+import com.example.extra.global.security.exception.TokenException;
+import com.example.extra.global.security.repository.RefreshTokenRepository;
+import com.example.extra.global.security.token.RefreshToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -32,10 +40,13 @@ public class JwtUtil {
     public static final String BEARER_PREFIX = "Bearer ";
     // 토큰 유효 기간 (밀리초로 계산 / 1주일 = 604800초)
     private static final long TOKEN_VALIDITY_TIME = 604800 * 1000L;
+    private static final long REFRESH_TOKEN_VALIDITY_TIME = 60 * 60 * 24 * 3 * 1000L;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     @Value("${jwt.secret.key}")
     private String secretKey;
     private Key key;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final MemberRepository memberRepository;
 
     @PostConstruct
     protected void init() {
@@ -57,6 +68,19 @@ public class JwtUtil {
                 .claim(AUTHORIZATION_KEY, role)
                 .setExpiration(new Date(date.getTime() + TOKEN_VALIDITY_TIME))
                 .setIssuedAt(date)
+                .signWith(key, signatureAlgorithm)
+                .compact();
+    }
+
+    public String createRefreshToken() {
+        Date date = new Date();
+
+        return BEARER_PREFIX +
+            Jwts.builder()
+                .setClaims(Jwts.claims())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(
+                    new Date(date.getTime() + REFRESH_TOKEN_VALIDITY_TIME))
                 .signWith(key, signatureAlgorithm)
                 .compact();
     }
@@ -101,6 +125,21 @@ public class JwtUtil {
             log.error("Invalid JWT signature : 잘못된 JWT 서명");
         } catch (ExpiredJwtException e) {
             log.error("Expired JWT token : 만료된 JWT token");
+
+            RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(token)
+                .orElseThrow(() -> new TokenException(TokenErrorCode.NOT_FOUND_TOKEN));
+
+            // refresh token 만료 확인
+            if (!isExpired(refreshToken.getRefreshToken())) {
+                log.error("Expired JWT refresh token : 만료된 JWT refresh token");
+            } else {
+                Member member = memberRepository.findById(Long.valueOf(refreshToken.getId()))
+                    .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
+
+                // accessToken 재발급 & 저장
+                String newAccessToken = createToken(member.getEmail(), member.getUserRole());
+                refreshTokenRepository.save(refreshToken);
+            }
         } catch (UnsupportedJwtException e) {
             log.error("Unsupported Jwt token : 지원하지 않는 JWT token");
         } catch (IllegalArgumentException e) {
@@ -112,6 +151,4 @@ public class JwtUtil {
     public Claims getUserInfoFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
-
-
 }
