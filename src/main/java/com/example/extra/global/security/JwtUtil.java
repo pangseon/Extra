@@ -20,6 +20,7 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Key;
 import java.util.Base64;
@@ -98,48 +99,68 @@ public class JwtUtil {
 //        }
 //    }
 
+    public void addTokenHeader(String token, HttpServletResponse response) {
+        response.addHeader(AUTHORIZATION_HEADER, token);
+    }
+
     public String substringToken(String tokenValue) {
         if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
             return tokenValue.substring(7);
         } else {
-            log.error("Not Found Token");
             throw new NullPointerException("Not Found Token");
         }
     }
 
     public Boolean isExpired(String token) {
-        long expireTime = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token)
+        long expireTime = Jwts
+            .parserBuilder()
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token)
             .getBody()
             .getExpiration()
             .getTime();
         long now = new Date().getTime();
 
-        return ((expireTime - now) % 1000) + 1 >= 0;
+        return !(((expireTime - now) % 1000) + 1 >= 0);
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token, HttpServletResponse response) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return true;
+            if (!isExpired(token)) {
+                return true;
+            } else {
+                // access token -> token 찾기
+                RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(token)
+                    .orElseThrow(() -> new TokenException(TokenErrorCode.NOT_FOUND_TOKEN));
+                log.info(refreshToken.toString());
+                // refresh token 만료 확인
+                if (isExpired(refreshToken.getRefreshToken()) &&
+                    refreshToken.getRefreshToken() != null) {
+                    log.error("Expired JWT refresh token : 만료된 JWT refresh token");
+                } else {
+                    Member member = memberRepository.findById(refreshToken.getId())
+                        .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
+
+                    // accessToken 재발급 & 저장
+                    String newAccessToken = createToken(member.getEmail(), member.getUserRole());
+                    String newRefreshToken = createRefreshToken();
+
+                    refreshTokenRepository.delete(refreshToken);
+                    refreshTokenRepository.save(
+                        new RefreshToken(
+                            member.getId(),
+                            newRefreshToken,
+                            newAccessToken)
+                    );
+                    addTokenHeader(newAccessToken, response);
+                    log.info(response.getHeader("Authorization"));
+                }
+            }
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
             log.error("Invalid JWT signature : 잘못된 JWT 서명");
         } catch (ExpiredJwtException e) {
             log.error("Expired JWT token : 만료된 JWT token");
-
-            RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(token)
-                .orElseThrow(() -> new TokenException(TokenErrorCode.NOT_FOUND_TOKEN));
-
-            // refresh token 만료 확인
-            if (!isExpired(refreshToken.getRefreshToken())) {
-                log.error("Expired JWT refresh token : 만료된 JWT refresh token");
-            } else {
-                Member member = memberRepository.findById(Long.valueOf(refreshToken.getId()))
-                    .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
-
-                // accessToken 재발급 & 저장
-                String newAccessToken = createToken(member.getEmail(), member.getUserRole());
-                refreshTokenRepository.save(refreshToken);
-            }
         } catch (UnsupportedJwtException e) {
             log.error("Unsupported Jwt token : 지원하지 않는 JWT token");
         } catch (IllegalArgumentException e) {
