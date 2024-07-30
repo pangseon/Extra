@@ -6,6 +6,7 @@ import com.example.extra.domain.applicationrequest.dto.service.ApplicationReques
 import com.example.extra.domain.applicationrequest.entity.ApplicationRequestMember;
 import com.example.extra.domain.applicationrequest.exception.ApplicationRequestErrorCode;
 import com.example.extra.domain.applicationrequest.exception.NotAbleToCancelApplicationRequestMemberException;
+import com.example.extra.domain.applicationrequest.exception.NotAbleToApplyToJobPostException;
 import com.example.extra.domain.applicationrequest.exception.NotFoundApplicationRequestCompanyException;
 import com.example.extra.domain.applicationrequest.exception.NotFoundApplicationRequestMemberException;
 import com.example.extra.domain.applicationrequest.mapper.entity.ApplicationRequestEntityMapper;
@@ -53,6 +54,13 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
     public void createApplicationRequestMember(final Long roleId) {
         Member member = getMember();
         Role role = getRoleById(roleId);
+        Boolean isStillRecruiting = role.getJobPost().getStatus();
+        // 모집이 마감된 경우 지원 불가
+        if (!isStillRecruiting){
+            throw new NotAbleToApplyToJobPostException(
+                ApplicationRequestErrorCode.NOT_ABLE_TO_APPLY_TO_JOB_POST
+            );
+        }
         applicationRequestMemberRepository.save(
             ApplicationRequestMember.builder()
                 .applyStatus(ApplyStatus.APPLIED)
