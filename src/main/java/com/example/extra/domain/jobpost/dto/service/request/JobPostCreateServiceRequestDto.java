@@ -1,9 +1,9 @@
-package com.example.extra.domain.jobpost.dto.service;
+package com.example.extra.domain.jobpost.dto.service.request;
 
 import com.example.extra.global.enums.Category;
 import java.time.LocalDateTime;
 
-public record JobPostUpdateServiceRequestDto(
+public record JobPostCreateServiceRequestDto(
     String dramaTitle,
     String gatheringLocation,
     LocalDateTime gatheringTime,

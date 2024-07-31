@@ -2,8 +2,8 @@ package com.example.extra.domain.jobpost.controller;
 
 import com.example.extra.domain.jobpost.dto.controller.JobPostCreateControllerRequestDto;
 import com.example.extra.domain.jobpost.dto.controller.JobPostUpdateControllerRequestDto;
-import com.example.extra.domain.jobpost.dto.service.JobPostCreateServiceRequestDto;
-import com.example.extra.domain.jobpost.dto.service.JobPostUpdateServiceRequestDto;
+import com.example.extra.domain.jobpost.dto.service.request.JobPostCreateServiceRequestDto;
+import com.example.extra.domain.jobpost.dto.service.request.JobPostUpdateServiceRequestDto;
 import com.example.extra.domain.jobpost.mapper.dto.JobPostDtoMapper;
 import com.example.extra.domain.jobpost.service.JobPostService;
 import com.example.extra.domain.role.dto.controller.RoleCreateControllerRequestDto;
