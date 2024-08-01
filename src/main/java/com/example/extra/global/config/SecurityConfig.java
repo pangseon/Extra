@@ -47,6 +47,7 @@ public class SecurityConfig {
             authorizeHttpRequests
                 .requestMatchers("/api/v1/members/signup").permitAll()  // 회원 가입
                 .requestMatchers("/api/v1/members/login").permitAll()   // 로그인
+                .requestMatchers("/api/v1/token").permitAll()           // 토큰 재발급
                 .anyRequest().authenticated()
         );
 
