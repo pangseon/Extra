@@ -128,10 +128,27 @@ public class MemberServiceImpl implements MemberService {
         final HttpServletRequest request
     ) {
         Member member = findByEmail(userDetails.getUsername());
-        return memberEntityMapper.toMemberReadServiceResponseDto(
-            member,
-            member.getTattoo()
-        );
+        Tattoo tattoo = member.getTattoo();
+        return MemberReadServiceResponseDto.builder()
+            .name(member.getName())
+            .sex(member.getSex())
+            .birthday(member.getBirthday())
+            .home(member.getHome())
+            .height(member.getHeight())
+            .weight(member.getWeight())
+            .introduction(member.getIntroduction())
+            .license(member.getLicense())
+            .pros(member.getPros())
+            .face(tattoo.getFace())
+            .chest(tattoo.getChest())
+            .arm(tattoo.getArm())
+            .leg(tattoo.getLeg())
+            .shoulder(tattoo.getShoulder())
+            .back(tattoo.getBack())
+            .hand(tattoo.getHand())
+            .feet(tattoo.getFeet())
+            .etc(tattoo.getEtc())
+            .build();
     }
 
     @Override
