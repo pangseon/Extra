@@ -32,6 +32,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         @NotNull HttpServletResponse response,
         @NotNull FilterChain filterChain
     ) throws ServletException, IOException {
+        String url = request.getRequestURI();
+        if (url.equals("/api/v1/token")) {
+            filterChain.doFilter(request, response);
+        }
+
         String token = jwtUtil.getTokenFromRequest(request);
         log.info("Http Header Authorization 추출: {}", token);
 

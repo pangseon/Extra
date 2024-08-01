@@ -6,8 +6,10 @@ import com.example.extra.global.exception.ErrorCode;
 import com.example.extra.global.exception.dto.BeanValidationExceptionResponseDto;
 import com.example.extra.global.exception.dto.CustomExceptionResponseDto;
 import com.example.extra.global.exception.dto.FieldErrorResponseDto;
+import com.example.extra.global.security.exception.TokenException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -50,6 +52,29 @@ public class GlobalExceptionHandler {
             .body(BeanValidationExceptionResponseDto.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .messages(fieldErrorResponseDtos)
+                .build());
+    }
+
+    @ExceptionHandler(TokenException.class)
+    public ResponseEntity<CustomExceptionResponseDto> tokenExceptionHandler(
+        TokenException exception) {
+        ErrorCode errorCode = exception.getErrorCode();
+//        String accessToken = exception.getAccessToken();
+        String accessToken = "";
+
+        log.error("커스텀 예외 발생 {} {}: {}", exception.getClass().getSimpleName(), errorCode.name(),
+            errorCode.getMessage());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", accessToken);
+
+        return ResponseEntity
+            .status(errorCode.getStatus())
+            .headers(headers)
+            .body(CustomExceptionResponseDto.builder()
+                .status(errorCode.getStatus().value())
+                .name(errorCode.name())
+                .message(errorCode.getMessage())
                 .build());
     }
 }

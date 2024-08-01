@@ -1,14 +1,8 @@
 package com.example.extra.global.security;
 
-import com.example.extra.domain.member.entity.Member;
-import com.example.extra.domain.member.exception.MemberErrorCode;
-import com.example.extra.domain.member.exception.MemberException;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.global.enums.UserRole;
-import com.example.extra.global.security.exception.TokenErrorCode;
-import com.example.extra.global.security.exception.TokenException;
 import com.example.extra.global.security.repository.RefreshTokenRepository;
-import com.example.extra.global.security.token.RefreshToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -40,8 +34,8 @@ public class JwtUtil {
     public static final String AUTHORIZATION_KEY = "auth";
     public static final String BEARER_PREFIX = "Bearer ";
     // 토큰 유효 기간 (밀리초로 계산 / 1주일 = 604800초)
-    private static final long TOKEN_VALIDITY_TIME = 604800 * 1000L;
-    private static final long REFRESH_TOKEN_VALIDITY_TIME = 60 * 60 * 24 * 3 * 1000L;
+    private static final long TOKEN_VALIDITY_TIME = 20 * 1000L;
+    private static final long REFRESH_TOKEN_VALIDITY_TIME = 60 * 60 * 1000L;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     @Value("${jwt.secret.key}")
     private String secretKey;
@@ -126,41 +120,45 @@ public class JwtUtil {
     }
 
     public boolean validateToken(String token, HttpServletResponse response) {
+//        // access token -> token 찾기
+//        RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(token)
+//            .orElseThrow(() -> new MemberException(MemberErrorCode.UNAUTHORIZED));
         try {
-            if (!isExpired(token)) {
-                return true;
-            } else {
-                // access token -> token 찾기
-                RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(token)
-                    .orElseThrow(() -> new TokenException(TokenErrorCode.NOT_FOUND_TOKEN));
-                log.info(refreshToken.toString());
-                // refresh token 만료 확인
-                if (isExpired(refreshToken.getRefreshToken()) &&
-                    refreshToken.getRefreshToken() != null) {
-                    log.error("Expired JWT refresh token : 만료된 JWT refresh token");
-                } else {
-                    Member member = memberRepository.findById(refreshToken.getId())
-                        .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
-
-                    // accessToken 재발급 & 저장
-                    String newAccessToken = createToken(member.getEmail(), member.getUserRole());
-                    String newRefreshToken = createRefreshToken();
-
-                    refreshTokenRepository.delete(refreshToken);
-                    refreshTokenRepository.save(
-                        new RefreshToken(
-                            member.getId(),
-                            newRefreshToken,
-                            newAccessToken)
-                    );
-                    addTokenHeader(newAccessToken, response);
-                    log.info(response.getHeader("Authorization"));
-                }
-            }
+            // access token 유효/만료 확인
+            return !isExpired(token);
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
             log.error("Invalid JWT signature : 잘못된 JWT 서명");
         } catch (ExpiredJwtException e) {
             log.error("Expired JWT token : 만료된 JWT token");
+////            Claims info = getUserInfoFromToken(token);
+////            String email = info.getSubject();
+////            Member member = memberRepository.findByEmail(email)
+////                .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
+////            RefreshToken refreshToken = refreshTokenRepository.findById(member.getId())
+////                .orElseThrow(() -> new TokenException(TokenErrorCode.NOT_FOUND_TOKEN));
+//
+//            log.info(refreshToken.toString());
+//            // refresh token 만료 확인
+//            if (isExpired(refreshToken.getRefreshToken()) &&
+//                refreshToken.getRefreshToken() != null) {
+//                log.error("Expired JWT refresh token : 만료된 JWT refresh token");
+//            } else {
+//                Member member = memberRepository.findById(refreshToken.getId())
+//                    .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
+//                // accessToken 재발급 & 저장
+//                String newAccessToken = createToken(member.getEmail(), member.getUserRole());
+//                String newRefreshToken = createRefreshToken();
+//
+//                refreshTokenRepository.delete(refreshToken);
+//                refreshTokenRepository.save(
+//                    new RefreshToken(
+//                        member.getId(),
+//                        newRefreshToken,
+//                        newAccessToken)
+//                );
+//                log.info(response.getHeader("Authorization"));
+//                throw new TokenException(TokenErrorCode.ACCESS_KEY_REISSUANCE, newAccessToken);
+//            }
         } catch (UnsupportedJwtException e) {
             log.error("Unsupported Jwt token : 지원하지 않는 JWT token");
         } catch (IllegalArgumentException e) {
