@@ -22,7 +22,7 @@ public class ScheduleController {
 
     @PostMapping("/{JobPost_id}/schedules/create")
     public ResponseEntity<?> createSchedule(
-        @PathVariable Long JobPost_id,
+        @PathVariable Long jobPost_id,
         @RequestBody ScheduleCreateControllerRequestDto createControllerRequestDto
     ){
 
