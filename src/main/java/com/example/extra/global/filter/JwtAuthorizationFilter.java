@@ -1,6 +1,8 @@
 package com.example.extra.global.filter;
 
 import com.example.extra.global.security.JwtUtil;
+import com.example.extra.global.security.exception.TokenErrorCode;
+import com.example.extra.global.security.exception.TokenException;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -33,8 +35,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         @NotNull FilterChain filterChain
     ) throws ServletException, IOException {
         String url = request.getRequestURI();
-        if (url.equals("/api/v1/token")) {
+        if (url.equals("/api/v1/token") ||              // 토큰 재발급
+            url.equals("/api/v1/members/signup") ||     // 회원 가입
+            url.equals("/api/v1/members/login")         // 로그인
+        ) {
+            log.info("다음 필터");
             filterChain.doFilter(request, response);
+            return;
         }
 
         String token = jwtUtil.getTokenFromRequest(request);
@@ -44,9 +51,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             token = jwtUtil.substringToken(token);
             log.info("Bearer 제거: {}", token);
 
-            if (!jwtUtil.validateToken(token, response)) {
+            if (!jwtUtil.validateToken(token)) {
                 log.error("Token validation 실패");
-                return;
+                throw new TokenException(TokenErrorCode.INVALID_TOKEN);
             }
 
             Claims info = jwtUtil.getUserInfoFromToken(token);
