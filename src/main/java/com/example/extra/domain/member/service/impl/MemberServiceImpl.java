@@ -96,11 +96,12 @@ public class MemberServiceImpl implements MemberService {
         log.info("access token: " + accessToken);
         log.info("refresh token: " + refreshToken);
 
+        member.updateRefreshToken(jwtUtil.substringToken(refreshToken));
+
         refreshTokenRepository.save(
             new RefreshToken(
                 member.getId(),
-                refreshToken,
-                accessToken
+                jwtUtil.substringToken(refreshToken)
             )
         );
 
