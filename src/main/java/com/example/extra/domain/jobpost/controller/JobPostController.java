@@ -4,6 +4,7 @@ import com.example.extra.domain.jobpost.dto.controller.JobPostCreateControllerRe
 import com.example.extra.domain.jobpost.dto.controller.JobPostUpdateControllerRequestDto;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostCreateServiceRequestDto;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostUpdateServiceRequestDto;
+import com.example.extra.domain.jobpost.dto.service.response.JobPostServiceResponseDto;
 import com.example.extra.domain.jobpost.mapper.dto.JobPostDtoMapper;
 import com.example.extra.domain.jobpost.service.JobPostService;
 import com.example.extra.domain.role.dto.controller.RoleCreateControllerRequestDto;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -61,6 +63,16 @@ public class JobPostController {
         ){
         jobPostService.deleteJobPost(jobpost_id);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+    @GetMapping("/{jobpost_id}")
+    public JobPostServiceResponseDto readOnceJobPost(
+        @PathVariable Long jobpost_id
+    ){
+        return jobPostService.readOnceJobPost(jobpost_id);
+    }
+    @GetMapping("")
+    public List<JobPostServiceResponseDto> readAllJobPosts(){
+        return jobPostService.readAllJobPosts();
     }
 
 }

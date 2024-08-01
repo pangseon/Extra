@@ -4,6 +4,7 @@ import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostCreateServiceRequestDto;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostUpdateServiceRequestDto;
+import com.example.extra.domain.jobpost.dto.service.response.JobPostServiceResponseDto;
 import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.domain.jobpost.exception.JobPostErrorCode;
 import com.example.extra.domain.jobpost.exception.NotFoundJobPostException;
@@ -75,5 +76,27 @@ public class JobPostServiceImpl implements JobPostService {
         JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id,company)
             .orElseThrow(()-> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
         jobPostRepository.delete(jobPost);
+    }
+
+    @Transactional(readOnly = true)
+    public JobPostServiceResponseDto readOnceJobPost(
+        Long jobPost_id
+        //,Company company
+    ){
+        Company company = companyRepository.findById(1L)
+            .orElseThrow(()->new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST));
+        JobPost jobPost = jobPostRepository.findByIdAndCompany(
+            jobPost_id
+                , company
+            )
+            .orElseThrow(()-> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        JobPostServiceResponseDto jobPostServiceResponseDto = jobPostEntityMapper.toJobPostServiceResponseDto(
+            jobPost,company);
+        return jobPostServiceResponseDto;
+    }
+    @Transactional(readOnly = true)
+    public List<JobPostServiceResponseDto> readAllJobPosts(){
+        List<JobPost> jobPostList = jobPostRepository.findAll();
+        return jobPostEntityMapper.toListJobPostServiceResponseDto(jobPostList);
     }
 }
