@@ -2,8 +2,9 @@ package com.example.extra.domain.jobpost.service.impl;
 
 import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.company.repository.CompanyRepository;
-import com.example.extra.domain.jobpost.dto.service.JobPostCreateServiceRequestDto;
-import com.example.extra.domain.jobpost.dto.service.JobPostUpdateServiceRequestDto;
+import com.example.extra.domain.jobpost.dto.service.request.JobPostCreateServiceRequestDto;
+import com.example.extra.domain.jobpost.dto.service.request.JobPostUpdateServiceRequestDto;
+import com.example.extra.domain.jobpost.dto.service.response.JobPostServiceResponseDto;
 import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.domain.jobpost.exception.JobPostErrorCode;
 import com.example.extra.domain.jobpost.exception.NotFoundJobPostException;
@@ -13,6 +14,7 @@ import com.example.extra.domain.jobpost.service.JobPostService;
 import com.example.extra.domain.role.dto.service.RoleCreateServiceRequestDto;
 import com.example.extra.domain.role.entity.Role;
 import com.example.extra.domain.role.mapper.service.RoleEntityMapper;
+import com.example.extra.domain.schedule.entity.Schedule;
 import com.example.extra.sample.exception.NotFoundTestException;
 import com.example.extra.sample.exception.TestErrorCode;
 import java.util.ArrayList;
@@ -39,7 +41,7 @@ public class JobPostServiceImpl implements JobPostService {
         System.out.println(company.getName());
         JobPost jobPost = jobPostEntityMapper.toJobPost(jobPostCreateServiceRequestDto,company);
         List<Role> roleList = new ArrayList<>();
-
+        List<Schedule> scheduleList = new ArrayList<>();
         for (int i = 0; i < roleCreateServiceRequestDtoList.size();i++ ){
             roleList.add(roleEntityMapper.toRole(roleCreateServiceRequestDtoList.get(i), jobPost));
         }
@@ -74,5 +76,27 @@ public class JobPostServiceImpl implements JobPostService {
         JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id,company)
             .orElseThrow(()-> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
         jobPostRepository.delete(jobPost);
+    }
+
+    @Transactional(readOnly = true)
+    public JobPostServiceResponseDto readOnceJobPost(
+        Long jobPost_id
+        //,Company company
+    ){
+        Company company = companyRepository.findById(1L)
+            .orElseThrow(()->new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST));
+        JobPost jobPost = jobPostRepository.findByIdAndCompany(
+            jobPost_id
+                , company
+            )
+            .orElseThrow(()-> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        JobPostServiceResponseDto jobPostServiceResponseDto = jobPostEntityMapper.toJobPostServiceResponseDto(
+            jobPost,company);
+        return jobPostServiceResponseDto;
+    }
+    @Transactional(readOnly = true)
+    public List<JobPostServiceResponseDto> readAllJobPosts(){
+        List<JobPost> jobPostList = jobPostRepository.findAll();
+        return jobPostEntityMapper.toListJobPostServiceResponseDto(jobPostList);
     }
 }
