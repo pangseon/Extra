@@ -114,11 +114,13 @@ public class MemberServiceImpl implements MemberService {
         final UserDetailsImpl userDetails,
         final HttpServletRequest request
     ) throws ServletException, IOException {
-        String token = jwtUtil.getTokenFromRequest(request);
-
-        RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(token)
+        Member member = userDetails.getMember();
+        RefreshToken refreshToken = refreshTokenRepository.findById(member.getId())
             .orElseThrow(() -> new MemberException(MemberErrorCode.UNAUTHORIZED));
         refreshTokenRepository.delete(refreshToken);
+
+        member.deleteRefreshToken();
+        memberRepository.save(member);
     }
 
     @Override
