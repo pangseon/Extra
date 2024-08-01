@@ -76,6 +76,9 @@ public class Member extends BaseEntity {
     @Column
     private String accountNumber;
 
+    @Column
+    private String refreshToken;
+
     // 계정 권한 설정
     // 공고글의 Role과 이름이 겹칠 것 같아 다른 네이밍 생각 필요 ex) authority | auth
     @Column(nullable = false)
@@ -151,6 +154,14 @@ public class Member extends BaseEntity {
 
     public void encodePassword(String password) {
         this.password = password;
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void deleteRefreshToken() {
+        this.refreshToken = null;
     }
 
 }
