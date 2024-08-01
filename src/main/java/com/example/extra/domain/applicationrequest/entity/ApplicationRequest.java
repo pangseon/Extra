@@ -1,50 +1,37 @@
-package com.example.extra.domain.memberterms.entity;
+package com.example.extra.domain.applicationrequest.entity;
 
 import com.example.extra.domain.member.entity.Member;
-import com.example.extra.domain.terms.entity.Terms;
+import com.example.extra.domain.role.entity.Role;
 import com.example.extra.global.entity.BaseEntity;
+import com.example.extra.global.enums.ApplyStatus;
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.MappedSuperclass;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "TB_MEMBER_TERMS")
-@Entity
-public class MemberTerms extends BaseEntity {
+@MappedSuperclass
+public abstract class ApplicationRequest extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "boolean default true")
-    private Boolean agree;
+    @Column(name = "apply_status", nullable = false)
+    protected ApplyStatus applyStatus;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id")
-    private Member member;
+    protected Member member;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "term_id")
-    private Terms term;
-
-    @Builder
-    public MemberTerms(
-        Boolean agree,
-        Member member,
-        Terms term
-    ){
-        this.agree = agree;
-        this.member = member;
-        this.term = term;
-    }
+    @JoinColumn(name = "role_id")
+    protected Role role;
 }

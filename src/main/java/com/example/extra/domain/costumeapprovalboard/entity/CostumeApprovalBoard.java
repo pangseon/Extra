@@ -2,7 +2,7 @@ package com.example.extra.domain.costumeapprovalboard.entity;
 
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.role.entity.Role;
-import com.example.extra.global.common.BaseEntity;
+import com.example.extra.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,7 +13,6 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

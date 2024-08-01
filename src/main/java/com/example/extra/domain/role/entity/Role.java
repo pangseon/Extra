@@ -1,7 +1,6 @@
 package com.example.extra.domain.role.entity;
 
 import com.example.extra.domain.jobpost.entity.JobPost;
-import com.example.extra.domain.schedule.entity.Schedule;
 import com.example.extra.global.entity.BaseEntity;
 import com.example.extra.global.enums.Season;
 import jakarta.persistence.Column;
@@ -76,4 +75,10 @@ public class Role extends BaseEntity {
         this.jobPost = jobPost;
     }
 
+    public void addOneToCurrentPersonnel(){
+        this.currentPersonnel += 1;
+    }
+    public void subtractOneToCurrentPersonnel(){
+        this.currentPersonnel -= 1;
+    }
 }
