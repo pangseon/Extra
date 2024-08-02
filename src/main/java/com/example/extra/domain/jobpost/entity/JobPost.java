@@ -45,9 +45,6 @@ public class JobPost extends BaseEntity {
     private LocalDateTime gatheringTime;
 
     @Column
-    private String imageUrl;
-
-    @Column
     private Boolean status;
 
     @Column
@@ -72,7 +69,6 @@ public class JobPost extends BaseEntity {
         final String dramaTitle,
         final String gatheringLocation,
         final LocalDateTime gatheringTime,
-        final String imageUrl,
         final Boolean status,
         final Integer hourPay,
         final Category category,
@@ -81,12 +77,25 @@ public class JobPost extends BaseEntity {
         this.dramaTitle = dramaTitle;
         this.gatheringLocation = gatheringLocation;
         this.gatheringTime = gatheringTime;
-        this.imageUrl = imageUrl;
         this.status = status;
         this.hourPay = hourPay;
         this.category = category;
         this.company = company;
-
+    }
+    public void updateJobPost(
+         String dramaTitle,
+         String gatheringLocation,
+         LocalDateTime gatheringTime,
+         Boolean status,
+         Integer hourPay,
+         Category category
+    ){
+        this.dramaTitle = dramaTitle;
+        this.gatheringLocation = gatheringLocation;
+        this.gatheringTime = gatheringTime;
+        this.status = status;
+        this.hourPay = hourPay;
+        this.category = category;
     }
 
 }

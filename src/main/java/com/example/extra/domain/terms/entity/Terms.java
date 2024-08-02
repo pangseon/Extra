@@ -1,6 +1,6 @@
 package com.example.extra.domain.terms.entity;
 
-import com.example.extra.global.common.BaseEntity;
+import com.example.extra.global.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

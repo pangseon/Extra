@@ -1,7 +1,14 @@
 package com.example.extra.global.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public enum ApplyStatus {
-    APPLIED, // 승인대기
-    REJECTED, // 미승인
-    APPROVED // 승인완료
+    APPLIED,
+    REJECTED,
+    APPROVED;
+
+    @JsonCreator
+    public static ApplyStatus fromString(String inputValue) {
+        return EnumUtils.fromString(ApplyStatus.class, inputValue);
+    }
 }
