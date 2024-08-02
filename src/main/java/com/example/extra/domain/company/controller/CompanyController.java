@@ -1,7 +1,10 @@
 package com.example.extra.domain.company.controller;
 
 import com.example.extra.domain.company.dto.controller.CompanyCreateControllerRequestDto;
-import com.example.extra.domain.company.dto.service.CompanyCreateServiceRequestDto;
+import com.example.extra.domain.company.dto.controller.CompanyLoginControllerRequestDto;
+import com.example.extra.domain.company.dto.service.request.CompanyCreateServiceRequestDto;
+import com.example.extra.domain.company.dto.service.request.CompanyLoginServiceRequestDto;
+import com.example.extra.domain.company.dto.service.response.CompanyLoginServiceResponseDto;
 import com.example.extra.domain.company.mapper.dto.CompanyDtoMapper;
 import com.example.extra.domain.company.service.CompanyService;
 import jakarta.validation.Valid;
@@ -21,6 +24,9 @@ public class CompanyController {
     private final CompanyService companyService;
     private final CompanyDtoMapper companyDtoMapper;
 
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+
+
     @PostMapping("/signup")
     public ResponseEntity<?> signup(
         @Valid @RequestBody CompanyCreateControllerRequestDto companyCreateControllerRequestDto
@@ -33,5 +39,24 @@ public class CompanyController {
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(
+        @Valid @RequestBody CompanyLoginControllerRequestDto companyLoginControllerRequestDto
+    ) {
+        CompanyLoginServiceRequestDto companyLoginServiceRequestDto =
+            companyDtoMapper.toCompanyLoginServiceRequestDto(companyLoginControllerRequestDto);
+
+        CompanyLoginServiceResponseDto companyLoginServiceResponseDto =
+            companyService.login(companyLoginServiceRequestDto);
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .header(
+                AUTHORIZATION_HEADER,
+                companyLoginServiceResponseDto.token()
+            )
+            .build();
     }
 }
