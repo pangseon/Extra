@@ -2,9 +2,12 @@ package com.example.extra.domain.company.entity;
 
 import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.global.entity.BaseEntity;
+import com.example.extra.global.enums.UserRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,6 +26,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "TB_COMPANY")
 @Entity
 public class Company extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,6 +43,11 @@ public class Company extends BaseEntity {
     @Column(name = "company_url")
     private String companyUrl;
 
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole;
+
+    private String refreshToken;
+
     // TODO - 회사-공고글 양방향 매핑할 지 확인 받기 + cascade 정책 확인 받기
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private List<JobPost> jobPostList = new ArrayList<>();
@@ -52,10 +61,29 @@ public class Company extends BaseEntity {
         String password,
         String name,
         String companyUrl
-    ){
+    ) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.companyUrl = companyUrl;
+        this.userRole = UserRole.USER;
+        this.refreshToken = null;
     }
+
+    public void updateRole() {
+        this.userRole = UserRole.ADMIN;
+    }
+
+    public void encodePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void deleteRefreshToken() {
+        this.refreshToken = null;
+    }
+
 }

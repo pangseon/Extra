@@ -1,20 +1,32 @@
 package com.example.extra.global.security;
 
+import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.global.enums.UserRole;
 import java.util.ArrayList;
 import java.util.Collection;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
-@RequiredArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
     private final Member member;
+    private final Company company;
+
+    // member 가입
+    public UserDetailsImpl(Member member) {
+        this.member = member;
+        this.company = null;
+    }
+
+    // company 가입
+    public UserDetailsImpl(Company company) {
+        this.member = null;
+        this.company = company;
+    }
 
     @Override
     public boolean isAccountNonExpired() {
@@ -38,7 +50,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        UserRole role = this.member.getUserRole();
+        UserRole role = member == null ? this.company.getUserRole() : this.member.getUserRole();
         String authority = role.getAuthority();
 
         SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(authority);
@@ -49,11 +61,11 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getPassword() {
-        return member.getPassword();
+        return member == null ? company.getPassword() : member.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return member.getEmail();
+        return member == null ? company.getEmail() : member.getEmail();
     }
 }
