@@ -19,4 +19,8 @@ public interface CompanyService {
     CompanyReadOnceServiceResponseDto readOnceCompany(
         final UserDetailsImpl userDetails
     );
+
+    void logout(
+        final UserDetailsImpl userDetails
+    );
 }

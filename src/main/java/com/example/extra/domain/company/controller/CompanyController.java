@@ -64,6 +64,16 @@ public class CompanyController {
             .build();
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        companyService.logout(userDetails);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .build();
+    }
+
     @GetMapping("")
     public ResponseEntity<?> readOnceCompany(
         @AuthenticationPrincipal UserDetailsImpl userDetails

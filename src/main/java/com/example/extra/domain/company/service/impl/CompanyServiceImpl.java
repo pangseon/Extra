@@ -107,6 +107,20 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    @Transactional
+    public void logout(
+        final UserDetailsImpl userDetails
+    ) {
+        Company company = userDetails.getCompany();
+        RefreshToken refreshToken = refreshTokenRepository.findById(company.getId())
+            .orElseThrow(() -> new CompanyException(CompanyErrorCode.UNAUTHORIZED));
+        refreshTokenRepository.delete(refreshToken);
+
+        company.deleteRefreshToken();
+        companyRepository.save(company);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public CompanyReadOnceServiceResponseDto readOnceCompany(
         UserDetailsImpl userDetails

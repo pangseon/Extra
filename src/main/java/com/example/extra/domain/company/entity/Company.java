@@ -82,4 +82,8 @@ public class Company extends BaseEntity {
         this.refreshToken = refreshToken;
     }
 
+    public void deleteRefreshToken() {
+        this.refreshToken = null;
+    }
+
 }
