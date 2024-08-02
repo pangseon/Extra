@@ -12,8 +12,8 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = SPRING)
 public interface RoleDtoMapper {
 
-    JobPostCreateServiceRequestDto toJobPostCreateServiceDto(
-      JobPostCreateControllerRequestDto jobPostCreateControllerRequestDto
+    RoleCreateServiceRequestDto toRoleCreateServiceDto(
+      RoleCreateControllerRequestDto roleCreateControllerRequestDto
     );
     List<RoleCreateServiceRequestDto> toRoleCreateServiceRequestDtoList(
     List<RoleCreateControllerRequestDto> roleCreateControllerRequestDtoList);
