@@ -1,25 +1,19 @@
 package com.example.extra.domain.member.entity;
 
-import com.example.extra.domain.applicationrequest.entity.ApplicationRequestCompany;
-import com.example.extra.domain.applicationrequest.entity.ApplicationRequestMember;
-import com.example.extra.domain.attendancemanagement.entity.AttendanceManagement;
-import com.example.extra.domain.costumeapprovalboard.entity.CostumeApprovalBoard;
-import com.example.extra.domain.memberterms.entity.MemberTerms;
 import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.global.entity.BaseEntity;
+import com.example.extra.global.enums.UserRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,31 +31,34 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(
+        nullable = false,
+        unique = true
+    )
     private String email;
 
-    @Column
+    @Column(nullable = false)
     private String password;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = false)
     private Boolean sex;
 
-    @Column
+    @Column(nullable = false)
     private LocalDate birthday;
 
-    @Column
+    @Column(nullable = false)
     private String home;
 
-    @Column
+    @Column(nullable = false)
     private Float height;
 
-    @Column
+    @Column(nullable = false)
     private Float weight;
 
-    @Column
+    @Column(nullable = false)
     private String phone;
 
     @Column
@@ -73,6 +70,21 @@ public class Member extends BaseEntity {
     @Column
     private String pros;
 
+    @Column
+    private String bank;
+
+    @Column
+    private String accountNumber;
+
+    @Column
+    private String refreshToken;
+
+    // 계정 권한 설정
+    // 공고글의 Role과 이름이 겹칠 것 같아 다른 네이밍 생각 필요 ex) authority | auth
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole;
+
     @OneToOne(
         mappedBy = "member",
         cascade = CascadeType.ALL,
@@ -81,20 +93,20 @@ public class Member extends BaseEntity {
     @ToString.Exclude
     private Tattoo tattoo;
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private final List<ApplicationRequestCompany> applicationRequestCompanyList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private final List<ApplicationRequestMember> applicationRequestMemberList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private final List<AttendanceManagement> attendanceManagementList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private final List<CostumeApprovalBoard> costumeApprovalBoardList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private final List<MemberTerms> memberTermsList = new ArrayList<>();
+//    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+//    private final List<ApplicationRequestCompany> applicationRequestCompanyList = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+//    private final List<ApplicationRequestMember> applicationRequestMemberList = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+//    private final List<AttendanceManagement> attendanceManagementList = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+//    private final List<CostumeApprovalBoard> costumeApprovalBoardList = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+//    private final List<MemberTerms> memberTermsList = new ArrayList<>();
 
     @Builder
     public Member(
@@ -110,7 +122,9 @@ public class Member extends BaseEntity {
         String introduction,
         String license,
         String pros,
-        Tattoo tattoo
+        Tattoo tattoo,
+        String bank,
+        String accountNumber
     ) {
         this.email = email;
         this.password = password;
@@ -125,9 +139,29 @@ public class Member extends BaseEntity {
         this.license = license;
         this.pros = pros;
         this.tattoo = tattoo;
+        this.bank = bank;
+        this.accountNumber = accountNumber;
+        this.userRole = UserRole.USER;
     }
 
     public void updateTattoo(Tattoo tattoo) {
         this.tattoo = tattoo;
     }
+
+    public void updateRole() {
+        this.userRole = UserRole.ADMIN;
+    }
+
+    public void encodePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void deleteRefreshToken() {
+        this.refreshToken = null;
+    }
+
 }
