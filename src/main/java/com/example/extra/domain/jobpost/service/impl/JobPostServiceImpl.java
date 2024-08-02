@@ -90,9 +90,8 @@ public class JobPostServiceImpl implements JobPostService {
                 , company
             )
             .orElseThrow(()-> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
-        JobPostServiceResponseDto jobPostServiceResponseDto = jobPostEntityMapper.toJobPostServiceResponseDto(
-            jobPost,company);
-        return jobPostServiceResponseDto;
+        return jobPostEntityMapper.toJobPostServiceResponseDto(
+            jobPost);
     }
     @Transactional(readOnly = true)
     public List<JobPostServiceResponseDto> readAllJobPosts(){

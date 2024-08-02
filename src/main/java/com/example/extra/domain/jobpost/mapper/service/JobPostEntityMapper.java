@@ -15,7 +15,7 @@ public interface JobPostEntityMapper {
 
     @Mapping(source = "company",target ="company")
     JobPost toJobPost(JobPostCreateServiceRequestDto jobPostCreateServiceRequestDto, Company company);
-    @Mapping(source = "company.name",target = "company_name")
-    JobPostServiceResponseDto toJobPostServiceResponseDto(JobPost jobPost, Company company);
+   @Mapping(source = "jobPost.company.name",target = "company_name")
+    JobPostServiceResponseDto toJobPostServiceResponseDto(JobPost jobPost);
     List<JobPostServiceResponseDto> toListJobPostServiceResponseDto(List<JobPost> jobPostList);
 }
