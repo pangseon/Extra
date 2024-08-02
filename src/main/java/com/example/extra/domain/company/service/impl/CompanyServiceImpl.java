@@ -36,7 +36,7 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional
     public void signup(
-        CompanyCreateServiceRequestDto companyCreateServiceRequestDto
+        final CompanyCreateServiceRequestDto companyCreateServiceRequestDto
     ) {
         // 이메일 중복 검사
         String email = companyCreateServiceRequestDto.email();
@@ -62,7 +62,8 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional
     public CompanyLoginServiceResponseDto login(
-        CompanyLoginServiceRequestDto companyLoginServiceRequestDto) {
+        final CompanyLoginServiceRequestDto companyLoginServiceRequestDto
+    ) {
         Company company = companyRepository.findByEmail(companyLoginServiceRequestDto.email())
             .orElseThrow(() -> new CompanyException(CompanyErrorCode.NOT_FOUND_COMPANY));
 

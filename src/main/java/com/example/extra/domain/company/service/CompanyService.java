@@ -7,10 +7,11 @@ import com.example.extra.domain.company.dto.service.response.CompanyLoginService
 public interface CompanyService {
 
     void signup(
-        CompanyCreateServiceRequestDto companyCreateServiceRequestDto
+        final CompanyCreateServiceRequestDto companyCreateServiceRequestDto
     );
 
     CompanyLoginServiceResponseDto login(
-        CompanyLoginServiceRequestDto companyLoginServiceRequestDto
+        final CompanyLoginServiceRequestDto companyLoginServiceRequestDto
+    );
     );
 }
