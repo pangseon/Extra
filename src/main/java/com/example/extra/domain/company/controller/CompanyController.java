@@ -5,12 +5,16 @@ import com.example.extra.domain.company.dto.controller.CompanyLoginControllerReq
 import com.example.extra.domain.company.dto.service.request.CompanyCreateServiceRequestDto;
 import com.example.extra.domain.company.dto.service.request.CompanyLoginServiceRequestDto;
 import com.example.extra.domain.company.dto.service.response.CompanyLoginServiceResponseDto;
+import com.example.extra.domain.company.dto.service.response.CompanyReadOnceServiceResponseDto;
 import com.example.extra.domain.company.mapper.dto.CompanyDtoMapper;
 import com.example.extra.domain.company.service.CompanyService;
+import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,5 +62,16 @@ public class CompanyController {
                 companyLoginServiceResponseDto.token()
             )
             .build();
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> readOnceCompany(
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        CompanyReadOnceServiceResponseDto companyReadOnceServiceResponseDto =
+            companyService.readOnceCompany(userDetails);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(companyReadOnceServiceResponseDto);
     }
 }
