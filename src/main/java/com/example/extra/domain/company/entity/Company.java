@@ -79,7 +79,7 @@ public class Company extends BaseEntity {
     }
 
     public void updateRefreshToken(String refreshToken) {
-        this.password = refreshToken;
+        this.refreshToken = refreshToken;
     }
 
 }
