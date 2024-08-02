@@ -46,6 +46,8 @@ public class Company extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    private String refreshToken;
+
     // TODO - 회사-공고글 양방향 매핑할 지 확인 받기 + cascade 정책 확인 받기
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private List<JobPost> jobPostList = new ArrayList<>();
@@ -65,6 +67,7 @@ public class Company extends BaseEntity {
         this.name = name;
         this.companyUrl = companyUrl;
         this.userRole = UserRole.USER;
+        this.refreshToken = null;
     }
 
     public void updateRole() {
@@ -73,6 +76,10 @@ public class Company extends BaseEntity {
 
     public void encodePassword(String password) {
         this.password = password;
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.password = refreshToken;
     }
 
 }
