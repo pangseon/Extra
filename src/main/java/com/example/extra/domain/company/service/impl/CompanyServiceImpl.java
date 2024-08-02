@@ -28,7 +28,9 @@ public class CompanyServiceImpl implements CompanyService {
         // 이메일 중복 검사
         String email = companyCreateServiceRequestDto.email();
         companyRepository.findByEmail(email)
-            .orElseThrow(() -> new CompanyException(CompanyErrorCode.ALREADY_EXIST_EMAIL));
+            .ifPresent(c -> {
+                throw new CompanyException(CompanyErrorCode.ALREADY_EXIST_EMAIL);
+            });
 
         Company company = companyEntityMapper.toCompany(companyCreateServiceRequestDto);
         companyRepository.save(company);
