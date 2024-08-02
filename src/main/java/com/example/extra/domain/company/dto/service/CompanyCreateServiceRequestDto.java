@@ -3,7 +3,9 @@ package com.example.extra.domain.company.dto.service;
 public record CompanyCreateServiceRequestDto(
     String email,
     String password,
-    String name
+    String name,
+    boolean isAdmin,
+    String adminToken
 ) {
 
 }
