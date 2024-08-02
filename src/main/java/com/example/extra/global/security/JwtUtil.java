@@ -1,5 +1,7 @@
 package com.example.extra.global.security;
 
+import com.example.extra.domain.company.entity.Company;
+import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.global.enums.UserRole;
@@ -40,7 +42,10 @@ public class JwtUtil {
     @Value("${jwt.secret.key}")
     private String secretKey;
     private Key key;
+
+    // repository
     private final MemberRepository memberRepository;
+    private final CompanyRepository companyRepository;
 
     @PostConstruct
     protected void init() {
@@ -122,9 +127,9 @@ public class JwtUtil {
         try {
             Claims info = getUserInfoFromToken(token);
             log.info(info.toString());
-            Member member = memberRepository.findByEmail(info.getSubject())
-                .orElseThrow(() -> new RuntimeException(""));
-            if (member.getRefreshToken() == null) {
+            Member member = memberRepository.findByEmail(info.getSubject()).get();
+            Company company = companyRepository.findByEmail(info.getSubject()).get();
+            if (member.getRefreshToken() == null && company.getRefreshToken() == null) {
                 return false;
             }
             // access token 유효/만료 확인
