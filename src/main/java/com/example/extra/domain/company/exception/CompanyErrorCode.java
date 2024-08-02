@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum CompanyErrorCode implements ErrorCode {
     // 400
+    ALREADY_EXIST_EMAIL(HttpStatus.BAD_REQUEST, "이미 존재하는 아이디"),
     INVALID_EMAIL(HttpStatus.BAD_REQUEST, "잘못된 아이디 입력"),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "잘못된 비밀번호 입력"),
 
