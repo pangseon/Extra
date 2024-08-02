@@ -8,6 +8,7 @@ import com.example.extra.domain.company.mapper.entity.CompanyEntityMapper;
 import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.company.service.CompanyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,9 @@ public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
     private final CompanyEntityMapper companyEntityMapper;
+
+    // security
+    private final PasswordEncoder passwordEncoder;
 
     private final String ADMIN_TOKEN = "admintoken";
 
@@ -33,6 +37,7 @@ public class CompanyServiceImpl implements CompanyService {
             });
 
         Company company = companyEntityMapper.toCompany(companyCreateServiceRequestDto);
+        company.encodePassword(passwordEncoder.encode(company.getPassword()));
         companyRepository.save(company);
 
         // role 변경 (ROLE_USER -> ROLE_ADMIN)

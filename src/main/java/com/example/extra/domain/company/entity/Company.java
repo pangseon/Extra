@@ -71,4 +71,8 @@ public class Company extends BaseEntity {
         this.userRole = UserRole.ADMIN;
     }
 
+    public void encodePassword(String password) {
+        this.password = password;
+    }
+
 }
