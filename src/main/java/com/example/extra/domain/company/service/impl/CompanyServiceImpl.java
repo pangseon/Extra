@@ -10,6 +10,9 @@ import com.example.extra.domain.company.exception.CompanyException;
 import com.example.extra.domain.company.mapper.entity.CompanyEntityMapper;
 import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.company.service.CompanyService;
+import com.example.extra.domain.member.exception.MemberErrorCode;
+import com.example.extra.domain.member.exception.MemberException;
+import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.global.security.JwtUtil;
 import com.example.extra.global.security.UserDetailsImpl;
 import com.example.extra.global.security.repository.RefreshTokenRepository;
@@ -26,12 +29,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final MemberRepository memberRepository;
+
+    // mapper
     private final CompanyEntityMapper companyEntityMapper;
 
     // security
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     private final String ADMIN_TOKEN = "admintoken";
 
@@ -45,6 +51,10 @@ public class CompanyServiceImpl implements CompanyService {
         companyRepository.findByEmail(email)
             .ifPresent(c -> {
                 throw new CompanyException(CompanyErrorCode.ALREADY_EXIST_EMAIL);
+            });
+        memberRepository.findByEmail(email)
+            .ifPresent(m -> {
+                throw new MemberException(MemberErrorCode.ALREADY_EXIST_MEMBER);
             });
 
         Company company = companyEntityMapper.toCompany(companyCreateServiceRequestDto);

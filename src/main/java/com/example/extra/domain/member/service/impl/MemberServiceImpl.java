@@ -1,5 +1,8 @@
 package com.example.extra.domain.member.service.impl;
 
+import com.example.extra.domain.company.exception.CompanyErrorCode;
+import com.example.extra.domain.company.exception.CompanyException;
+import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
 import com.example.extra.domain.member.dto.service.request.MemberLoginServiceRequestDto;
 import com.example.extra.domain.member.dto.service.response.MemberLoginServiceResponseDto;
@@ -34,6 +37,9 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final TattooRepository tattooRepository;
+    private final CompanyRepository companyRepository;
+
+    // mapper
     private final MemberEntityMapper memberEntityMapper;
     private final TattooEntityMapper tattooEntityMapper;
 
@@ -55,6 +61,10 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.findByEmail(email)
             .ifPresent(m -> {
                 throw new MemberException(MemberErrorCode.ALREADY_EXIST_MEMBER);
+            });
+        companyRepository.findByEmail(email)
+            .ifPresent(m -> {
+                throw new CompanyException(CompanyErrorCode.ALREADY_EXIST_EMAIL);
             });
 
         Member member = memberEntityMapper.toMember(memberCreateServiceRequestDto);
