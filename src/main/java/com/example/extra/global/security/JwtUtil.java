@@ -130,8 +130,8 @@ public class JwtUtil {
             Member member = memberRepository.findByEmail(info.getSubject()).orElse(null);
             Company company = companyRepository.findByEmail(info.getSubject()).orElse(null);
 
-            if (member != null && member.getRefreshToken() != null ||
-                company != null && company.getRefreshToken() != null
+            if ((member != null && member.getRefreshToken() != null) ||
+                (company != null && company.getRefreshToken() != null)
             ) {
                 // access token 유효/만료 확인
                 return !isExpired(token);
