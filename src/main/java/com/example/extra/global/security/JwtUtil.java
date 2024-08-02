@@ -127,13 +127,15 @@ public class JwtUtil {
         try {
             Claims info = getUserInfoFromToken(token);
             log.info(info.toString());
-            Member member = memberRepository.findByEmail(info.getSubject()).get();
-            Company company = companyRepository.findByEmail(info.getSubject()).get();
-            if (member.getRefreshToken() == null && company.getRefreshToken() == null) {
-                return false;
+            Member member = memberRepository.findByEmail(info.getSubject()).orElse(null);
+            Company company = companyRepository.findByEmail(info.getSubject()).orElse(null);
+
+            if (member != null && member.getRefreshToken() != null ||
+                company != null && company.getRefreshToken() != null
+            ) {
+                // access token 유효/만료 확인
+                return !isExpired(token);
             }
-            // access token 유효/만료 확인
-            return !isExpired(token);
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
             log.error("Invalid JWT signature : 잘못된 JWT 서명");
         } catch (ExpiredJwtException e) {

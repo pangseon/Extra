@@ -1,8 +1,10 @@
 package com.example.extra.global.filter;
 
+import com.example.extra.global.exception.ErrorCode;
+import com.example.extra.global.exception.dto.CustomExceptionResponseDto;
 import com.example.extra.global.security.JwtUtil;
 import com.example.extra.global.security.exception.TokenErrorCode;
-import com.example.extra.global.security.exception.TokenException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -55,7 +57,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             if (!jwtUtil.validateToken(token)) {
                 log.error("Token validation 실패");
-                throw new TokenException(TokenErrorCode.INVALID_TOKEN);
+                jwtException(response, TokenErrorCode.NOT_FOUND_TOKEN);
+                return;
             }
 
             Claims info = jwtUtil.getUserInfoFromToken(token);
@@ -86,5 +89,23 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             null,
             userDetails.getAuthorities()
         );
+    }
+
+    private void jwtException(HttpServletResponse response, ErrorCode errorCode) {
+        response.setStatus(errorCode.getStatus().value());
+        response.setContentType("application/json;charset=UTF-8");
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(
+                CustomExceptionResponseDto.builder()
+                    .status(errorCode.getStatus().value())
+                    .name(errorCode.name())
+                    .message(errorCode.getMessage())
+                    .build()
+            );
+            response.getWriter().write(json);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
     }
 }
