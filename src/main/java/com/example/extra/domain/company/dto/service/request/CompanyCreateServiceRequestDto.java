@@ -1,4 +1,4 @@
-package com.example.extra.domain.company.dto.service;
+package com.example.extra.domain.company.dto.service.request;
 
 public record CompanyCreateServiceRequestDto(
     String email,
