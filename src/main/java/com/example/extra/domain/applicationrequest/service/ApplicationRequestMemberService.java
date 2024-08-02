@@ -21,15 +21,14 @@ public interface ApplicationRequestMemberService {
         final Pageable pageable
     );
 
-    List<ApplicationRequestCompanyReadServiceResponseDto> getApprovedMembersByRole(
-        final long roleId,
-        final Pageable pageable
-    );
-
     void updateStatus(
-        final Long applicationRequestId,
+        final Long applicationRequestMemberId,
+        final ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
+    );
+    void createAttendanceManagementIfApproved(
+        final Long applicationRequestMemberId,
         final ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
     );
 
-    void deleteApplicationRequestMember(final Long applicationRequestId);
+    void deleteApplicationRequestMember(final Long applicationRequestMemberId);
 }
