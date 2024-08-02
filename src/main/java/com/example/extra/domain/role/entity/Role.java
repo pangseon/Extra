@@ -31,7 +31,7 @@ public class Role extends BaseEntity {
     private Long id;
 
     @Column
-    private String roleName;
+    private String role_name;
 
     @Column
     private String costume;
@@ -40,13 +40,13 @@ public class Role extends BaseEntity {
     private Boolean sex;
 
     @Column
-    private LocalDate roleAge;
+    private LocalDate role_age;
 
     @Column
-    private Integer limitPersonnel;
+    private Integer limit_personnel;
 
     @Column
-    private Integer currentPersonnel;
+    private Integer current_personnel;
 
     @Column
     private Season season;
@@ -57,21 +57,21 @@ public class Role extends BaseEntity {
     private JobPost jobPost;
     @Builder
     public Role(
-        String  roleName,
+        String  role_name,
         String costume,
         Boolean sex,
-        LocalDate roleAge,
-        Integer limitPersonnel,
-        Integer currentPersonnel,
+        LocalDate role_age,
+        Integer limit_personnel,
+        Integer current_personnel,
         Season season,
         JobPost jobPost
     ){
-        this.roleName = roleName;
+        this.role_name = role_name;
         this.costume = costume;
         this.sex = sex;
-        this.roleAge = roleAge;
-        this.limitPersonnel = limitPersonnel;
-        this.currentPersonnel = currentPersonnel;
+        this.role_age = role_age;
+        this.limit_personnel = limit_personnel;
+        this.current_personnel = current_personnel;
         this.season = season;
         this.jobPost = jobPost;
     }
