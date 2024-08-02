@@ -3,6 +3,7 @@ package com.example.extra.domain.company.service.impl;
 import com.example.extra.domain.company.dto.service.request.CompanyCreateServiceRequestDto;
 import com.example.extra.domain.company.dto.service.request.CompanyLoginServiceRequestDto;
 import com.example.extra.domain.company.dto.service.response.CompanyLoginServiceResponseDto;
+import com.example.extra.domain.company.dto.service.response.CompanyReadOnceServiceResponseDto;
 import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.company.exception.CompanyErrorCode;
 import com.example.extra.domain.company.exception.CompanyException;
@@ -10,6 +11,7 @@ import com.example.extra.domain.company.mapper.entity.CompanyEntityMapper;
 import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.company.service.CompanyService;
 import com.example.extra.global.security.JwtUtil;
+import com.example.extra.global.security.UserDetailsImpl;
 import com.example.extra.global.security.repository.RefreshTokenRepository;
 import com.example.extra.global.security.token.RefreshToken;
 import lombok.RequiredArgsConstructor;
@@ -64,8 +66,7 @@ public class CompanyServiceImpl implements CompanyService {
     public CompanyLoginServiceResponseDto login(
         final CompanyLoginServiceRequestDto companyLoginServiceRequestDto
     ) {
-        Company company = companyRepository.findByEmail(companyLoginServiceRequestDto.email())
-            .orElseThrow(() -> new CompanyException(CompanyErrorCode.NOT_FOUND_COMPANY));
+        Company company = findByEmail(companyLoginServiceRequestDto.email());
 
         if (!passwordEncoder.matches(
             companyLoginServiceRequestDto.password(),
@@ -93,5 +94,19 @@ public class CompanyServiceImpl implements CompanyService {
         );
 
         return new CompanyLoginServiceResponseDto(accessToken);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CompanyReadOnceServiceResponseDto readOnceCompany(
+        UserDetailsImpl userDetails
+    ) {
+        Company company = findByEmail(userDetails.getUsername());
+        return companyEntityMapper.toCompanyReadOnceServiceResponseDto(company);
+    }
+
+    private Company findByEmail(String email) {
+        return companyRepository.findByEmail(email)
+            .orElseThrow(() -> new CompanyException(CompanyErrorCode.NOT_FOUND_COMPANY));
     }
 }
