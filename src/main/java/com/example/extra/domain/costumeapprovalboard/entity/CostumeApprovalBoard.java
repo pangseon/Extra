@@ -39,6 +39,9 @@ public class CostumeApprovalBoard extends BaseEntity {
     @Column(name = "costume_image_url", nullable = false)
     private String costumeImageUrl;
 
+    @Column
+    private String image_explain;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id")
     private Member member;
