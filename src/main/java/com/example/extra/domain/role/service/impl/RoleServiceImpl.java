@@ -54,4 +54,15 @@ public class RoleServiceImpl implements RoleService {
             roleUpdateServiceRequestDto.check_tattoo());
         roleRepository.save(role);
     }
+    public void deleteRole(
+        Long jobPost_id,
+        Long role_id,
+        Company company
+    ){
+        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id,company)
+            .orElseThrow(()->new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        Role role = roleRepository.findByIdAndJobPost(role_id,jobPost)
+            .orElseThrow(()->new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
+        roleRepository.delete(role);
+    }
 }
