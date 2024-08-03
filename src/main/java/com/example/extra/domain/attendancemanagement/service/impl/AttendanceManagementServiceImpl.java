@@ -170,7 +170,7 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
                     AttendanceManagementReadServiceResponseDto.builder()
                         .memberId(applicationRequestMember.getMember().getId())
                         .memberName(applicationRequestMember.getMember().getName())
-                        .roleName(role.getRoleName())
+                        .roleName(role.getRole_name())
                         .isAttended(isAttended)
                         .build()
                 );
