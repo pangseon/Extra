@@ -59,15 +59,15 @@ public class Role extends BaseEntity {
     private JobPost jobPost;
     @Builder
     public Role(
-        String  role_name,
-        String costume,
-        Boolean sex,
-        LocalDate role_age,
-        Integer limit_personnel,
-        Integer current_personnel,
-        Season season,
-        Boolean check_tattoo,
-        JobPost jobPost
+        final String  role_name,
+        final String costume,
+        final Boolean sex,
+        final LocalDate role_age,
+        final Integer limit_personnel,
+        final Integer current_personnel,
+        final Season season,
+        final Boolean check_tattoo,
+        final JobPost jobPost
     ){
         this.role_name = role_name;
         this.costume = costume;
@@ -78,6 +78,25 @@ public class Role extends BaseEntity {
         this.season = season;
         this.check_tattoo=check_tattoo;
         this.jobPost = jobPost;
+    }
+    public void updateRole(
+        String  role_name,
+        String costume,
+        Boolean sex,
+        LocalDate role_age,
+        Integer limit_personnel,
+        Integer current_personnel,
+        Season season,
+        Boolean check_tattoo
+    ){
+        this.role_name = role_name;
+        this.costume = costume;
+        this.sex = sex;
+        this.role_age = role_age;
+        this.limit_personnel = limit_personnel;
+        this.current_personnel = current_personnel;
+        this.season = season;
+        this.check_tattoo=check_tattoo;
     }
 
     public void addOneToCurrentPersonnel(){
