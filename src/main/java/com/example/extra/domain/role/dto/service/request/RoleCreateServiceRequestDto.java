@@ -1,4 +1,4 @@
-package com.example.extra.domain.role.dto.service;
+package com.example.extra.domain.role.dto.service.request;
 
 import com.example.extra.global.enums.Season;
 import java.time.LocalDate;
