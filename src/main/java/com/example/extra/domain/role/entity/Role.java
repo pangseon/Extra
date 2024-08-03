@@ -87,8 +87,7 @@ public class Role extends BaseEntity {
         Integer limit_personnel,
         Integer current_personnel,
         Season season,
-        Boolean check_tattoo,
-        JobPost jobPost
+        Boolean check_tattoo
     ){
         this.role_name = role_name;
         this.costume = costume;
@@ -98,7 +97,6 @@ public class Role extends BaseEntity {
         this.current_personnel = current_personnel;
         this.season = season;
         this.check_tattoo=check_tattoo;
-        this.jobPost = jobPost;
     }
 
     public void addOneToCurrentPersonnel(){
