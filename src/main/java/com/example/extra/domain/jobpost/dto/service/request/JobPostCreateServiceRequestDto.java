@@ -4,7 +4,7 @@ import com.example.extra.global.enums.Category;
 import java.time.LocalDateTime;
 
 public record JobPostCreateServiceRequestDto(
-    String dramaTitle,
+    String title,
     String gatheringLocation,
     LocalDateTime gatheringTime,
     String imageUrl,
