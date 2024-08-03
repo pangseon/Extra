@@ -175,7 +175,7 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
         return applicationRequestMemberRepository.findById(applicationRequestMemberId).orElseThrow(
             // 지원 상태 업데이트 하려 했는데 없으면 예외 발생.
             ()-> new NotFoundApplicationRequestCompanyException(
-                ApplicationRequestErrorCode.NOT_FOUND_APPLICATION_REQUEST_COMPANY
+                ApplicationRequestErrorCode.NOT_FOUND_APPLICATION_REQUEST_MEMBER
             )
         );
     }
