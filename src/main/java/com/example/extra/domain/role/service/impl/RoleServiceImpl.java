@@ -5,14 +5,16 @@ import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.domain.jobpost.exception.JobPostErrorCode;
 import com.example.extra.domain.jobpost.exception.NotFoundJobPostException;
 import com.example.extra.domain.jobpost.repository.JobPostRepository;
-import com.example.extra.domain.role.dto.service.RoleCreateServiceRequestDto;
-import com.example.extra.domain.role.dto.service.RoleUpdateServiceRequestDto;
+import com.example.extra.domain.role.dto.service.request.RoleCreateServiceRequestDto;
+import com.example.extra.domain.role.dto.service.request.RoleUpdateServiceRequestDto;
+import com.example.extra.domain.role.dto.service.response.RoleServiceReResponseDto;
 import com.example.extra.domain.role.entity.Role;
 import com.example.extra.domain.role.exception.NotFoundRoleException;
 import com.example.extra.domain.role.exception.RoleErrorCode;
 import com.example.extra.domain.role.mapper.service.RoleEntityMapper;
 import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.domain.role.service.RoleService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -64,5 +66,21 @@ public class RoleServiceImpl implements RoleService {
         Role role = roleRepository.findByIdAndJobPost(role_id,jobPost)
             .orElseThrow(()->new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
         roleRepository.delete(role);
+    }
+    public RoleServiceReResponseDto readRole(
+        Long jobPost_id,
+        Long role_id
+    ){
+        JobPost jobPost = jobPostRepository.findById(jobPost_id)
+            .orElseThrow(()->new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        Role role = roleRepository.findByIdAndJobPost(role_id,jobPost)
+            .orElseThrow(()->new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
+        return roleEntityMapper.toRoleServiceReResponseDto(role);
+    }
+    public List<RoleServiceReResponseDto> readAllRole(Long jobPost_id){
+        JobPost jobPost =jobPostRepository.findById(jobPost_id)
+            .orElseThrow(()->new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        List<Role> roleList = roleRepository.findAllByJobPost(jobPost);
+        return roleEntityMapper.toListRoleServiceReResponseDto(roleList);
     }
 }

@@ -2,16 +2,19 @@ package com.example.extra.domain.role.controller;
 
 import com.example.extra.domain.role.dto.controller.RoleCreateControllerRequestDto;
 import com.example.extra.domain.role.dto.controller.RoleUpdateControllerRequestDto;
-import com.example.extra.domain.role.dto.service.RoleCreateServiceRequestDto;
-import com.example.extra.domain.role.dto.service.RoleUpdateServiceRequestDto;
+import com.example.extra.domain.role.dto.service.request.RoleCreateServiceRequestDto;
+import com.example.extra.domain.role.dto.service.request.RoleUpdateServiceRequestDto;
+import com.example.extra.domain.role.dto.service.response.RoleServiceReResponseDto;
 import com.example.extra.domain.role.mapper.dto.RoleDtoMapper;
 import com.example.extra.domain.role.service.RoleService;
 import com.example.extra.global.security.UserDetailsImpl;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -57,6 +60,17 @@ public class RoleController {
     ){
         roleService.deleteRole(jobPost_id,role_id,userDetails.getCompany());
         return  ResponseEntity.status(HttpStatus.OK).build();
+    }
+    @GetMapping("/{jobPost_id}/roles/{role_id}")
+    public RoleServiceReResponseDto readOnceRole(
+        @PathVariable Long jobPost_id,
+        @PathVariable Long role_id
+    ){
+        return roleService.readRole(jobPost_id,role_id);
+    }
+    @GetMapping("/{jobPost_id}/roles")
+    public List<RoleServiceReResponseDto> readAllRile(@PathVariable Long jobPost_id){
+        return roleService.readAllRole(jobPost_id);
     }
 
 }
