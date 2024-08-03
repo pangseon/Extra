@@ -10,7 +10,8 @@ public record RoleUpdateControllerRequestDto(
     LocalDate role_age,
     Integer limit_personnel,
     Integer current_personnel,
-    Season season
+    Season season,
+    Boolean check_tattoo
 )
 {
 
