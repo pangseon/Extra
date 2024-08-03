@@ -6,7 +6,8 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum CostumeApprovalBoardErrorCode implements ErrorCode {
-    ;
+
+    NOT_FOUND_COSTUME_APPROVAL_BOARD_MEMBER(HttpStatus.NOT_FOUND, "의상 컨펌 작성 이력이 없습니다."),;
 
     private final HttpStatus status;
     private final String message;
