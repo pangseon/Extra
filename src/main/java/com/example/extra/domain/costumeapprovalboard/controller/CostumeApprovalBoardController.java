@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,5 +32,17 @@ public class CostumeApprovalBoardController {
         );
         return ResponseEntity.status(HttpStatus.OK)
             .body(costumeApprovalBoardMemberReadServiceResponseDto);
+    }
+    // 출연자 본인 역할에 대해 의상 컨펌 삭제
+    @DeleteMapping("/member/roles/{roleId}")
+    public ResponseEntity<?> deleteCostumeApprovalBoardFromMember(
+        @PathVariable Long roleId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        costumeApprovalBoardService.deleteCostumeApprovalBoardByMember(
+            userDetails.getMember(),
+            roleId
+        );
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
