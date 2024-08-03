@@ -29,7 +29,7 @@ public class ApplicationRequestCompanyController {
     private final ApplicationRequestDtoMapper applicationRequestDtoMapper;
 
     // 해당 역할에 지원한 출연자들(지원현황 화면)
-    @GetMapping("/{roleId}/members")
+    @GetMapping("/roles/{roleId}/members")
     public ResponseEntity<?> readAllApplicationRequestMemberByStatus(
         @PathVariable(name = "roleId") Long roleId,
         @PageableDefault(size = 10, sort = "createdAt", direction = Direction.ASC) Pageable pageable
@@ -43,7 +43,7 @@ public class ApplicationRequestCompanyController {
             .body(applicationRequestCompanyReadServiceResponseDtoList);
     }
     // 요청 승인 및 거절(지원현황 화면)
-    @PutMapping("{applicationRequestId}")
+    @PutMapping("application-requests/{applicationRequestId}")
     public ResponseEntity<?> updateApplicationRequestMemberStatusToRejected(
         @PathVariable(name = "applicationRequestId") Long applicationRequestId,
         @Valid @RequestPart(name = "applicationRequestMemberUpdateControllerRequestDto")

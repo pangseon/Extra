@@ -33,7 +33,7 @@ public class AttendanceManagementController {
     private final AttendanceManagementDtoMapper attendanceManagementDtoMapper;
 
     // 해당 공고 출연자들(출연자 목록 화면)
-    @GetMapping("/{jobPostId}/members")
+    @GetMapping("/jobposts/{jobPostId}/members")
     public ResponseEntity<?> readAllAttendanceManagementByJobPost(
         @PathVariable(name = "jobPostId") Long jobPostId,
         @PageableDefault(size = 10, sort = "roleName", direction = Direction.ASC) Pageable pageable
@@ -47,7 +47,7 @@ public class AttendanceManagementController {
             .body(attendanceManagementReadServiceResponseDtoList);
     }
     // QR 출근 체크
-    @PutMapping("/{jobPostId}/clock-in")
+    @PutMapping("/jobposts/{jobPostId}/clock-in")
     public ResponseEntity<?> updateAttendanceManagementClockInTime(
         @PathVariable(name = "jobPostId") Long jobPostId,
         @Valid @RequestPart(name = "attendanceManagementUpdateControllerRequestDto")
@@ -64,7 +64,7 @@ public class AttendanceManagementController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
     // QR 퇴근 체크
-    @PutMapping("/{jobPostId}/clock-out")
+    @PutMapping("/jobposts/{jobPostId}/clock-out")
     public ResponseEntity<?> updateAttendanceManagementClockOutTime(
         @PathVariable(name = "jobPostId") Long jobPostId,
         @Valid @RequestPart(name = "attendanceManagementUpdateControllerRequestDto")
@@ -81,7 +81,7 @@ public class AttendanceManagementController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
     // QR 식사 체크
-    @PutMapping("/{jobPostId}/meal-count")
+    @PutMapping("/jobposts/{jobPostId}/meal-count")
     public ResponseEntity<?> updateAttendanceManagementMealCount(
         @PathVariable(name = "jobPostId") Long jobPostId,
         @Valid @RequestPart(name = "attendanceManagementUpdateControllerRequestDto")
@@ -98,7 +98,7 @@ public class AttendanceManagementController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
     // 출퇴근 정보 엑셀 파일
-    @GetMapping("/{jobPostId}/excel")
+    @GetMapping("/jobposts/{jobPostId}/excel")
     public void downloadAttendanceInfo(
         @PathVariable(name = "jobPostId") Long jobPostId,
         HttpServletResponse response
