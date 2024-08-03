@@ -32,12 +32,11 @@ public class CostumeApprovalBoard extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "costume_approve", columnDefinition = "boolean default false")
-    private Boolean costumeApprove;
+    @Column(columnDefinition = "boolean default false")
+    private Boolean costume_approve;
 
-    // TODO - DTO에 @NotBlank constraint 붙이기.
-    @Column(name = "costume_image_url", nullable = false)
-    private String costumeImageUrl;
+    @Column
+    private String costume_image_url;
 
     @Column
     private String image_explain;
@@ -52,13 +51,15 @@ public class CostumeApprovalBoard extends BaseEntity {
 
     @Builder
     public CostumeApprovalBoard(
-        Boolean costumeApprove,
-        String costumeImageUrl,
-        Member member,
-        Role role
+        final Boolean costumeApprove,
+        final String costumeImageUrl,
+        final String image_explain,
+        final Member member,
+        final Role role
     ){
-        this.costumeApprove = costumeApprove;
-        this.costumeImageUrl = costumeImageUrl;
+        this.costume_approve = costumeApprove;
+        this.costume_image_url = costumeImageUrl;
+        this.image_explain = image_explain;
         this.member = member;
         this.role = role;
     }
