@@ -14,4 +14,8 @@ public interface RoleService {
         Long role_id,
         Company company,
         RoleUpdateServiceRequestDto roleUpdateServiceRequestDto);
+    void deleteRole(
+        Long jobPost_id,
+        Long role_id,
+        Company company);
 }
