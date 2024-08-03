@@ -39,7 +39,6 @@ public class Member extends BaseEntity {
     private String email;
 
     @Column(nullable = false)
-    @Size(max = 30)
     private String password;
 
     @Column(nullable = false)
@@ -141,9 +140,9 @@ public class Member extends BaseEntity {
         this.height = height;
         this.weight = weight;
         this.phone = phone;
-        this.introduction = introduction;
-        this.license = license;
-        this.pros = pros;
+        this.introduction = "";
+        this.license = "";
+        this.pros = "";
         this.tattoo = tattoo;
         this.bank = bank;
         this.accountNumber = accountNumber;
