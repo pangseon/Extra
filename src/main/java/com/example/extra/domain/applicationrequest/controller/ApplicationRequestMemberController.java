@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApplicationRequestMemberController {
     private final ApplicationRequestMemberService applicationRequestMemberService;
     // 사용자가 특정 역할에 지원
-    @PostMapping("/role/{roleId}")
+    @PostMapping("/roles/{roleId}")
     public ResponseEntity<?> createApplicationRequestMember(
         @PathVariable(name = "roleId") Long roleId
     ){
@@ -61,7 +61,7 @@ public class ApplicationRequestMemberController {
             .body(appliedRoleList);
     }
     // 특정 역할에 지원 취소
-    @DeleteMapping("{applicationRequestId}")
+    @DeleteMapping("/application-requests/{applicationRequestId}")
     public ResponseEntity<?> deleteApplicationRequestMember(
         @PathVariable(name = "applicationRequestId") Long applicationRequestId
     ){

@@ -4,16 +4,13 @@ import com.example.extra.domain.applicationrequest.entity.ApplicationRequestMemb
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.role.entity.Role;
 import com.example.extra.global.enums.ApplyStatus;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ApplicationRequestMemberRepository extends JpaRepository<ApplicationRequestMember, Long> {
-    Optional<ApplicationRequestMember> findByMemberAndRole(
-        Member member,
-        Role role
-    );
     Slice<ApplicationRequestMember> findAllByMember(
         Member member,
         Pageable page
@@ -28,10 +25,8 @@ public interface ApplicationRequestMemberRepository extends JpaRepository<Applic
         Role role,
         Pageable page
     );
-    Slice<ApplicationRequestMember> findAllByRoleAndApplyStatus(
+    List<ApplicationRequestMember> findAllByRoleAndApplyStatus(
         Role role,
-        ApplyStatus applyStatus,
-        Pageable page
+        ApplyStatus applyStatus
     );
-
 }
