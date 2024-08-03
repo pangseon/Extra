@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -48,4 +49,14 @@ public class RoleController {
         roleService.updateRole(jobPost_id,role_id,userDetails.getCompany(),roleUpdateServiceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+    @DeleteMapping("/{jobPost_id}/roles/{role_id}")
+    public ResponseEntity<?> deleteRole(
+        @PathVariable Long jobPost_id,
+        @PathVariable Long role_id,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        roleService.deleteRole(jobPost_id,role_id,userDetails.getCompany());
+        return  ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 }
