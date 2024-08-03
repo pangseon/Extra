@@ -1,6 +1,5 @@
 package com.example.extra.domain.jobpost.controller;
 
-import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.jobpost.dto.controller.JobPostCreateControllerRequestDto;
 import com.example.extra.domain.jobpost.dto.controller.JobPostUpdateControllerRequestDto;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostCreateServiceRequestDto;
@@ -8,8 +7,6 @@ import com.example.extra.domain.jobpost.dto.service.request.JobPostUpdateService
 import com.example.extra.domain.jobpost.dto.service.response.JobPostServiceResponseDto;
 import com.example.extra.domain.jobpost.mapper.dto.JobPostDtoMapper;
 import com.example.extra.domain.jobpost.service.JobPostService;
-import com.example.extra.domain.role.dto.controller.RoleCreateControllerRequestDto;
-import com.example.extra.domain.role.dto.service.RoleCreateServiceRequestDto;
 import com.example.extra.domain.role.mapper.dto.RoleDtoMapper;
 import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
@@ -25,7 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
