@@ -8,4 +8,8 @@ public interface CostumeApprovalBoardService {
         Member member,
         Long roleId
     );
+    void deleteCostumeApprovalBoardByMember(
+        Member member,
+        Long roleId
+    );
 }

@@ -26,4 +26,15 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             );
         return CostumeApprovalBoardMemberReadServiceResponseDto.from(costumeApprovalBoard);
     }
+    @Transactional
+    public void deleteCostumeApprovalBoardByMember(
+        Member member,
+        Long roleId
+    ){
+        CostumeApprovalBoard costumeApprovalBoard = costumeApprovalBoardRepository.findByMemberAndRoleId(member, roleId)
+            .orElseThrow(() -> new CostumeApprovalBoardException(
+                CostumeApprovalBoardErrorCode.NOT_FOUND_COSTUME_APPROVAL_BOARD_MEMBER)
+            );
+        costumeApprovalBoardRepository.deleteById(costumeApprovalBoard.getId());
+    }
 }
