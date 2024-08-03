@@ -101,7 +101,10 @@ public class MemberServiceImpl implements MemberService {
         }
 
         // jwt 토큰 생성
-        String accessToken = jwtUtil.createToken(member.getEmail(), member.getUserRole());
+        String accessToken = jwtUtil.createToken(
+            member.getEmail(),
+            member.getUserRole()
+        );
         String refreshToken = jwtUtil.createRefreshToken();
         log.info("access token: " + accessToken);
         log.info("refresh token: " + refreshToken);
@@ -125,6 +128,7 @@ public class MemberServiceImpl implements MemberService {
         final HttpServletRequest request
     ) throws ServletException, IOException {
         Member member = userDetails.getMember();
+
         RefreshToken refreshToken = refreshTokenRepository.findById(member.getId())
             .orElseThrow(() -> new MemberException(MemberErrorCode.UNAUTHORIZED));
         refreshTokenRepository.delete(refreshToken);
@@ -173,8 +177,8 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.delete(member);
     }
 
-    private Member findByEmail(String name) {
-        return memberRepository.findByEmail(name)
+    private Member findByEmail(String email) {
+        return memberRepository.findByEmail(email)
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
     }
 

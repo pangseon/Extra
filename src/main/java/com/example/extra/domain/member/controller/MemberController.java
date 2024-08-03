@@ -82,7 +82,7 @@ public class MemberController {
         @NotNull HttpServletRequest request
     ) throws ServletException, IOException {
         memberService.logout(userDetails, request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("")
