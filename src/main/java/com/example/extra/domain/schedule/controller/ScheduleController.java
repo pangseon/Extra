@@ -28,7 +28,7 @@ public class ScheduleController {
 
         ScheduleCreateServiceRequestDto scheduleCreateServiceRequestDto =
             scheduleDtoMapper.toScheduleCreateServiceDto(createControllerRequestDto);
-        scheduleService.createSchedule(JobPost_id,scheduleCreateServiceRequestDto);
+        scheduleService.createSchedule(jobPost_id,scheduleCreateServiceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

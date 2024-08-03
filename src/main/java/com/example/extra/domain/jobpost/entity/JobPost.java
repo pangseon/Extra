@@ -36,7 +36,7 @@ public class JobPost extends BaseEntity {
     private Long id;
 
     @Column
-    private String dramaTitle;
+    private String title;
 
     @Column
     private String gatheringLocation;
@@ -66,7 +66,7 @@ public class JobPost extends BaseEntity {
 
     @Builder
     public JobPost(
-        final String dramaTitle,
+        final String title,
         final String gatheringLocation,
         final LocalDateTime gatheringTime,
         final Boolean status,
@@ -74,7 +74,7 @@ public class JobPost extends BaseEntity {
         final Category category,
         final Company company
     ){
-        this.dramaTitle = dramaTitle;
+        this.title = title;
         this.gatheringLocation = gatheringLocation;
         this.gatheringTime = gatheringTime;
         this.status = status;
@@ -90,7 +90,7 @@ public class JobPost extends BaseEntity {
          Integer hourPay,
          Category category
     ){
-        this.dramaTitle = dramaTitle;
+        this.title = dramaTitle;
         this.gatheringLocation = gatheringLocation;
         this.gatheringTime = gatheringTime;
         this.status = status;
