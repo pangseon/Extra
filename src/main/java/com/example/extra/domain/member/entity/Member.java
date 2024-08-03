@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,9 +39,11 @@ public class Member extends BaseEntity {
     private String email;
 
     @Column(nullable = false)
+    @Size(max = 30)
     private String password;
 
     @Column(nullable = false)
+    @Size(min = 1, max = 10)
     private String name;
 
     @Column(nullable = false)
@@ -59,6 +62,7 @@ public class Member extends BaseEntity {
     private Float weight;
 
     @Column(nullable = false)
+    @Size(max = 15)
     private String phone;
 
     @Column
@@ -71,9 +75,11 @@ public class Member extends BaseEntity {
     private String pros;
 
     @Column
+    @Size(max = 10)
     private String bank;
 
     @Column
+    @Size(max = 30)
     private String accountNumber;
 
     @Column
