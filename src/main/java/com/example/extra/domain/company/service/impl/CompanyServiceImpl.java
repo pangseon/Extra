@@ -111,7 +111,7 @@ public class CompanyServiceImpl implements CompanyService {
         final Company company
     ) {
         RefreshToken refreshToken = refreshTokenRepository.findById(company.getId())
-            .orElseThrow(() -> new CompanyException(CompanyErrorCode.UNAUTHORIZED));
+            .orElseThrow(() -> new CompanyException(CompanyErrorCode.FORBIDDEN));
         refreshTokenRepository.delete(refreshToken);
 
         company.deleteRefreshToken();
