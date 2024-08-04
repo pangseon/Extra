@@ -15,4 +15,9 @@ public interface ScheduleService {
         Company company,
         ScheduleUpdateServiceRequestDto scheduleUpdateServiceRequestDto
     );
+    void deleteSchedule(
+        Long jobPost_id,
+        Long schedule_id,
+        Company company
+    );
 }

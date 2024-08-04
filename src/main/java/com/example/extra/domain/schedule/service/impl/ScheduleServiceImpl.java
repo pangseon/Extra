@@ -53,5 +53,16 @@ public class ScheduleServiceImpl implements ScheduleService {
         schedule.updateSchedule(scheduleUpdateServiceRequestDto.calender());
         scheduleRepository.save(schedule);
     }
+    public void deleteSchedule(
+        Long jobPost_id,
+        Long schedule_id,
+        Company company
+    ){
+        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id,company)
+            .orElseThrow(()->new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        Schedule schedule = scheduleRepository.findByIdAndJobPost(schedule_id,jobPost)
+            .orElseThrow(()->new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+        scheduleRepository.delete(schedule);
+    }
 
 }
