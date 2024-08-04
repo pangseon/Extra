@@ -82,7 +82,6 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
      * @param role
      * @return
      */
-
     private ApplyStatus getApplyStatus(Member member, Role role) {
         Optional<ApplicationRequestMember> requestMemberOptional =
             applicationRequestMemberRepository.findByMemberAndRole(
