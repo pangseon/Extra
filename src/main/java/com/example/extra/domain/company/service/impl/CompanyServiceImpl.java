@@ -87,7 +87,7 @@ public class CompanyServiceImpl implements CompanyService {
         // jwt 토큰 생성
         String accessToken = jwtUtil.createToken(
             company.getEmail(),
-            company.getUserRole()
+            company.getUser_role()
         );
         String refreshToken = jwtUtil.createRefreshToken();
         log.info("access token: " + accessToken);
