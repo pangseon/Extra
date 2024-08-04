@@ -143,8 +143,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     }
 
     private String saveImage(MultipartFile multipartFile) {
-        String url = multipartFile.getName();
-        ;
+        String url = multipartFile.getOriginalFilename();
         return url;
     }
 }
