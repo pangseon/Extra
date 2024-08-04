@@ -5,6 +5,7 @@ import lombok.Builder;
 
 @Builder
 public record CostumeApprovalBoardCompanyReadDetailServiceResponseDto(
+    Long id,
     String member_name,
     String role_name,
     Boolean sex,
@@ -16,6 +17,7 @@ public record CostumeApprovalBoardCompanyReadDetailServiceResponseDto(
     public static CostumeApprovalBoardCompanyReadDetailServiceResponseDto from(CostumeApprovalBoard costumeApprovalBoard) {
         return CostumeApprovalBoardCompanyReadDetailServiceResponseDto
             .builder()
+                .id(costumeApprovalBoard.getId())
                 .member_name(costumeApprovalBoard.getMember().getName())
                 .role_name(costumeApprovalBoard.getRole().getRole_name())
                 .sex(costumeApprovalBoard.getRole().getSex())
