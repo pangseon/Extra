@@ -60,5 +60,11 @@ public class S3Provider {
         amazonS3.putObject(bucket, imageName, multipartFile.getInputStream(), metadata);
         return amazonS3.getUrl(bucket, imageName).toString();
     }
+    public void delete(String imageName) {
+        if (imageName == null) {
+            return;
+        }
+        amazonS3.deleteObject(bucket, imageName);
+    }
 
 }
