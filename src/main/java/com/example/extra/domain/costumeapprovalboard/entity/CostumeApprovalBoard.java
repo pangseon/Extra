@@ -63,4 +63,12 @@ public class CostumeApprovalBoard extends BaseEntity {
         this.member = member;
         this.role = role;
     }
+
+    public void updateImageExplain(String imageExplain) {
+        this.image_explain = imageExplain;
+    }
+
+    public void updateCostumeImageUrl(String costumeImageUrl) {
+        this.costumeImageUrl = costumeImageUrl;
+    }
 }
