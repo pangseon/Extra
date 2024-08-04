@@ -8,6 +8,8 @@ import com.example.extra.domain.applicationrequest.repository.ApplicationRequest
 import com.example.extra.domain.applicationrequest.repository.ApplicationRequestMemberRepository;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCreateServiceDto;
 import com.example.extra.domain.costumeapprovalboard.entity.CostumeApprovalBoard;
+import com.example.extra.domain.costumeapprovalboard.exception.CostumeApprovalBoardErrorCode;
+import com.example.extra.domain.costumeapprovalboard.exception.CostumeApprovalBoardException;
 import com.example.extra.domain.costumeapprovalboard.repository.CostumeApprovalBoardRepository;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
 import com.example.extra.domain.member.entity.Member;
@@ -40,6 +42,15 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     ) {
         Role role = roleRepository.findById(roleId)
             .orElseThrow(() -> new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
+
+        // 이미 의상 승인 글을 작성한 경우
+        costumeApprovalBoardRepository.findByMemberAndRole(
+                member,
+                role)
+            .ifPresent(c -> {
+                throw new CostumeApprovalBoardException(
+                    CostumeApprovalBoardErrorCode.ALREADY_EXIST_COSTUME_APPROVAL_BOARD);
+            });
 
         /**
          *  member가 승인 받은 공고 & 역할이 맞는지 확인
