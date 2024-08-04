@@ -52,13 +52,14 @@ public class CostumeApprovalBoard extends BaseEntity {
 
     @Builder
     public CostumeApprovalBoard(
-        Boolean costumeApprove,
         String costumeImageUrl,
+        String image_explain,
         Member member,
         Role role
-    ){
-        this.costumeApprove = costumeApprove;
+    ) {
+        this.costumeApprove = false;
         this.costumeImageUrl = costumeImageUrl;
+        this.image_explain = image_explain;
         this.member = member;
         this.role = role;
     }
