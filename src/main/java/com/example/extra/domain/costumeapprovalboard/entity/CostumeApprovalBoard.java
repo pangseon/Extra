@@ -53,13 +53,13 @@ public class CostumeApprovalBoard extends BaseEntity {
     public CostumeApprovalBoard(
         final Boolean costumeApprove,
         final String costumeImageUrl,
-        final String image_explain,
+        final String imageExplain,
         final Member member,
         final Role role
     ){
         this.costume_approve = costumeApprove;
         this.costume_image_url = costumeImageUrl;
-        this.image_explain = image_explain;
+        this.image_explain = imageExplain;
         this.member = member;
         this.role = role;
     }
