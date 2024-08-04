@@ -1,55 +1,99 @@
 package com.example.extra.domain.costumeapprovalboard.service.impl;
 
+import com.example.extra.domain.applicationrequest.repository.ApplicationRequestCompanyRepository;
+import com.example.extra.domain.applicationrequest.repository.ApplicationRequestMemberRepository;
 import com.example.extra.domain.company.entity.Company;
+import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
 import com.example.extra.domain.applicationrequest.entity.ApplicationRequestCompany;
 import com.example.extra.domain.applicationrequest.entity.ApplicationRequestMember;
 import com.example.extra.domain.applicationrequest.exception.ApplicationRequestErrorCode;
 import com.example.extra.domain.applicationrequest.exception.ApplicationRequestException;
-import com.example.extra.domain.applicationrequest.repository.ApplicationRequestCompanyRepository;
-import com.example.extra.domain.applicationrequest.repository.ApplicationRequestMemberRepository;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCreateServiceDto;
 import com.example.extra.domain.costumeapprovalboard.entity.CostumeApprovalBoard;
 import com.example.extra.domain.costumeapprovalboard.exception.CostumeApprovalBoardErrorCode;
 import com.example.extra.domain.costumeapprovalboard.exception.CostumeApprovalBoardException;
 import com.example.extra.domain.costumeapprovalboard.repository.CostumeApprovalBoardRepository;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
+import com.example.extra.domain.jobpost.entity.JobPost;
+import com.example.extra.domain.jobpost.exception.JobPostErrorCode;
+import com.example.extra.domain.jobpost.exception.NotFoundJobPostException;
+import com.example.extra.domain.jobpost.repository.JobPostRepository;
 import com.example.extra.domain.member.entity.Member;
+import com.example.extra.domain.role.exception.NotFoundRoleException;
+import com.example.extra.domain.role.exception.RoleErrorCode;
+import com.example.extra.domain.role.repository.RoleRepository;
+import com.example.extra.global.enums.ApplyStatus;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.extra.domain.role.entity.Role;
-import com.example.extra.domain.role.exception.NotFoundRoleException;
-import com.example.extra.domain.role.exception.RoleErrorCode;
-import com.example.extra.domain.role.repository.RoleRepository;
-import com.example.extra.global.enums.ApplyStatus;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
 public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardService {
     private final CostumeApprovalBoardRepository costumeApprovalBoardRepository;
+    private final JobPostRepository jobPostRepository;
     private final RoleRepository roleRepository;
     private final ApplicationRequestMemberRepository applicationRequestMemberRepository;
     private final ApplicationRequestCompanyRepository applicationRequestCompanyRepository;
 
-    @Override
-    @Transactional(readOnly = true)
     public CostumeApprovalBoardMemberReadServiceResponseDto getCostumeApprovalBoardForMember(
         Member member,
         Long roleId
     ) {
-        CostumeApprovalBoard costumeApprovalBoard = costumeApprovalBoardRepository.findByMemberAndRoleId(
-                member, roleId)
+        CostumeApprovalBoard costumeApprovalBoard = costumeApprovalBoardRepository.findByMemberAndRoleId(member, roleId)
             .orElseThrow(() -> new CostumeApprovalBoardException(
                 CostumeApprovalBoardErrorCode.NOT_FOUND_COSTUME_APPROVAL_BOARD)
             );
         return CostumeApprovalBoardMemberReadServiceResponseDto.from(costumeApprovalBoard);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<CostumeApprovalBoardCompanyReadServiceResponseDto> getCostumeApprovalBoardForCompany(
+        final Company company,
+        final Long jobPostId
+    ) {
+        // 해당 업체가 올린 공고가 아니면 예외 처리
+        JobPost jobPost = jobPostRepository.findById(jobPostId)
+            .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        if (!Objects.equals(jobPost.getCompany().getId(), jobPostId)) {
+            throw new CostumeApprovalBoardException(
+                CostumeApprovalBoardErrorCode.NOT_ABLE_TO_ACCESS_COSTUME_APPROVAL_BOARD);
+        }
+
+        return jobPost.getRoleList().stream()
+            .map(costumeApprovalBoardRepository::findAllByRole)
+            .filter(Optional::isPresent)
+            .flatMap(costumeApprovalBoardList -> costumeApprovalBoardList.get().stream())
+            .map(CostumeApprovalBoardCompanyReadServiceResponseDto::from)
+            .collect(Collectors.toList());
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public CostumeApprovalBoardCompanyReadDetailServiceResponseDto getCostumeApprovalBoardDetailForCompany(
+        final Company company,
+        final Long costumeApprovalBoardId
+    ) {
+        CostumeApprovalBoard costumeApprovalBoard = costumeApprovalBoardRepository.findById(
+                costumeApprovalBoardId)
+            .orElseThrow(() -> new CostumeApprovalBoardException(
+                CostumeApprovalBoardErrorCode.NOT_FOUND_COSTUME_APPROVAL_BOARD)
+            );
+        if (!Objects.equals(costumeApprovalBoard.getRole().getJobPost().getCompany().getId(),
+            company.getId())) {
+            throw new CostumeApprovalBoardException(
+                CostumeApprovalBoardErrorCode.NOT_ABLE_TO_READ_COSTUME_APPROVAL_BOARD);
+        }
+        return CostumeApprovalBoardCompanyReadDetailServiceResponseDto.from(costumeApprovalBoard);
+    }
     @Override
     @Transactional
     public void deleteCostumeApprovalBoardByMember(
@@ -82,24 +126,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
         }
         costumeApprovalBoardRepository.delete(costumeApprovalBoard);
     }
-    @Override
-    @Transactional(readOnly = true)
-    public CostumeApprovalBoardCompanyReadDetailServiceResponseDto getCostumeApprovalBoardDetailForCompany(
-        final Company company,
-        final Long costumeApprovalBoardId
-    ) {
-        CostumeApprovalBoard costumeApprovalBoard = costumeApprovalBoardRepository.findById(
-                costumeApprovalBoardId)
-            .orElseThrow(() -> new CostumeApprovalBoardException(
-                CostumeApprovalBoardErrorCode.NOT_FOUND_COSTUME_APPROVAL_BOARD)
-            );
-        if (!Objects.equals(costumeApprovalBoard.getRole().getJobPost().getCompany().getId(),
-            company.getId())) {
-            throw new CostumeApprovalBoardException(
-                CostumeApprovalBoardErrorCode.NOT_ABLE_TO_READ_COSTUME_APPROVAL_BOARD);
-        }
-        return CostumeApprovalBoardCompanyReadDetailServiceResponseDto.from(costumeApprovalBoard);
-    }
+
     @Override
     @Transactional
     public void createCostumeApprovalBoard (

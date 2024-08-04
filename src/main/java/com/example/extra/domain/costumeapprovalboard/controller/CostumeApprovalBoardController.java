@@ -1,8 +1,10 @@
 package com.example.extra.domain.costumeapprovalboard.controller;
 
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
 import com.example.extra.global.security.UserDetailsImpl;
+import java.util.List;
+import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +23,23 @@ import org.springframework.web.bind.annotation.RestController;
 public class CostumeApprovalBoardController {
 
     private final CostumeApprovalBoardService costumeApprovalBoardService;
-
+    // 업체가 의상 승인 게시글 목록 조회
+    @GetMapping("/jobposts/{jobPostId}")
+    public ResponseEntity<?> readCostumeApprovalBoardFromCompany(
+        @PathVariable Long jobPostId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        List<CostumeApprovalBoardCompanyReadServiceResponseDto> costumeApprovalBoardCompanyReadServiceResponseDtoList =
+            costumeApprovalBoardService.getCostumeApprovalBoardForCompany(
+                userDetails.getCompany(),
+                jobPostId
+            );
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(costumeApprovalBoardCompanyReadServiceResponseDtoList);
+    }
     // 업체가 특정 게시글 조회
     @GetMapping("/{costumeApprovalBoardId}")
-    public ResponseEntity<?> readCostumeApprovalBoardFromCompany(
+    public ResponseEntity<?> readCostumeApprovalBoardDetailFromCompany(
         @PathVariable Long costumeApprovalBoardId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
