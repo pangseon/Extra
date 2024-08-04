@@ -1,5 +1,6 @@
 package com.example.extra.domain.costumeapprovalboard.service.impl;
 
+import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
 import com.example.extra.domain.applicationrequest.entity.ApplicationRequestCompany;
 import com.example.extra.domain.applicationrequest.entity.ApplicationRequestMember;
 import com.example.extra.domain.applicationrequest.exception.ApplicationRequestErrorCode;
@@ -13,15 +14,15 @@ import com.example.extra.domain.costumeapprovalboard.exception.CostumeApprovalBo
 import com.example.extra.domain.costumeapprovalboard.repository.CostumeApprovalBoardRepository;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
 import com.example.extra.domain.member.entity.Member;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.example.extra.domain.role.entity.Role;
 import com.example.extra.domain.role.exception.NotFoundRoleException;
 import com.example.extra.domain.role.exception.RoleErrorCode;
 import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.global.enums.ApplyStatus;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
@@ -33,13 +34,26 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     private final ApplicationRequestMemberRepository applicationRequestMemberRepository;
     private final ApplicationRequestCompanyRepository applicationRequestCompanyRepository;
 
+    @Transactional(readOnly = true)
+    public CostumeApprovalBoardMemberReadServiceResponseDto getCostumeApprovalBoardForMember(
+        Member member,
+        Long roleId
+    ) {
+        CostumeApprovalBoard costumeApprovalBoard = costumeApprovalBoardRepository.findByMemberAndRoleId(
+                member, roleId)
+            .orElseThrow(() -> new CostumeApprovalBoardException(
+                CostumeApprovalBoardErrorCode.NOT_FOUND_COSTUME_APPROVAL_BOARD_MEMBER)
+            );
+        return CostumeApprovalBoardMemberReadServiceResponseDto.from(costumeApprovalBoard);
+    }
+
     @Override
     @Transactional
-    public void createCostumeApprovalBoard(
+    public void createCostumeApprovalBoard (
         Long roleId,
         Member member,
         CostumeApprovalBoardCreateServiceDto costumeApprovalBoardCreateServiceDto
-    ) {
+    ){
         Role role = roleRepository.findById(roleId)
             .orElseThrow(() -> new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
 
@@ -59,18 +73,20 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
          *  - 해당 역할 승인을 받지 못한 경우 -> throw 미승인 예외
          */
         if (getApplyStatus(member, role) != ApplyStatus.APPROVED) {
-            throw new ApplicationRequestException(ApplicationRequestErrorCode.NOT_APPROVED_REQUEST);
+            throw new ApplicationRequestException(
+                ApplicationRequestErrorCode.NOT_APPROVED_REQUEST);
         }
 
         // 이미지 저장 후 경로 가져오기 (메서드 추출, 추후 작성)
-        String costumeImageUrl = saveImage(costumeApprovalBoardCreateServiceDto.multipartFile());
+        String costumeImageUrl = saveImage(
+            costumeApprovalBoardCreateServiceDto.multipartFile());
 
         // 의상 승인 게시판 생성하기
         CostumeApprovalBoard costumeApprovalBoard = CostumeApprovalBoard.builder()
             .costumeImageUrl(costumeImageUrl)
             .member(member)
             .role(role)
-            .image_explain(costumeApprovalBoardCreateServiceDto.image_explain())
+            .imageExplain(costumeApprovalBoardCreateServiceDto.image_explain())
             .build();
         costumeApprovalBoardRepository.save(costumeApprovalBoard);
     }
@@ -83,7 +99,10 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
      * @return
      */
 
-    private ApplyStatus getApplyStatus(Member member, Role role) {
+    private ApplyStatus getApplyStatus (
+        Member member,
+        Role role
+    ){
         Optional<ApplicationRequestMember> requestMemberOptional =
             applicationRequestMemberRepository.findByMemberAndRole(
                 member,
@@ -107,8 +126,9 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
         }
     }
 
-    private String saveImage(MultipartFile multipartFile) {
+    private String saveImage (MultipartFile multipartFile){
         String url = "이미지 경로";
         return url;
     }
+
 }

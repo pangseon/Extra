@@ -6,8 +6,8 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum CostumeApprovalBoardErrorCode implements ErrorCode {
-    ALREADY_EXIST_COSTUME_APPROVAL_BOARD(HttpStatus.BAD_REQUEST, "이미 글을 작성했습니다."),
-    ;
+    NOT_FOUND_COSTUME_APPROVAL_BOARD_MEMBER(HttpStatus.NOT_FOUND, "의상 컨펌 작성 이력이 없습니다."),
+    ALREADY_EXIST_COSTUME_APPROVAL_BOARD(HttpStatus.BAD_REQUEST, "이미 글을 작성했습니다.");
 
     private final HttpStatus status;
     private final String message;
