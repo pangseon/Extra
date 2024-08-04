@@ -7,6 +7,7 @@ import com.example.extra.domain.applicationrequest.exception.ApplicationRequestE
 import com.example.extra.domain.applicationrequest.repository.ApplicationRequestCompanyRepository;
 import com.example.extra.domain.applicationrequest.repository.ApplicationRequestMemberRepository;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCreateServiceDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardExplainUpdateServiceRequestDto;
 import com.example.extra.domain.costumeapprovalboard.entity.CostumeApprovalBoard;
 import com.example.extra.domain.costumeapprovalboard.exception.CostumeApprovalBoardErrorCode;
 import com.example.extra.domain.costumeapprovalboard.exception.CostumeApprovalBoardException;
@@ -73,6 +74,24 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             .image_explain(costumeApprovalBoardCreateServiceDto.image_explain())
             .build();
         costumeApprovalBoardRepository.save(costumeApprovalBoard);
+    }
+
+    @Override
+    @Transactional
+    public void updateCostumeApprovalBoardByMember(
+        final Long costumeApprovalBoardId,
+        final Member member,
+        final CostumeApprovalBoardExplainUpdateServiceRequestDto serviceRequestDto
+    ) {
+        CostumeApprovalBoard costumeApprovalBoard =
+            costumeApprovalBoardRepository.findById(costumeApprovalBoardId)
+                .orElseThrow(() -> new CostumeApprovalBoardException(
+                    CostumeApprovalBoardErrorCode.NOT_FOUND_COSTUME_APPROVAL_BOARD));
+        // 설명 수정
+
+        // 이미지 수정
+
+        // 저장
     }
 
     /**
