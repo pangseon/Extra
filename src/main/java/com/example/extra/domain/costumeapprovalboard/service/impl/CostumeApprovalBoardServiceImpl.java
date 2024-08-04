@@ -7,6 +7,7 @@ import com.example.extra.domain.applicationrequest.exception.ApplicationRequestE
 import com.example.extra.domain.applicationrequest.repository.ApplicationRequestCompanyRepository;
 import com.example.extra.domain.applicationrequest.repository.ApplicationRequestMemberRepository;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCreateServiceDto;
+import com.example.extra.domain.costumeapprovalboard.entity.CostumeApprovalBoard;
 import com.example.extra.domain.costumeapprovalboard.repository.CostumeApprovalBoardRepository;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
 import com.example.extra.domain.member.entity.Member;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -48,10 +50,18 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
         if (getApplyStatus(member, role) != ApplyStatus.APPROVED) {
             throw new ApplicationRequestException(ApplicationRequestErrorCode.NOT_APPROVED_REQUEST);
         }
-        
-        // 이미지 저장 후 경로 가져오기
+
+        // 이미지 저장 후 경로 가져오기 (메서드 추출, 추후 작성)
+        String costumeImageUrl = saveImage(costumeApprovalBoardCreateServiceDto.multipartFile());
 
         // 의상 승인 게시판 생성하기
+        CostumeApprovalBoard costumeApprovalBoard = CostumeApprovalBoard.builder()
+            .costumeImageUrl(costumeImageUrl)
+            .member(member)
+            .role(role)
+            .image_explain(costumeApprovalBoardCreateServiceDto.image_explain())
+            .build();
+        costumeApprovalBoardRepository.save(costumeApprovalBoard);
     }
 
     /**
@@ -84,5 +94,10 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
         } else {
             return requestMemberOptional.get().getApplyStatus();
         }
+    }
+
+    private String saveImage(MultipartFile multipartFile) {
+        String url = "이미지 경로";
+        return url;
     }
 }
