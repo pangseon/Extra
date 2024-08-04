@@ -44,4 +44,7 @@ public class Schedule extends BaseEntity {
         this.calender = calender;
         this.jobPost = jobPost;
     }
+    public void updateSchedule(LocalDate calender){
+        this.calender = calender;
+    }
 }
