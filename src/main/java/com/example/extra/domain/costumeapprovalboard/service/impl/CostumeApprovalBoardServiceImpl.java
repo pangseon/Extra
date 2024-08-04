@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardService {
     private final CostumeApprovalBoardRepository costumeApprovalBoardRepository;
+    @Override
     @Transactional(readOnly = true)
     public CostumeApprovalBoardMemberReadServiceResponseDto getCostumeApprovalBoardForMember(
         Member member,
@@ -28,6 +29,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             );
         return CostumeApprovalBoardMemberReadServiceResponseDto.from(costumeApprovalBoard);
     }
+    @Override
     @Transactional
     public void deleteCostumeApprovalBoardByMember(
         Member member,
@@ -45,6 +47,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     }
 
     @Override
+    @Transactional
     public void deleteCostumeApprovalBoardByCompany(
         final Company company,
         final Long costumeApprovalBoardId
