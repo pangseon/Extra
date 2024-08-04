@@ -22,22 +22,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "TB_COSTUME_APPROVAL_BOARD",
     indexes = {
-    @Index(columnList = "createdAt"),
-    @Index(columnList = "modifiedAt")
-}
+        @Index(columnList = "createdAt"),
+        @Index(columnList = "modifiedAt")
+    }
 )
 @Entity
 public class CostumeApprovalBoard extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "costume_approve", columnDefinition = "boolean default false")
-    private Boolean costumeApprove;
+    @Column(columnDefinition = "boolean default false")
+    private Boolean costume_approve;
 
-    // TODO - DTO에 @NotBlank constraint 붙이기.
-    @Column(name = "costume_image_url", nullable = false)
-    private String costumeImageUrl;
+    @Column
+    private String costume_image_url;
 
     @Column
     private String image_explain;
@@ -52,14 +52,15 @@ public class CostumeApprovalBoard extends BaseEntity {
 
     @Builder
     public CostumeApprovalBoard(
-        String costumeImageUrl,
-        String image_explain,
-        Member member,
-        Role role
+        final Boolean costumeApprove,
+        final String costumeImageUrl,
+        final String imageExplain,
+        final Member member,
+        final Role role
     ) {
-        this.costumeApprove = false;
-        this.costumeImageUrl = costumeImageUrl;
-        this.image_explain = image_explain;
+        this.costume_approve = costumeApprove;
+        this.costume_image_url = costumeImageUrl;
+        this.image_explain = imageExplain;
         this.member = member;
         this.role = role;
     }
@@ -69,6 +70,6 @@ public class CostumeApprovalBoard extends BaseEntity {
     }
 
     public void updateCostumeImageUrl(String costumeImageUrl) {
-        this.costumeImageUrl = costumeImageUrl;
+        this.costume_image_url = costumeImageUrl;
     }
 }
