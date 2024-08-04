@@ -3,6 +3,7 @@ package com.example.extra.domain.costumeapprovalboard.controller;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
 import com.example.extra.global.security.UserDetailsImpl;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,16 +34,24 @@ public class CostumeApprovalBoardController {
         return ResponseEntity.status(HttpStatus.OK)
             .body(costumeApprovalBoardMemberReadServiceResponseDto);
     }
-    // 출연자 본인 역할에 대해 의상 컨펌 삭제
-    @DeleteMapping("/member/roles/{roleId}")
+    // TODO - 출연자의 삭제 요청과 회사의 삭제 요청 API상으로 구분할지
+    // 의상 컨펌 게시글 삭제
+    @DeleteMapping("/{costumeApprovalBoardId}")
     public ResponseEntity<?> deleteCostumeApprovalBoardFromMember(
-        @PathVariable Long roleId,
+        @PathVariable Long costumeApprovalBoardId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        costumeApprovalBoardService.deleteCostumeApprovalBoardByMember(
-            userDetails.getMember(),
-            roleId
-        );
+        if(Objects.nonNull(userDetails.getMember())){
+            costumeApprovalBoardService.deleteCostumeApprovalBoardByMember(
+                userDetails.getMember(),
+                costumeApprovalBoardId
+            );
+        } else {
+            costumeApprovalBoardService.deleteCostumeApprovalBoardByCompany(
+                userDetails.getCompany(),
+                costumeApprovalBoardId
+            );
+        }
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
