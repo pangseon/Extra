@@ -4,14 +4,17 @@ import com.example.extra.domain.schedule.dto.controller.ScheduleCreateController
 import com.example.extra.domain.schedule.dto.controller.ScheduleUpdateControllerRequestDto;
 import com.example.extra.domain.schedule.dto.service.request.ScheduleCreateServiceRequestDto;
 import com.example.extra.domain.schedule.dto.service.request.ScheduleUpdateServiceRequestDto;
+import com.example.extra.domain.schedule.dto.service.response.ScheduleServiceResponseDto;
 import com.example.extra.domain.schedule.mapper.dto.ScheduleDtoMapper;
 import com.example.extra.domain.schedule.service.ScheduleService;
 import com.example.extra.global.security.UserDetailsImpl;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -57,5 +60,18 @@ public class ScheduleController {
     ){
         scheduleService.deleteSchedule(jobPost_id,schedule_id,userDetails.getCompany());
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+    @GetMapping("/{jobPost_id}/schedules/{schedule_id}")
+    public ScheduleServiceResponseDto readSchedule(
+        @PathVariable Long jobPost_id,
+        @PathVariable Long schedule_id
+    ){
+        return scheduleService.readSchedule(jobPost_id,schedule_id);
+    }
+    @GetMapping("/{jobPost_id}/schedules")
+    public List<ScheduleServiceResponseDto> readAllSchedule(
+        @PathVariable Long jobPost_id
+    ){
+        return scheduleService.readAllSchedule(jobPost_id);
     }
 }
