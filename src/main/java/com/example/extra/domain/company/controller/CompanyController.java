@@ -1,5 +1,8 @@
 package com.example.extra.domain.company.controller;
 
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+
 import com.example.extra.domain.company.dto.controller.CompanyCreateControllerRequestDto;
 import com.example.extra.domain.company.dto.controller.CompanyLoginControllerRequestDto;
 import com.example.extra.domain.company.dto.service.request.CompanyCreateServiceRequestDto;
@@ -11,7 +14,6 @@ import com.example.extra.domain.company.service.CompanyService;
 import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +44,7 @@ public class CompanyController {
             companyCreateServiceRequestDto
         );
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(CREATED).build();
     }
 
     @PostMapping("/login")
@@ -56,7 +58,7 @@ public class CompanyController {
             companyService.login(companyLoginServiceRequestDto);
 
         return ResponseEntity
-            .status(HttpStatus.OK)
+            .status(OK)
             .header(
                 AUTHORIZATION_HEADER,
                 companyLoginServiceResponseDto.token()
@@ -70,7 +72,7 @@ public class CompanyController {
     ) {
         companyService.logout(userDetails);
         return ResponseEntity
-            .status(HttpStatus.OK)
+            .status(OK)
             .build();
     }
 
@@ -81,7 +83,7 @@ public class CompanyController {
         CompanyReadOnceServiceResponseDto companyReadOnceServiceResponseDto =
             companyService.readOnceCompany(userDetails);
         return ResponseEntity
-            .status(HttpStatus.OK)
+            .status(OK)
             .body(companyReadOnceServiceResponseDto);
     }
 }
