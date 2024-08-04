@@ -86,11 +86,13 @@ public class CostumeApprovalBoardController {
                 controllerRequestDto,
                 multipartFile
             );
+
         costumeApprovalBoardService.updateCostumeApprovalBoardByMember(
             costumeApprovalBoardId,
             userDetails.getMember(),
             serviceRequestDto
         );
+
         return ResponseEntity
             .status(HttpStatus.OK)
             .build();
