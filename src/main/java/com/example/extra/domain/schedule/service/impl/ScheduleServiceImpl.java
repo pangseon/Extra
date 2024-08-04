@@ -25,12 +25,10 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
 
     public void createSchedule(
-        Long jobPost_id
-        ,ScheduleCreateServiceRequestDto scheduleCreateServiceRequestDto
-        //,Company comapny
+        Long jobPost_id,
+        Company company,
+        ScheduleCreateServiceRequestDto scheduleCreateServiceRequestDto
     ){
-        Company company = companyRepository.findById(1L)
-            .orElseThrow(()-> new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST));
         JobPost jobPost = jobPostRepository.findByIdAndCompany(
             jobPost_id,
             company
