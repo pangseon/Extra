@@ -3,10 +3,12 @@ package com.example.extra.domain.costumeapprovalboard.controller;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
 import com.example.extra.global.security.UserDetailsImpl;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,5 +33,25 @@ public class CostumeApprovalBoardController {
         );
         return ResponseEntity.status(HttpStatus.OK)
             .body(costumeApprovalBoardMemberReadServiceResponseDto);
+    }
+    // TODO - 출연자의 삭제 요청과 회사의 삭제 요청 API상으로 구분할지
+    // 의상 컨펌 게시글 삭제
+    @DeleteMapping("/{costumeApprovalBoardId}")
+    public ResponseEntity<?> deleteCostumeApprovalBoardFromMember(
+        @PathVariable Long costumeApprovalBoardId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        if(Objects.nonNull(userDetails.getMember())){
+            costumeApprovalBoardService.deleteCostumeApprovalBoardByMember(
+                userDetails.getMember(),
+                costumeApprovalBoardId
+            );
+        } else {
+            costumeApprovalBoardService.deleteCostumeApprovalBoardByCompany(
+                userDetails.getCompany(),
+                costumeApprovalBoardId
+            );
+        }
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
