@@ -70,7 +70,7 @@ public class CompanyController {
     public ResponseEntity<?> logout(
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        companyService.logout(userDetails);
+        companyService.logout(userDetails.getCompany());
         return ResponseEntity
             .status(OK)
             .build();
@@ -81,7 +81,7 @@ public class CompanyController {
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         CompanyReadOnceServiceResponseDto companyReadOnceServiceResponseDto =
-            companyService.readOnceCompany(userDetails);
+            companyService.readOnceCompany(userDetails.getCompany());
         return ResponseEntity
             .status(OK)
             .body(companyReadOnceServiceResponseDto);
