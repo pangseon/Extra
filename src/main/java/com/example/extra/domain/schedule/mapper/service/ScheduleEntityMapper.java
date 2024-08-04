@@ -3,7 +3,7 @@ package com.example.extra.domain.schedule.mapper.service;
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
 import com.example.extra.domain.jobpost.entity.JobPost;
-import com.example.extra.domain.schedule.dto.service.ScheduleCreateServiceRequestDto;
+import com.example.extra.domain.schedule.dto.service.request.ScheduleCreateServiceRequestDto;
 import com.example.extra.domain.schedule.entity.Schedule;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
