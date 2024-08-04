@@ -1,6 +1,7 @@
 package com.example.extra.domain.costumeapprovalboard.service.impl;
 
 import com.example.extra.domain.company.entity.Company;
+import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
 import com.example.extra.domain.applicationrequest.entity.ApplicationRequestCompany;
 import com.example.extra.domain.applicationrequest.entity.ApplicationRequestMember;
@@ -30,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Service
 public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardService {
-
     private final CostumeApprovalBoardRepository costumeApprovalBoardRepository;
     private final RoleRepository roleRepository;
     private final ApplicationRequestMemberRepository applicationRequestMemberRepository;
@@ -66,7 +66,6 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
         }
         costumeApprovalBoardRepository.delete(costumeApprovalBoard);
     }
-
     @Override
     @Transactional
     public void deleteCostumeApprovalBoardByCompany(
@@ -83,7 +82,24 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
         }
         costumeApprovalBoardRepository.delete(costumeApprovalBoard);
     }
-
+    @Override
+    @Transactional(readOnly = true)
+    public CostumeApprovalBoardCompanyReadDetailServiceResponseDto getCostumeApprovalBoardDetailForCompany(
+        final Company company,
+        final Long costumeApprovalBoardId
+    ) {
+        CostumeApprovalBoard costumeApprovalBoard = costumeApprovalBoardRepository.findById(
+                costumeApprovalBoardId)
+            .orElseThrow(() -> new CostumeApprovalBoardException(
+                CostumeApprovalBoardErrorCode.NOT_FOUND_COSTUME_APPROVAL_BOARD)
+            );
+        if (!Objects.equals(costumeApprovalBoard.getRole().getJobPost().getCompany().getId(),
+            company.getId())) {
+            throw new CostumeApprovalBoardException(
+                CostumeApprovalBoardErrorCode.NOT_ABLE_TO_READ_COSTUME_APPROVAL_BOARD);
+        }
+        return CostumeApprovalBoardCompanyReadDetailServiceResponseDto.from(costumeApprovalBoard);
+    }
     @Override
     @Transactional
     public void createCostumeApprovalBoard (
@@ -120,6 +136,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
 
         // 의상 승인 게시판 생성하기
         CostumeApprovalBoard costumeApprovalBoard = CostumeApprovalBoard.builder()
+            .costumeApprove(false)
             .costumeImageUrl(costumeImageUrl)
             .member(member)
             .role(role)
@@ -167,5 +184,4 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
         String url = "이미지 경로";
         return url;
     }
-
 }

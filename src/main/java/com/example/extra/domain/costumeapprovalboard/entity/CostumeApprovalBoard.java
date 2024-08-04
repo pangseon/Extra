@@ -22,9 +22,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "TB_COSTUME_APPROVAL_BOARD",
     indexes = {
-    @Index(columnList = "createdAt"),
-    @Index(columnList = "modifiedAt")
-}
+        @Index(columnList = "createdAt"),
+        @Index(columnList = "modifiedAt")
+    }
 )
 @Entity
 public class CostumeApprovalBoard extends BaseEntity {

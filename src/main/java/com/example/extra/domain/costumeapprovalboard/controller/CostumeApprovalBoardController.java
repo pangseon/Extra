@@ -1,8 +1,9 @@
 package com.example.extra.domain.costumeapprovalboard.controller;
 
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
 import com.example.extra.global.security.UserDetailsImpl;
+import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/costumeapprovalboards")
 public class CostumeApprovalBoardController {
+
     private final CostumeApprovalBoardService costumeApprovalBoardService;
+
+    // 업체가 특정 게시글 조회
+    @GetMapping("/{costumeApprovalBoardId}")
+    public ResponseEntity<?> readCostumeApprovalBoardFromCompany(
+        @PathVariable Long costumeApprovalBoardId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        CostumeApprovalBoardCompanyReadDetailServiceResponseDto costumeApprovalBoardCompanyReadDetailServiceResponseDto =
+            costumeApprovalBoardService.getCostumeApprovalBoardDetailForCompany(
+                userDetails.getCompany(),
+                costumeApprovalBoardId
+            );
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(costumeApprovalBoardCompanyReadDetailServiceResponseDto);
+    }
 
     // 출연자 본인 역할에 대해 의상 컨펌 조회
     @GetMapping("/member/roles/{roleId}")
@@ -30,7 +47,7 @@ public class CostumeApprovalBoardController {
             costumeApprovalBoardService.getCostumeApprovalBoardForMember(
                 userDetails.getMember(),
                 roleId
-        );
+            );
         return ResponseEntity.status(HttpStatus.OK)
             .body(costumeApprovalBoardMemberReadServiceResponseDto);
     }
