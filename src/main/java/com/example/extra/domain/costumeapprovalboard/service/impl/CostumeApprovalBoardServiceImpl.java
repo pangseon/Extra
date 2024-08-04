@@ -94,6 +94,11 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
                 CostumeApprovalBoardErrorCode.NOT_MASTER_COSTUME_APPROVAL_BOARD);
         }
 
+        // 아무것도 들어오지 않았을 경우
+        if (serviceRequestDto == null) {
+            return;
+        }
+
         // 설명 수정
         if (serviceRequestDto.image_explain() != null) {
             costumeApprovalBoard.updateImageExplain(serviceRequestDto.image_explain());
