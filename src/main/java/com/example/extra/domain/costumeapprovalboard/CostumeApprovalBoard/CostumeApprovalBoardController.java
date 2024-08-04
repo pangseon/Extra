@@ -44,11 +44,11 @@ public class CostumeApprovalBoardController {
         @NotNull @RequestPart(name = "image") MultipartFile multipartFile
     ) {
         Member member = userDetails.getMember();
-        CostumeApprovalBoardCreateServiceDto costumeApprovalBoardCreateServiceDto = costumeApprovalBoardDtoMapper.toCostumeApprovalBoardCreateServiceDto(
-            costumeApprovalBoardExplainCreateRequestDto,
-            multipartFile
-        );
-        log.info(costumeApprovalBoardCreateServiceDto.toString());
+        CostumeApprovalBoardCreateServiceDto costumeApprovalBoardCreateServiceDto =
+            costumeApprovalBoardDtoMapper.toCostumeApprovalBoardCreateServiceDto(
+                costumeApprovalBoardExplainCreateRequestDto,
+                multipartFile
+            );
 
         costumeApprovalBoardService.createCostumeApprovalBoard(
             roleId,
