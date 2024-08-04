@@ -2,6 +2,7 @@ package com.example.extra.domain.costumeapprovalboard.CostumeApprovalBoard;
 
 import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardExplainCreateRequestDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCreateServiceDto;
+import com.example.extra.domain.costumeapprovalboard.mapper.dto.CostumeApprovalBoardDtoMapper;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.global.security.UserDetailsImpl;
@@ -24,6 +25,8 @@ public class CostumeApprovalBoardController {
 
     private final CostumeApprovalBoardService costumeApprovalBoardService;
 
+    private final CostumeApprovalBoardDtoMapper costumeApprovalBoardDtoMapper;
+
     /**
      * 의상 승인 게시판 글 작성하기
      *
@@ -41,11 +44,11 @@ public class CostumeApprovalBoardController {
         @NotNull @RequestPart(name = "image") MultipartFile multipartFile
     ) {
         Member member = userDetails.getMember();
-        CostumeApprovalBoardCreateServiceDto costumeApprovalBoardCreateServiceDto =
-            CostumeApprovalBoardCreateServiceDto.builder()
-                .image_explain(costumeApprovalBoardExplainCreateRequestDto.image_explain())
-                .multipartFile(multipartFile)
-                .build();
+        CostumeApprovalBoardCreateServiceDto costumeApprovalBoardCreateServiceDto = costumeApprovalBoardDtoMapper.toCostumeApprovalBoardCreateServiceDto(
+            costumeApprovalBoardExplainCreateRequestDto,
+            multipartFile
+        );
+        log.info(costumeApprovalBoardCreateServiceDto.toString());
 
         costumeApprovalBoardService.createCostumeApprovalBoard(
             roleId,
