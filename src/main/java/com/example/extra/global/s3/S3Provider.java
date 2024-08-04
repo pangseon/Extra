@@ -46,6 +46,19 @@ public class S3Provider {
             throw new IllegalArgumentException("잘못된 파일 형식입니다");
         }
     }
-
+    private static ObjectMetadata setObjectMetadata(MultipartFile multipartFile) {
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(multipartFile.getSize());
+        metadata.setContentType(multipartFile.getContentType());
+        return metadata;
+    }
+    public String saveFile(MultipartFile multipartFile, String imageName) throws IOException {
+        if (multipartFile.isEmpty()) {
+            return null;
+        }
+        ObjectMetadata metadata = setObjectMetadata(multipartFile);
+        amazonS3.putObject(bucket, imageName, multipartFile.getInputStream(), metadata);
+        return amazonS3.getUrl(bucket, imageName).toString();
+    }
 
 }
