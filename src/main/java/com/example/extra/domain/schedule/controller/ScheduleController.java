@@ -1,7 +1,7 @@
 package com.example.extra.domain.schedule.controller;
 
 import com.example.extra.domain.schedule.dto.controller.ScheduleCreateControllerRequestDto;
-import com.example.extra.domain.schedule.dto.service.ScheduleCreateServiceRequestDto;
+import com.example.extra.domain.schedule.dto.service.request.ScheduleCreateServiceRequestDto;
 import com.example.extra.domain.schedule.mapper.dto.ScheduleDtoMapper;
 import com.example.extra.domain.schedule.service.ScheduleService;
 import lombok.RequiredArgsConstructor;

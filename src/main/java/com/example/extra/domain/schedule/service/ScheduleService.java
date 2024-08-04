@@ -1,6 +1,6 @@
 package com.example.extra.domain.schedule.service;
 
-import com.example.extra.domain.schedule.dto.service.ScheduleCreateServiceRequestDto;
+import com.example.extra.domain.schedule.dto.service.request.ScheduleCreateServiceRequestDto;
 
 public interface ScheduleService {
     void createSchedule(
