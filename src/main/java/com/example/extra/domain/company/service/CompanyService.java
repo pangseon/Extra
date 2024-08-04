@@ -4,7 +4,7 @@ import com.example.extra.domain.company.dto.service.request.CompanyCreateService
 import com.example.extra.domain.company.dto.service.request.CompanyLoginServiceRequestDto;
 import com.example.extra.domain.company.dto.service.response.CompanyLoginServiceResponseDto;
 import com.example.extra.domain.company.dto.service.response.CompanyReadOnceServiceResponseDto;
-import com.example.extra.global.security.UserDetailsImpl;
+import com.example.extra.domain.company.entity.Company;
 
 public interface CompanyService {
 
@@ -17,10 +17,10 @@ public interface CompanyService {
     );
 
     CompanyReadOnceServiceResponseDto readOnceCompany(
-        final UserDetailsImpl userDetails
+        final Company company
     );
 
     void logout(
-        final UserDetailsImpl userDetails
+        final Company company
     );
 }

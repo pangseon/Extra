@@ -14,7 +14,6 @@ import com.example.extra.domain.member.exception.MemberErrorCode;
 import com.example.extra.domain.member.exception.MemberException;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.global.security.JwtUtil;
-import com.example.extra.global.security.UserDetailsImpl;
 import com.example.extra.global.security.repository.RefreshTokenRepository;
 import com.example.extra.global.security.token.RefreshToken;
 import lombok.RequiredArgsConstructor;
@@ -88,7 +87,7 @@ public class CompanyServiceImpl implements CompanyService {
         // jwt 토큰 생성
         String accessToken = jwtUtil.createToken(
             company.getEmail(),
-            company.getUserRole()
+            company.getUser_role()
         );
         String refreshToken = jwtUtil.createRefreshToken();
         log.info("access token: " + accessToken);
@@ -109,11 +108,10 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional
     public void logout(
-        final UserDetailsImpl userDetails
+        final Company company
     ) {
-        Company company = userDetails.getCompany();
         RefreshToken refreshToken = refreshTokenRepository.findById(company.getId())
-            .orElseThrow(() -> new CompanyException(CompanyErrorCode.UNAUTHORIZED));
+            .orElseThrow(() -> new CompanyException(CompanyErrorCode.FORBIDDEN));
         refreshTokenRepository.delete(refreshToken);
 
         company.deleteRefreshToken();
@@ -123,9 +121,8 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional(readOnly = true)
     public CompanyReadOnceServiceResponseDto readOnceCompany(
-        UserDetailsImpl userDetails
+        Company company
     ) {
-        Company company = findByEmail(userDetails.getUsername());
         return companyEntityMapper.toCompanyReadOnceServiceResponseDto(company);
     }
 
