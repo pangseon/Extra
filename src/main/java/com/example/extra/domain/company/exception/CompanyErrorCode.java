@@ -12,7 +12,7 @@ public enum CompanyErrorCode implements ErrorCode {
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "잘못된 비밀번호 입력"),
 
     // 403
-    UNAUTHORIZED(HttpStatus.FORBIDDEN, "권한 없음. 로그인 하세요."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "권한 없음. 로그인 하세요."),
 
     // 404
     NOT_FOUND_COMPANY(HttpStatus.NOT_FOUND, "찾을 수 없는 회사"),

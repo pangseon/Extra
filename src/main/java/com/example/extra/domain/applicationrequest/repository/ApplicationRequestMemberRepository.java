@@ -10,11 +10,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ApplicationRequestMemberRepository extends JpaRepository<ApplicationRequestMember, Long> {
+public interface ApplicationRequestMemberRepository extends
+    JpaRepository<ApplicationRequestMember, Long> {
+
     Slice<ApplicationRequestMember> findAllByMember(
         Member member,
         Pageable page
     );
+
     Slice<ApplicationRequestMember> findAllByMemberAndApplyStatus(
         Member member,
         ApplyStatus applyStatus,
@@ -25,8 +28,14 @@ public interface ApplicationRequestMemberRepository extends JpaRepository<Applic
         Role role,
         Pageable page
     );
+
     List<ApplicationRequestMember> findAllByRoleAndApplyStatus(
         Role role,
         ApplyStatus applyStatus
+    );
+
+    Optional<ApplicationRequestMember> findByMemberAndRole(
+        Member member,
+        Role role
     );
 }
