@@ -87,11 +87,23 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             costumeApprovalBoardRepository.findById(costumeApprovalBoardId)
                 .orElseThrow(() -> new CostumeApprovalBoardException(
                     CostumeApprovalBoardErrorCode.NOT_FOUND_COSTUME_APPROVAL_BOARD));
+
+        // 회원이 작성한 글이 아님 -> throw 주인 아님 예외
+        if (!member.getId().equals(costumeApprovalBoard.getMember().getId())) {
+            throw new CostumeApprovalBoardException(
+                CostumeApprovalBoardErrorCode.NOT_MASTER_COSTUME_APPROVAL_BOARD);
+        }
+
         // 설명 수정
+        if (serviceRequestDto.image_explain() != null) {
+            costumeApprovalBoard.updateImageExplain(serviceRequestDto.image_explain());
+        }
 
         // 이미지 수정
-
-        // 저장
+        if (serviceRequestDto.multipartFile() != null) {
+            String url = saveImage(serviceRequestDto.multipartFile());
+            costumeApprovalBoard.updateCostumeImageUrl(url);
+        }
     }
 
     /**
