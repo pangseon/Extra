@@ -4,6 +4,8 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +67,42 @@ public class S3Provider {
             return;
         }
         amazonS3.deleteObject(bucket, imageName);
+    }
+    public String updateImage(String imageName, String folderName, MultipartFile multipartFile)
+        throws IOException {
+        // S3에 대한 데이터 저장이나 변경이 없을 경우
+        if (imageName == null && multipartFile.isEmpty()) {
+            return null;
+        } else {
+            // S3에 대한 정보가 DB에 저장되었지만 해당 내용을 삭제하고 싶을 때
+            if (multipartFile.isEmpty()) {
+                imageName = imageName.replace(url, "");
+                imageName = imageName.substring(imageName.lastIndexOf("/"));
+                delete(folderName + imageName);
+                return null;
+            } else if (imageName == null) {
+                // S3에 대한 정보 저장이 없다가 추가하고 싶을때
+                String image = originalFileName(multipartFile);
+                imageName = folderName + SEPARATOR + image;
+                ObjectMetadata metadata = setObjectMetadata(multipartFile);
+                amazonS3.putObject(bucket, imageName, multipartFile.getInputStream(), metadata);
+                folderName = URLEncoder.encode(folderName, StandardCharsets.UTF_8);
+                imageName = url + folderName + SEPARATOR
+                    + image;
+            } else {
+                // S3에 대한 정보 교체
+                imageName = imageName.replace(url, "");
+                imageName = imageName.substring(imageName.lastIndexOf("/"));
+                delete(folderName + imageName);// 이미지 내용을 변경하고 싶거나 또는 유지하고 싶을 때
+                String NewImage = originalFileName(multipartFile);
+                imageName = url + URLEncoder.encode(folderName, StandardCharsets.UTF_8) + SEPARATOR
+                    + NewImage;
+                String saveImageUrl = folderName + SEPARATOR + NewImage;
+                ObjectMetadata metadata = setObjectMetadata(multipartFile);
+                amazonS3.putObject(bucket, saveImageUrl, multipartFile.getInputStream(), metadata);
+            }
+        }
+        return imageName;
     }
 
 }
