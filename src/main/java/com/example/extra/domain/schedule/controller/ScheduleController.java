@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -48,5 +49,13 @@ public class ScheduleController {
         scheduleService.updateSchedule(jobPost_id,schedule_id,userDetails.getCompany(),scheduleUpdateServiceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
+    @DeleteMapping("/{jobPost_id}/schedules/{schedule_id}")
+    public ResponseEntity<?> deleteSchedule(
+        @PathVariable Long jobPost_id,
+        @PathVariable Long schedule_id,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        scheduleService.deleteSchedule(jobPost_id,schedule_id,userDetails.getCompany());
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }
