@@ -72,4 +72,8 @@ public class CostumeApprovalBoard extends BaseEntity {
     public void updateCostumeImageUrl(String costumeImageUrl) {
         this.costume_image_url = costumeImageUrl;
     }
+
+    public void updateCostumeApprove() {
+        this.costume_approve = true;
+    }
 }
