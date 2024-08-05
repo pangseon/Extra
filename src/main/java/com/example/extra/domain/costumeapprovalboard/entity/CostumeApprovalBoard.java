@@ -3,6 +3,7 @@ package com.example.extra.domain.costumeapprovalboard.entity;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.role.entity.Role;
 import com.example.extra.global.entity.BaseEntity;
+import com.example.extra.global.enums.ApplyStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,8 +34,8 @@ public class CostumeApprovalBoard extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "boolean default false")
-    private Boolean costume_approve;
+    @Column
+    private ApplyStatus costume_approve;
 
     @Column
     private String costume_image_url;
@@ -52,13 +53,12 @@ public class CostumeApprovalBoard extends BaseEntity {
 
     @Builder
     public CostumeApprovalBoard(
-        final Boolean costumeApprove,
         final String costumeImageUrl,
         final String imageExplain,
         final Member member,
         final Role role
     ) {
-        this.costume_approve = costumeApprove;
+        this.costume_approve = ApplyStatus.APPLIED;
         this.costume_image_url = costumeImageUrl;
         this.image_explain = imageExplain;
         this.member = member;
@@ -73,7 +73,7 @@ public class CostumeApprovalBoard extends BaseEntity {
         this.costume_image_url = costumeImageUrl;
     }
 
-    public void updateCostumeApprove() {
-        this.costume_approve = true;
+    public void updateCostumeApprove(ApplyStatus applyStatus) {
+        this.costume_approve = applyStatus;
     }
 }
