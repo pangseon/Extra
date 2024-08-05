@@ -216,6 +216,32 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
         }
     }
 
+    public void updateCostumeApprovalBoardByCompany(
+        Company company,
+        Long costumeApprovalBoardId
+    ) {
+        // costume approval board가 있는지 확인
+        CostumeApprovalBoard costumeApprovalBoard = costumeApprovalBoardRepository.findById(
+                costumeApprovalBoardId).
+            orElseThrow(() -> new CostumeApprovalBoardException(
+                CostumeApprovalBoardErrorCode.NOT_FOUND_COSTUME_APPROVAL_BOARD));
+
+        // company가 작성한 job post의 role인지 확인
+        if (!company.getId().equals(
+            costumeApprovalBoard
+                .getRole()
+                .getJobPost()
+                .getCompany()
+                .getId())
+        ) {
+            throw new CostumeApprovalBoardException(
+                CostumeApprovalBoardErrorCode.NOT_ABLE_TO_ACCESS_COSTUME_APPROVAL_BOARD);
+        }
+
+        // 승인 여부 변경
+        costumeApprovalBoard.updateCostumeApprove();
+    }
+
     /**
      * 지원 요청 여부 확인 후, 지원 상태 가져오기
      *

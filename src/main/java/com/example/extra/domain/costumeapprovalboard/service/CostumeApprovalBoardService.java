@@ -47,4 +47,9 @@ public interface CostumeApprovalBoardService {
         final Member member,
         final CostumeApprovalBoardExplainUpdateServiceRequestDto serviceRequestDto
     );
+
+    void updateCostumeApprovalBoardByCompany(
+        Company company,
+        Long costumeApprovalBoardId
+    );
 }
