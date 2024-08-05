@@ -1,6 +1,7 @@
 package com.example.extra.domain.costumeapprovalboard.service;
 
 import com.example.extra.domain.company.entity.Company;
+import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardApplyStatusUpdateServiceRequestDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCreateServiceDto;
@@ -46,5 +47,11 @@ public interface CostumeApprovalBoardService {
         final Long costumeApprovalBoardId,
         final Member member,
         final CostumeApprovalBoardExplainUpdateServiceRequestDto serviceRequestDto
+    );
+
+    void updateCostumeApprovalBoardByCompany(
+        final Company company,
+        final Long costumeApprovalBoardId,
+        final CostumeApprovalBoardApplyStatusUpdateServiceRequestDto controllerRequestDto
     );
 }

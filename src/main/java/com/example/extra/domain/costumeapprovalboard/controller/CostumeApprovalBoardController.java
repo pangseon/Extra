@@ -1,7 +1,9 @@
 package com.example.extra.domain.costumeapprovalboard.controller;
 
+import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardApplyStatusUpdateControllerRequestDto;
 import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardExplainCreateRequestDto;
 import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardExplainUpdateControllerRequestDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardApplyStatusUpdateServiceRequestDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCreateServiceDto;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -169,5 +172,34 @@ public class CostumeApprovalBoardController {
         return ResponseEntity
             .status(HttpStatus.OK)
             .build();
+    }
+
+    /**
+     * [회사] 의상 승인 글 승인하기
+     *
+     * @param userDetails
+     * @param costumeApprovalBoardId
+     * @return
+     */
+    @PutMapping("/{costume_approval_board_id}/companies")
+    public ResponseEntity<?> updateCostumeApprovalBoardByCompany(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PathVariable(name = "costume_approval_board_id") Long costumeApprovalBoardId,
+        @RequestBody CostumeApprovalBoardApplyStatusUpdateControllerRequestDto controllerRequestDto
+    ) {
+        CostumeApprovalBoardApplyStatusUpdateServiceRequestDto serviceRequestDto =
+            costumeApprovalBoardDtoMapper.toCostumeApprovalBoardApplyStatusUpdateServiceRequestDto(
+                controllerRequestDto);
+
+        costumeApprovalBoardService.updateCostumeApprovalBoardByCompany(
+            userDetails.getCompany(),
+            costumeApprovalBoardId,
+            serviceRequestDto
+        );
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .build();
+
     }
 }
