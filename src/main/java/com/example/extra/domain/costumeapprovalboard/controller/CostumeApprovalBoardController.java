@@ -170,4 +170,26 @@ public class CostumeApprovalBoardController {
             .status(HttpStatus.OK)
             .build();
     }
+
+    /**
+     * [회사] 의상 승인 글 승인하기
+     *
+     * @param userDetails
+     * @param costumeApprovalBoardId
+     * @return
+     */
+    @PutMapping("/{costume_approval_board_id}/companies")
+    public ResponseEntity<?> updateCostumeApprovalBoardByCompany(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PathVariable(name = "costume_approval_board_id") Long costumeApprovalBoardId
+    ) {
+        costumeApprovalBoardService.updateCostumeApprovalBoardByCompany(
+            userDetails.getCompany(),
+            costumeApprovalBoardId
+        );
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .build();
+
+    }
 }
