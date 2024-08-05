@@ -7,6 +7,7 @@ import com.example.extra.domain.applicationrequest.exception.ApplicationRequestE
 import com.example.extra.domain.applicationrequest.repository.ApplicationRequestCompanyRepository;
 import com.example.extra.domain.applicationrequest.repository.ApplicationRequestMemberRepository;
 import com.example.extra.domain.company.entity.Company;
+import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardApplyStatusUpdateServiceRequestDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCreateServiceDto;
@@ -172,7 +173,6 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
 
         // 의상 승인 게시판 생성하기
         CostumeApprovalBoard costumeApprovalBoard = CostumeApprovalBoard.builder()
-            .costumeApprove(false)
             .costumeImageUrl(costumeImageUrl)
             .member(member)
             .role(role)
@@ -216,9 +216,12 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
         }
     }
 
+    @Override
+    @Transactional
     public void updateCostumeApprovalBoardByCompany(
         Company company,
-        Long costumeApprovalBoardId
+        Long costumeApprovalBoardId,
+        CostumeApprovalBoardApplyStatusUpdateServiceRequestDto serviceRequestDto
     ) {
         // costume approval board가 있는지 확인
         CostumeApprovalBoard costumeApprovalBoard = costumeApprovalBoardRepository.findById(
@@ -238,8 +241,13 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
                 CostumeApprovalBoardErrorCode.NOT_ABLE_TO_ACCESS_COSTUME_APPROVAL_BOARD);
         }
 
-        // 승인 여부 변경
-        costumeApprovalBoard.updateCostumeApprove();
+        // 승인 여부 확인 및 변경
+        if (costumeApprovalBoard.getCostume_approve() == ApplyStatus.APPROVED) {
+            throw new CostumeApprovalBoardException(CostumeApprovalBoardErrorCode.ALREADY_APPROVED);
+        }
+        costumeApprovalBoard.updateCostumeApprove(
+            ApplyStatus.fromString(serviceRequestDto.costumeApprove())
+        );
     }
 
     /**
