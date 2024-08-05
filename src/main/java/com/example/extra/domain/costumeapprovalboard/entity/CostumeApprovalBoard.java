@@ -28,6 +28,7 @@ import lombok.NoArgsConstructor;
 )
 @Entity
 public class CostumeApprovalBoard extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -56,11 +57,19 @@ public class CostumeApprovalBoard extends BaseEntity {
         final String imageExplain,
         final Member member,
         final Role role
-    ){
+    ) {
         this.costume_approve = costumeApprove;
         this.costume_image_url = costumeImageUrl;
         this.image_explain = imageExplain;
         this.member = member;
         this.role = role;
+    }
+
+    public void updateImageExplain(String imageExplain) {
+        this.image_explain = imageExplain;
+    }
+
+    public void updateCostumeImageUrl(String costumeImageUrl) {
+        this.costume_image_url = costumeImageUrl;
     }
 }
