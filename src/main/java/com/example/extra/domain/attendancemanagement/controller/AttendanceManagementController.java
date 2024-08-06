@@ -1,15 +1,18 @@
 package com.example.extra.domain.attendancemanagement.controller;
 
 import com.example.extra.domain.attendancemanagement.dto.controller.AttendanceManagementUpdateControllerRequestDto;
+import com.example.extra.domain.attendancemanagement.dto.controller.AttendanceManagementUpdateMealCountControllerRequestDto;
 import com.example.extra.domain.attendancemanagement.dto.service.AttendanceManagementCreateExcelServiceResponseDto;
 import com.example.extra.domain.attendancemanagement.dto.service.AttendanceManagementReadServiceResponseDto;
 import com.example.extra.domain.attendancemanagement.dto.service.AttendanceManagementUpdateServiceRequestDto;
 import com.example.extra.domain.attendancemanagement.mapper.dto.AttendanceManagementDtoMapper;
 import com.example.extra.domain.attendancemanagement.service.AttendanceManagementService;
 import com.example.extra.domain.attendancemanagement.util.ExcelFile;
+import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +21,11 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,11 +40,13 @@ public class AttendanceManagementController {
     // 해당 공고 출연자들(출연자 목록 화면)
     @GetMapping("/jobposts/{jobPostId}/members")
     public ResponseEntity<?> readAllAttendanceManagementByJobPost(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "jobPostId") Long jobPostId,
         @PageableDefault(size = 10, sort = "roleName", direction = Direction.ASC) Pageable pageable
     ){
         List<AttendanceManagementReadServiceResponseDto> attendanceManagementReadServiceResponseDtoList =
             attendanceManagementService.getApprovedMemberInfo(
+                userDetails.getCompany(),
                 jobPostId,
                 pageable
             );
@@ -49,15 +56,16 @@ public class AttendanceManagementController {
     // QR 출근 체크
     @PutMapping("/jobposts/{jobPostId}/clock-in")
     public ResponseEntity<?> updateAttendanceManagementClockInTime(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "jobPostId") Long jobPostId,
-        @Valid @RequestPart(name = "attendanceManagementUpdateControllerRequestDto")
-        AttendanceManagementUpdateControllerRequestDto attendanceManagementUpdateControllerRequestDto
+        @Valid @RequestBody AttendanceManagementUpdateControllerRequestDto attendanceManagementUpdateControllerRequestDto
     ) {
         AttendanceManagementUpdateServiceRequestDto attendanceManagementUpdateServiceRequestDto =
             attendanceManagementDtoMapper.toAttendanceManagementUpdateServiceRequestDto(
                 attendanceManagementUpdateControllerRequestDto
             );
         attendanceManagementService.updateClockInTime(
+            userDetails.getCompany(),
             jobPostId,
             attendanceManagementUpdateServiceRequestDto
         );
@@ -66,15 +74,16 @@ public class AttendanceManagementController {
     // QR 퇴근 체크
     @PutMapping("/jobposts/{jobPostId}/clock-out")
     public ResponseEntity<?> updateAttendanceManagementClockOutTime(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "jobPostId") Long jobPostId,
-        @Valid @RequestPart(name = "attendanceManagementUpdateControllerRequestDto")
-        AttendanceManagementUpdateControllerRequestDto attendanceManagementUpdateControllerRequestDto
+        @Valid @RequestBody AttendanceManagementUpdateControllerRequestDto attendanceManagementUpdateControllerRequestDto
     ) {
         AttendanceManagementUpdateServiceRequestDto attendanceManagementUpdateServiceRequestDto =
             attendanceManagementDtoMapper.toAttendanceManagementUpdateServiceRequestDto(
                 attendanceManagementUpdateControllerRequestDto
             );
         attendanceManagementService.updateClockOutTime(
+            userDetails.getCompany(),
             jobPostId,
             attendanceManagementUpdateServiceRequestDto
         );
@@ -83,15 +92,16 @@ public class AttendanceManagementController {
     // QR 식사 체크
     @PutMapping("/jobposts/{jobPostId}/meal-count")
     public ResponseEntity<?> updateAttendanceManagementMealCount(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "jobPostId") Long jobPostId,
-        @Valid @RequestPart(name = "attendanceManagementUpdateControllerRequestDto")
-        AttendanceManagementUpdateControllerRequestDto attendanceManagementUpdateControllerRequestDto
+        @Valid @RequestBody AttendanceManagementUpdateMealCountControllerRequestDto attendanceManagementUpdateMealCountControllerRequestDto
     ) {
         AttendanceManagementUpdateServiceRequestDto attendanceManagementUpdateServiceRequestDto =
             attendanceManagementDtoMapper.toAttendanceManagementUpdateServiceRequestDto(
-                attendanceManagementUpdateControllerRequestDto
+                attendanceManagementUpdateMealCountControllerRequestDto
             );
         attendanceManagementService.updateMealCount(
+            userDetails.getCompany(),
             jobPostId,
             attendanceManagementUpdateServiceRequestDto
         );
@@ -100,20 +110,25 @@ public class AttendanceManagementController {
     // 출퇴근 정보 엑셀 파일
     @GetMapping("/jobposts/{jobPostId}/excel")
     public void downloadAttendanceInfo(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "jobPostId") Long jobPostId,
         HttpServletResponse response
     ) throws IOException {
         List<AttendanceManagementCreateExcelServiceResponseDto> attendanceManagementCreateExcelServiceResponseDtoList =
-            attendanceManagementService.getExcelInfo(jobPostId);
+            attendanceManagementService.getExcelInfo(
+                userDetails.getCompany(),
+                jobPostId
+            );
         ExcelFile excelFile = new ExcelFile(attendanceManagementCreateExcelServiceResponseDtoList);
 
-        // TODO - 파일 이름에 공고 이름 사용하려면 jobPost name 관련 service 이용?
-        String JobPostName = "공고1";
-        String fileName = new String(JobPostName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1).concat(".xlsx");
+        String fileName = attendanceManagementService.getJobPostTitle(jobPostId).concat(".xlsx");
+        // UTF-8로 파일명 인코딩
+        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8)
+            .replace("+", "%20"); // 공백을 '+' 대신 '%20'으로 변환
         String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=".concat(fileName);
+        String headerValue = "attachment; filename*=utf-8''" + encodedFileName + ";";
 
-        response.setContentType("ms-vnd/excel");
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader(headerKey, headerValue);
 
         excelFile.write(response.getOutputStream());
