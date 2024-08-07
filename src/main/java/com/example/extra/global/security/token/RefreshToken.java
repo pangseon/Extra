@@ -18,7 +18,7 @@ public class RefreshToken {
      * - 예제 -- new RefreshToken(2, "blabla") => "refreshToken:2"
      */
     @Id
-    private Long id;
+    private String id;
     private String refreshToken;
 
 }
