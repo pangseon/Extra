@@ -14,6 +14,7 @@ import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoar
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
@@ -185,8 +186,9 @@ public class CostumeApprovalBoardController {
     public ResponseEntity<?> updateCostumeApprovalBoardByCompany(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "costume_approval_board_id") Long costumeApprovalBoardId,
-        @RequestBody CostumeApprovalBoardApplyStatusUpdateControllerRequestDto controllerRequestDto
+        @Valid @RequestBody CostumeApprovalBoardApplyStatusUpdateControllerRequestDto controllerRequestDto
     ) {
+
         CostumeApprovalBoardApplyStatusUpdateServiceRequestDto serviceRequestDto =
             costumeApprovalBoardDtoMapper.toCostumeApprovalBoardApplyStatusUpdateServiceRequestDto(
                 controllerRequestDto);

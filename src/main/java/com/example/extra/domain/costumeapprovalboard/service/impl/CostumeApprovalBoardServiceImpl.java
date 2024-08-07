@@ -246,7 +246,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             throw new CostumeApprovalBoardException(CostumeApprovalBoardErrorCode.ALREADY_APPROVED);
         }
         costumeApprovalBoard.updateCostumeApprove(
-            ApplyStatus.fromString(serviceRequestDto.costumeApprove())
+            serviceRequestDto.costumeApprove()
         );
     }
 

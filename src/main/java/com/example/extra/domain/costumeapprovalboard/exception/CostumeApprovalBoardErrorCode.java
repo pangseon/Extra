@@ -16,7 +16,8 @@ public enum CostumeApprovalBoardErrorCode implements ErrorCode {
 
     // 404
     NOT_FOUND_COSTUME_APPROVAL_BOARD(HttpStatus.NOT_FOUND, "유효하지 않은 의상 승인 게시글입니다"),
-    NOT_FOUND_COSTUME_APPROVAL_BOARD_MEMBER(HttpStatus.NOT_FOUND, "의상 컨펌 작성 이력이 없습니다.");
+    NOT_FOUND_COSTUME_APPROVAL_BOARD_MEMBER(HttpStatus.NOT_FOUND, "의상 컨펌 작성 이력이 없습니다."),
+    ;
 
     private final HttpStatus status;
     private final String message;

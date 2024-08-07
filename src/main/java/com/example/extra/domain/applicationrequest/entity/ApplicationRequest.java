@@ -24,7 +24,7 @@ public abstract class ApplicationRequest extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "apply_status", nullable = false)
+    @Column(nullable = false)
     protected ApplyStatus applyStatus;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
