@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class S3Provider {
     private final AmazonS3 amazonS3;
     public static final String SEPARATOR = "/";
-    @Value("${cloud.aws.s3.bucket.name}")
+    @Value("${cloud.aws.s3.bucket}")
     public String bucket;
     public final String url = "https://extra-file.s3.ap-northeast-2.amazonaws.com/";
 
@@ -32,22 +32,20 @@ public class S3Provider {
         }
     }
     public String originalFileName(MultipartFile multipartFile) {
-        if (multipartFile.isEmpty()) {
-            return "";
-        }
+/*        System.out.println(multipartFile.getContentType());
         if (Objects.equals(multipartFile.getContentType(), "image/png")
-            || Objects.equals(multipartFile.getContentType(), "image/jpeg")) {
+            || Objects.equals(multipartFile.getContentType(), "image/jpeg")) {*/
             String fileType = switch (multipartFile.getContentType()) {
-                case "image/png" -> ".png";
+                case "multipart/form-data" -> ".png";
                 case "image/jpeg" -> ".jpg";
                 default -> throw new IllegalStateException(
                     "Unexpected value: " + multipartFile.getContentType());
             };
             return UUID.randomUUID() + fileType;
-        } else {
+        } /*else {
             throw new IllegalArgumentException("잘못된 파일 형식입니다");
-        }
-    }
+        }*/
+    //}
     private static ObjectMetadata setObjectMetadata(MultipartFile multipartFile) {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());

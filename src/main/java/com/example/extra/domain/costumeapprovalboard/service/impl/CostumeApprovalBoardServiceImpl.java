@@ -28,9 +28,12 @@ import com.example.extra.domain.role.exception.NotFoundRoleException;
 import com.example.extra.domain.role.exception.RoleErrorCode;
 import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.global.enums.ApplyStatus;
+import com.example.extra.global.s3.S3Provider;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,6 +49,11 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     private final RoleRepository roleRepository;
     private final ApplicationRequestMemberRepository applicationRequestMemberRepository;
     private final ApplicationRequestCompanyRepository applicationRequestCompanyRepository;
+    private final S3Provider s3Provider;
+    private final String s3url = "https://light-house-ai.s3.ap-northeast-2.amazonaws.com/";
+    private final String SEPARATOR = "/";
+
+
 
     public CostumeApprovalBoardMemberReadServiceResponseDto getCostumeApprovalBoardForMember(
         Member member,
@@ -142,11 +150,11 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     public void createCostumeApprovalBoard(
         Long roleId,
         Member member,
-        CostumeApprovalBoardCreateServiceDto costumeApprovalBoardCreateServiceDto
-    ) {
+        CostumeApprovalBoardCreateServiceDto costumeApprovalBoardCreateServiceDto,
+        MultipartFile multipartFile
+    )throws IOException {
         Role role = roleRepository.findById(roleId)
             .orElseThrow(() -> new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
-
         // 이미 의상 승인 글을 작성한 경우
         costumeApprovalBoardRepository.findByMemberAndRole(
                 member,
@@ -166,19 +174,24 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             throw new ApplicationRequestException(
                 ApplicationRequestErrorCode.NOT_APPROVED_REQUEST);
         }
+        String fileName;
+        String fileUrl;
+        String folderName = member.getName()+ UUID.randomUUID();
 
         // 이미지 저장 후 경로 가져오기 (메서드 추출, 추후 작성)
-        String costumeImageUrl = saveImage(
-            costumeApprovalBoardCreateServiceDto.multipartFile());
+        fileName = s3Provider.originalFileName(multipartFile);
+        fileUrl = s3url + folderName + SEPARATOR + fileName;
 
         // 의상 승인 게시판 생성하기
         CostumeApprovalBoard costumeApprovalBoard = CostumeApprovalBoard.builder()
-            .costumeImageUrl(costumeImageUrl)
+            .costumeImageUrl(fileUrl)
             .member(member)
             .role(role)
             .imageExplain(costumeApprovalBoardCreateServiceDto.image_explain())
             .build();
         costumeApprovalBoardRepository.save(costumeApprovalBoard);
+        fileUrl = folderName + SEPARATOR + fileName;
+        s3Provider.saveFile(multipartFile,fileUrl);
     }
 
     @Override
