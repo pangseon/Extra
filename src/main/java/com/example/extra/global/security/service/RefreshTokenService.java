@@ -1,5 +1,9 @@
 package com.example.extra.global.security.service;
 
+import com.example.extra.domain.company.entity.Company;
+import com.example.extra.domain.company.exception.CompanyErrorCode;
+import com.example.extra.domain.company.exception.CompanyException;
+import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.exception.MemberErrorCode;
 import com.example.extra.domain.member.exception.MemberException;
@@ -25,8 +29,9 @@ public class RefreshTokenService {
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberRepository memberRepository;
+    private final CompanyRepository companyRepository;
 
-    public void getNewAccessToken(
+    public void getMemberNewAccessToken(
         final HttpServletRequest httpServletRequest,
         final HttpServletResponse httpServletResponse
     ) {
@@ -56,6 +61,37 @@ public class RefreshTokenService {
         } else {
             throw new TokenException(TokenErrorCode.INVALID_TOKEN);
         }
+    }
 
+    public void getCompanyNewAccessToken(
+        final HttpServletRequest httpServletRequest,
+        final HttpServletResponse httpServletResponse
+    ) {
+        String token = httpServletRequest.getHeader("Authorization");
+        log.info(token);
+        Company company = companyRepository.findByRefreshToken(jwtUtil.substringToken(token))
+            .orElseThrow(() -> new CompanyException(CompanyErrorCode.NOT_FOUND_COMPANY));
+
+        RefreshToken refreshToken = refreshTokenRepository.findById(company.tokenId())
+            .orElseThrow(() -> new TokenException(TokenErrorCode.NOT_FOUND_TOKEN));
+
+        // redis refresh token == rdb refresh token
+        if (refreshToken.getRefreshToken().equals(company.getRefreshToken())) {
+            String newAccessToken = jwtUtil.createToken(company.getEmail(), company.getUserRole());
+            String newRefreshToken = jwtUtil.createRefreshToken();
+
+            refreshTokenRepository.delete(refreshToken);
+            refreshTokenRepository.save(
+                new RefreshToken(
+                    company.tokenId(),
+                    jwtUtil.substringToken(newRefreshToken)
+                )
+            );
+
+            company.updateRefreshToken(jwtUtil.substringToken(newRefreshToken));
+            jwtUtil.addTokenHeader(newAccessToken, httpServletResponse);
+        } else {
+            throw new TokenException(TokenErrorCode.INVALID_TOKEN);
+        }
     }
 }
