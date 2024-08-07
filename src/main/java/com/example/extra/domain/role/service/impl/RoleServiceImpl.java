@@ -46,12 +46,12 @@ public class RoleServiceImpl implements RoleService {
         Role role = roleRepository.findByIdAndJobPost(role_id,jobPost)
             .orElseThrow(()->new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
         role.updateRole(
-            roleUpdateServiceRequestDto.role_name(),
+            roleUpdateServiceRequestDto.roleName(),
             roleUpdateServiceRequestDto.costume(),
             roleUpdateServiceRequestDto.sex(),
-                roleUpdateServiceRequestDto.role_age(),
-            roleUpdateServiceRequestDto.limit_personnel(),
-            roleUpdateServiceRequestDto.current_personnel(),
+                roleUpdateServiceRequestDto.roleAge(),
+            roleUpdateServiceRequestDto.limitPersonnel(),
+            roleUpdateServiceRequestDto.currentPersonnel(),
             roleUpdateServiceRequestDto.season(),
             roleUpdateServiceRequestDto.check_tattoo());
         roleRepository.save(role);
