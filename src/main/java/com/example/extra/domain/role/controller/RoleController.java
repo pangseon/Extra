@@ -30,9 +30,9 @@ public class RoleController {
     private final RoleDtoMapper roleDtoMapper;
     private final RoleService roleService;
 
-    @PostMapping("/{jobPost_id}/roles/create")
+    @PostMapping("/{jobPost_id}/roles")
     public ResponseEntity<?> createRole(
-        @PathVariable(name = "jobpost_id") Long jobPostId,
+        @PathVariable(name = "jobPost_id") Long jobPostId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody RoleCreateControllerRequestDto roleCreateControllerRequestDto
     ) {
@@ -44,7 +44,7 @@ public class RoleController {
 
     @PutMapping("/{jobPost_id}/roles/{role_id}")
     public ResponseEntity<?> updateRole(
-        @PathVariable(name = "jobpost_id") Long jobPostId,
+        @PathVariable(name = "jobPost_id") Long jobPostId,
         @PathVariable(name = "role_id") Long roleId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody RoleUpdateControllerRequestDto roleUpdateControllerRequestDto
@@ -58,7 +58,7 @@ public class RoleController {
 
     @DeleteMapping("/{jobPost_id}/roles/{role_id}")
     public ResponseEntity<?> deleteRole(
-        @PathVariable(name = "jobpost_id") Long jobPostId,
+        @PathVariable(name = "jobPost_id") Long jobPostId,
         @PathVariable(name = "role_id") Long roleId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
@@ -68,7 +68,7 @@ public class RoleController {
 
     @GetMapping("/{jobPost_id}/roles/{role_id}")
     public RoleServiceReResponseDto readOnceRole(
-        @PathVariable(name = "jobpost_id") Long jobPostId,
+        @PathVariable(name = "jobPost_id") Long jobPostId,
         @PathVariable(name = "role_id") Long roleId
     ) {
         return roleService.readRole(jobPostId, roleId);
@@ -76,7 +76,7 @@ public class RoleController {
 
     @GetMapping("/{jobPost_id}/roles")
     public List<RoleServiceReResponseDto> readAllRile(
-        @PathVariable(name = "jobpost_id") Long jobPostId) {
+        @PathVariable(name = "jobPost_id") Long jobPostId) {
         return roleService.readAllRole(jobPostId);
     }
 
