@@ -8,7 +8,9 @@ import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApproval
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardExplainUpdateServiceRequestDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
 import com.example.extra.domain.member.entity.Member;
+import java.io.IOException;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface CostumeApprovalBoardService {
 
@@ -40,8 +42,9 @@ public interface CostumeApprovalBoardService {
     void createCostumeApprovalBoard(
         final Long roleId,
         final Member member,
-        final CostumeApprovalBoardCreateServiceDto costumeApprovalBoardCreateServiceDto
-    );
+        final CostumeApprovalBoardCreateServiceDto costumeApprovalBoardCreateServiceDto,
+        final MultipartFile multipartFile
+    ) throws IOException;
 
     void updateCostumeApprovalBoardByMember(
         final Long costumeApprovalBoardId,

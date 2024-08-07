@@ -15,6 +15,7 @@ import com.example.extra.domain.member.entity.Member;
 import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -121,8 +122,8 @@ public class CostumeApprovalBoardController {
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "role_id") Long roleId,
         @RequestPart(name = "explain") CostumeApprovalBoardExplainCreateRequestDto costumeApprovalBoardExplainCreateRequestDto,
-        @NotNull @RequestPart(name = "image") MultipartFile multipartFile
-    ) {
+        @RequestPart(name = "image") MultipartFile multipartFile
+    )throws IOException {
         Member member = userDetails.getMember();
         CostumeApprovalBoardCreateServiceDto costumeApprovalBoardCreateServiceDto =
             costumeApprovalBoardDtoMapper.toCostumeApprovalBoardCreateServiceDto(
@@ -133,7 +134,8 @@ public class CostumeApprovalBoardController {
         costumeApprovalBoardService.createCostumeApprovalBoard(
             roleId,
             member,
-            costumeApprovalBoardCreateServiceDto
+            costumeApprovalBoardCreateServiceDto,
+            multipartFile
         );
 
         return ResponseEntity
