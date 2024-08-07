@@ -97,7 +97,7 @@ public class CompanyServiceImpl implements CompanyService {
 
         refreshTokenRepository.save(
             new RefreshToken(
-                company.getId(),
+                company.tokenId(),
                 jwtUtil.substringToken(refreshToken)
             )
         );
@@ -110,7 +110,7 @@ public class CompanyServiceImpl implements CompanyService {
     public void logout(
         final Company company
     ) {
-        RefreshToken refreshToken = refreshTokenRepository.findById(company.getId())
+        RefreshToken refreshToken = refreshTokenRepository.findById(company.tokenId())
             .orElseThrow(() -> new CompanyException(CompanyErrorCode.FORBIDDEN));
         refreshTokenRepository.delete(refreshToken);
 

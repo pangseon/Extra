@@ -113,7 +113,7 @@ public class MemberServiceImpl implements MemberService {
 
         refreshTokenRepository.save(
             new RefreshToken(
-                member.getId(),
+                member.tokenId(),
                 jwtUtil.substringToken(refreshToken)
             )
         );
@@ -129,7 +129,7 @@ public class MemberServiceImpl implements MemberService {
     ) throws ServletException, IOException {
         Member member = userDetails.getMember();
 
-        RefreshToken refreshToken = refreshTokenRepository.findById(member.getId())
+        RefreshToken refreshToken = refreshTokenRepository.findById(member.tokenId())
             .orElseThrow(() -> new MemberException(MemberErrorCode.UNAUTHORIZED));
         refreshTokenRepository.delete(refreshToken);
 

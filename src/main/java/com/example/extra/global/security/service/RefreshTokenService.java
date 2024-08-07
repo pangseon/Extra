@@ -37,7 +37,7 @@ public class RefreshTokenService {
         Member member = memberRepository.findByRefreshToken(jwtUtil.substringToken(token))
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
 
-        RefreshToken refreshToken = refreshTokenRepository.findById(member.getId())
+        RefreshToken refreshToken = refreshTokenRepository.findById(member.tokenId())
             .orElseThrow(() -> new TokenException(TokenErrorCode.NOT_FOUND_TOKEN));
 
         // redis refresh token == rdb refresh token
@@ -48,7 +48,7 @@ public class RefreshTokenService {
             refreshTokenRepository.delete(refreshToken);
             refreshTokenRepository.save(
                 new RefreshToken(
-                    member.getId(),
+                    member.tokenId(),
                     jwtUtil.substringToken(newRefreshToken)
                 )
             );
