@@ -5,7 +5,6 @@ import com.example.extra.domain.member.exception.MemberErrorCode;
 import com.example.extra.domain.member.exception.MemberException;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.global.security.JwtUtil;
-import com.example.extra.global.security.UserDetailsImpl;
 import com.example.extra.global.security.exception.TokenErrorCode;
 import com.example.extra.global.security.exception.TokenException;
 import com.example.extra.global.security.repository.RefreshTokenRepository;
@@ -28,7 +27,6 @@ public class RefreshTokenService {
     private final MemberRepository memberRepository;
 
     public void getNewAccessToken(
-        final UserDetailsImpl userDetails,
         final HttpServletRequest httpServletRequest,
         final HttpServletResponse httpServletResponse
     ) {
