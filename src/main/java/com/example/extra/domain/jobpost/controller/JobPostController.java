@@ -31,30 +31,29 @@ public class JobPostController {
 
     private final JobPostDtoMapper jobPostDtoMapper;
     private final JobPostService jobPostService;
-    private final RoleDtoMapper roleDtoMapper;
 
     @PostMapping("")
     public ResponseEntity<?> createJobPost(
-        @Valid @RequestBody JobPostCreateControllerRequestDto jobPostCreateControllerRequestDto,
+        @Valid @RequestBody JobPostCreateControllerRequestDto controllerRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        JobPostCreateServiceRequestDto jobPostCreateServiceRequestDto =
-            jobPostDtoMapper.toJobPostCreateServiceDto(jobPostCreateControllerRequestDto);
-        jobPostService.createJobPost(userDetails.getCompany(), jobPostCreateServiceRequestDto);
+        JobPostCreateServiceRequestDto serviceRequestDto =
+            jobPostDtoMapper.toJobPostCreateServiceDto(controllerRequestDto);
+        jobPostService.createJobPost(userDetails.getCompany(), serviceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{jobpost_id}")
     public ResponseEntity<?> updateJobPost(
         @PathVariable(name = "jobpost_id") Long jobpostId,
-        @Valid @RequestBody JobPostUpdateControllerRequestDto jobPostUpdateControllerRequestDto,
+        @Valid @RequestBody JobPostUpdateControllerRequestDto controllerRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        JobPostUpdateServiceRequestDto jobPostUpdateServiceRequestDto =
-            jobPostDtoMapper.toJobPostUpdateServiceDto(jobPostUpdateControllerRequestDto);
+        JobPostUpdateServiceRequestDto serviceRequestDto =
+            jobPostDtoMapper.toJobPostUpdateServiceDto(controllerRequestDto);
         jobPostService.updateJobPost(
             jobpostId
-            , jobPostUpdateServiceRequestDto,
+            , serviceRequestDto,
             userDetails.getCompany());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

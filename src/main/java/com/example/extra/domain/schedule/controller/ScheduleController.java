@@ -34,12 +34,12 @@ public class ScheduleController {
     public ResponseEntity<?> createSchedule(
         @PathVariable(name = "jobPost_id") Long jobPostId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @RequestBody ScheduleCreateControllerRequestDto createControllerRequestDto
+        @RequestBody ScheduleCreateControllerRequestDto controllerRequestDto
     ) {
-        ScheduleCreateServiceRequestDto scheduleCreateServiceRequestDto =
-            scheduleDtoMapper.toScheduleCreateServiceDto(createControllerRequestDto);
+        ScheduleCreateServiceRequestDto serviceRequestDto =
+            scheduleDtoMapper.toScheduleCreateServiceDto(controllerRequestDto);
         scheduleService.createSchedule(jobPostId, userDetails.getCompany(),
-            scheduleCreateServiceRequestDto);
+            serviceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -48,12 +48,12 @@ public class ScheduleController {
         @PathVariable(name = "jobPost_id") Long jobPostId,
         @PathVariable(name = "schedule_id") Long scheduleId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @RequestBody ScheduleUpdateControllerRequestDto scheduleUpdateControllerRequestDto
+        @RequestBody ScheduleUpdateControllerRequestDto controllerRequestDto
     ) {
-        ScheduleUpdateServiceRequestDto scheduleUpdateServiceRequestDto =
-            scheduleDtoMapper.toScheduleUpdateServiceDto(scheduleUpdateControllerRequestDto);
+        ScheduleUpdateServiceRequestDto serviceRequestDto =
+            scheduleDtoMapper.toScheduleUpdateServiceDto(controllerRequestDto);
         scheduleService.updateSchedule(jobPostId, scheduleId, userDetails.getCompany(),
-            scheduleUpdateServiceRequestDto);
+            serviceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
