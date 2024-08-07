@@ -12,7 +12,7 @@ public record RoleCreateControllerRequestDto(
     Integer limitPersonnel,
     Integer currentPersonnel,
     Season season,
-    Boolean check_tattoo
+    Boolean checkTattoo
 
 )
 {

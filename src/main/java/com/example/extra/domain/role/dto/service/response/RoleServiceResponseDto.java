@@ -4,16 +4,16 @@ import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.global.enums.Season;
 import java.time.LocalDate;
 
-public record RoleServiceReResponseDto(
+public record RoleServiceResponseDto(
     Long id,
-    String role_name,
+    String roleName,
     String costume,
     Boolean sex,
-    LocalDate role_age,
-    Integer limit_personnel,
-    Integer current_personnel,
+    LocalDate roleAge,
+    Integer limitPersonnel,
+    Integer currentPersonnel,
     Season season,
-    Boolean check_tattoo
+    Boolean checkTattoo
 )
 {
 
