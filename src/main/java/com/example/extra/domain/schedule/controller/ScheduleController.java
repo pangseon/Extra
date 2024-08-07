@@ -32,7 +32,7 @@ public class ScheduleController {
 
     @PostMapping("/{jobPost_id}/schedules")
     public ResponseEntity<?> createSchedule(
-        @PathVariable(name = "jobpost_id") Long jobPostId,
+        @PathVariable(name = "jobPost_id") Long jobPostId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody ScheduleCreateControllerRequestDto createControllerRequestDto
     ) {
@@ -45,7 +45,7 @@ public class ScheduleController {
 
     @PutMapping("/{jobPost_id}/schedules/{schedule_id}")
     public ResponseEntity<?> updateSchedule(
-        @PathVariable(name = "jobpost_id") Long jobPostId,
+        @PathVariable(name = "jobPost_id") Long jobPostId,
         @PathVariable(name = "schedule_id") Long scheduleId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody ScheduleUpdateControllerRequestDto scheduleUpdateControllerRequestDto
@@ -59,7 +59,7 @@ public class ScheduleController {
 
     @DeleteMapping("/{jobPost_id}/schedules/{schedule_id}")
     public ResponseEntity<?> deleteSchedule(
-        @PathVariable(name = "jobpost_id") Long jobPostId,
+        @PathVariable(name = "jobPost_id") Long jobPostId,
         @PathVariable(name = "schedule_id") Long scheduleId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
@@ -69,7 +69,7 @@ public class ScheduleController {
 
     @GetMapping("/{jobPost_id}/schedules/{schedule_id}")
     public ScheduleServiceResponseDto readSchedule(
-        @PathVariable(name = "jobpost_id") Long jobPostId,
+        @PathVariable(name = "jobPost_id") Long jobPostId,
         @PathVariable(name = "schedule_id") Long scheduleId
     ) {
         return scheduleService.readSchedule(jobPostId, scheduleId);
@@ -77,7 +77,7 @@ public class ScheduleController {
 
     @GetMapping("/{jobPost_id}/schedules")
     public List<ScheduleServiceResponseDto> readAllSchedule(
-        @PathVariable(name = "jobpost_id") Long jobPostId
+        @PathVariable(name = "jobPost_id") Long jobPostId
     ) {
         return scheduleService.readAllSchedule(jobPostId);
     }
