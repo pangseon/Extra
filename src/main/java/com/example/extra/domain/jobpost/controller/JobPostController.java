@@ -33,7 +33,7 @@ public class JobPostController {
     private final JobPostService jobPostService;
     private final RoleDtoMapper roleDtoMapper;
 
-    @PostMapping("/create")
+    @PostMapping("")
     public ResponseEntity<?> createJobPost(
         @Valid @RequestBody JobPostCreateControllerRequestDto jobPostCreateControllerRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails
@@ -44,7 +44,7 @@ public class JobPostController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/{jobpost_id}/update")
+    @PutMapping("/{jobpost_id}")
     public ResponseEntity<?> updateJobPost(
         @PathVariable(name = "jobpost_id") Long jobpostId,
         @Valid @RequestBody JobPostUpdateControllerRequestDto jobPostUpdateControllerRequestDto,
@@ -59,7 +59,7 @@ public class JobPostController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping("/{jobpost_id}/delete")
+    @DeleteMapping("/{jobpost_id}")
     public ResponseEntity<?> deleteJobPost(
         @PathVariable(name = "jobpost_id") Long jobpostId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
