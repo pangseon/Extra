@@ -8,24 +8,23 @@ import com.example.extra.domain.attendancemanagement.dto.service.AttendanceManag
 import com.example.extra.domain.attendancemanagement.dto.service.AttendanceManagementReadServiceResponseDto;
 import com.example.extra.domain.attendancemanagement.dto.service.AttendanceManagementUpdateServiceRequestDto;
 import com.example.extra.domain.attendancemanagement.entity.AttendanceManagement;
-import com.example.extra.domain.attendancemanagement.exception.AlreadyClockedInException;
-import com.example.extra.domain.attendancemanagement.exception.AlreadyClockedOutException;
+import com.example.extra.domain.attendancemanagement.exception.AttendanceManagementException;
 import com.example.extra.domain.attendancemanagement.exception.AttendanceManagementErrorCode;
-import com.example.extra.domain.attendancemanagement.exception.NotFoundAttendanceManagementException;
 import com.example.extra.domain.attendancemanagement.mapper.entity.AttendanceManagementEntityMapper;
 import com.example.extra.domain.attendancemanagement.repository.AttendanceManagementRepository;
 import com.example.extra.domain.attendancemanagement.service.AttendanceManagementService;
+import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.domain.jobpost.exception.JobPostErrorCode;
 import com.example.extra.domain.jobpost.exception.NotFoundJobPostException;
 import com.example.extra.domain.jobpost.repository.JobPostRepository;
 import com.example.extra.domain.member.entity.Member;
+import com.example.extra.domain.member.exception.MemberErrorCode;
+import com.example.extra.domain.member.exception.MemberException;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.role.entity.Role;
 import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.global.enums.ApplyStatus;
-import com.example.extra.sample.exception.NotFoundTestException;
-import com.example.extra.sample.exception.TestErrorCode;
 import java.text.Collator;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -52,11 +51,16 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
     @Override
     @Transactional(readOnly = true)
     public List<AttendanceManagementReadServiceResponseDto> getApprovedMemberInfo(
+        final Company company,
         final Long jobPostId,
         Pageable pageable
     ) {
+        JobPost jobPost = getJobPostById(jobPostId);
+        if(!Objects.equals(jobPost.getCompany().getId(), company.getId())){
+            throw new AttendanceManagementException(AttendanceManagementErrorCode.FORBIDDEN_ACCESS_ATTENDANCE_MANAGEMENT);
+        }
         List<AttendanceManagementReadServiceResponseDto> attendanceManagementReadServiceResponseDtoList =
-            getAttendanceManagementReadServiceResponseDtoList(jobPostId);
+            getAttendanceManagementReadServiceResponseDtoList(jobPost);
 
         sortAttendanceManagementReadServiceResponseDtoList(attendanceManagementReadServiceResponseDtoList, pageable);
 
@@ -68,15 +72,20 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
     @Override
     @Transactional
     public void updateClockInTime(
+        final Company company,
         final Long jobPostId,
         final AttendanceManagementUpdateServiceRequestDto attendanceManagementUpdateServiceRequestDto
     ) {
-        AttendanceManagement attendanceManagement = getAttendanceManagementByJobPostIdAndRequestDto(
-            jobPostId,
+        JobPost jobPost = getJobPostById(jobPostId);
+        if(!Objects.equals(jobPost.getCompany().getId(), company.getId())){
+            throw new AttendanceManagementException(AttendanceManagementErrorCode.FORBIDDEN_ACCESS_ATTENDANCE_MANAGEMENT);
+        }
+        AttendanceManagement attendanceManagement = getAttendanceManagementByJobPostAndRequestDto(
+            jobPost,
             attendanceManagementUpdateServiceRequestDto
         );
         if(Objects.nonNull(attendanceManagement.getClockInTime())){
-            throw new AlreadyClockedInException(AttendanceManagementErrorCode.ALREADY_CLOCKED_IN);
+            throw new AttendanceManagementException(AttendanceManagementErrorCode.ALREADY_CLOCKED_IN);
         }
         attendanceManagement.updateClockInTimeTo(attendanceManagementUpdateServiceRequestDto.time());
     }
@@ -84,15 +93,20 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
     @Override
     @Transactional
     public void updateClockOutTime(
+        final Company company,
         final Long jobPostId,
         final AttendanceManagementUpdateServiceRequestDto attendanceManagementUpdateServiceRequestDto
     ) {
-        AttendanceManagement attendanceManagement = getAttendanceManagementByJobPostIdAndRequestDto(
-            jobPostId,
+        JobPost jobPost = getJobPostById(jobPostId);
+        if(!Objects.equals(jobPost.getCompany().getId(), company.getId())){
+            throw new AttendanceManagementException(AttendanceManagementErrorCode.FORBIDDEN_ACCESS_ATTENDANCE_MANAGEMENT);
+        }
+        AttendanceManagement attendanceManagement = getAttendanceManagementByJobPostAndRequestDto(
+            jobPost,
             attendanceManagementUpdateServiceRequestDto
         );
         if(Objects.nonNull(attendanceManagement.getClockOutTime())){
-            throw new AlreadyClockedOutException(AttendanceManagementErrorCode.ALREADY_CLOCKED_OUT);
+            throw new AttendanceManagementException(AttendanceManagementErrorCode.ALREADY_CLOCKED_OUT);
         }
         attendanceManagement.updateClockOutTimeTo(attendanceManagementUpdateServiceRequestDto.time());
     }
@@ -100,11 +114,16 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
     @Override
     @Transactional
     public void updateMealCount(
+        final Company company,
         final Long jobPostId,
         final AttendanceManagementUpdateServiceRequestDto attendanceManagementUpdateServiceRequestDto
     ) {
-        AttendanceManagement attendanceManagement = getAttendanceManagementByJobPostIdAndRequestDto(
-            jobPostId,
+        JobPost jobPost = getJobPostById(jobPostId);
+        if(!Objects.equals(jobPost.getCompany().getId(), company.getId())){
+            throw new AttendanceManagementException(AttendanceManagementErrorCode.FORBIDDEN_ACCESS_ATTENDANCE_MANAGEMENT);
+        }
+        AttendanceManagement attendanceManagement = getAttendanceManagementByJobPostAndRequestDto(
+            jobPost,
             attendanceManagementUpdateServiceRequestDto
         );
         attendanceManagement.addOneToMealCount();
@@ -112,19 +131,33 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
 
     @Override
     @Transactional(readOnly = true)
-    public List<AttendanceManagementCreateExcelServiceResponseDto> getExcelInfo(final Long jobPostId){
+    public List<AttendanceManagementCreateExcelServiceResponseDto> getExcelInfo(
+        final Company company,
+        final Long jobPostId
+    ){
         JobPost jobPost = getJobPostById(jobPostId);
+        if(!Objects.equals(jobPost.getCompany().getId(), company.getId())){
+            throw new AttendanceManagementException(AttendanceManagementErrorCode.FORBIDDEN_ACCESS_ATTENDANCE_MANAGEMENT);
+        }
         List<AttendanceManagement> attendanceManagementList = attendanceManagementRepository.findAllByJobPost(jobPost);
         return attendanceManagementEntityMapper.toAttendanceManagementCreateExcelServiceResponseDtoList(attendanceManagementList);
     }
 
-    private Member getMemberByNameAndBirthday(String memberName, LocalDate memberBirthday){
+    @Override
+    @Transactional(readOnly = true)
+    public String getJobPostTitle(final Long jobPostId) {
+        return getJobPostById(jobPostId).getTitle();
+    }
+
+    private Member getMemberByNameAndBirthday(
+        String memberName,
+        LocalDate memberBirthday
+    ){
         return memberRepository.findByNameAndBirthday(
             memberName,
             memberBirthday
         ).orElseThrow(
-            // TODO - member 의 NOT FOUND exception 이용
-            ()-> new NotFoundTestException(TestErrorCode.NOT_FOUND_TEST)
+            ()-> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER)
         );
     }
 
@@ -134,25 +167,23 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
         );
     }
 
-    private AttendanceManagement getAttendanceManagementByJobPostIdAndRequestDto(
-        Long jobPostId,
+    private AttendanceManagement getAttendanceManagementByJobPostAndRequestDto(
+        JobPost jobPost,
         AttendanceManagementUpdateServiceRequestDto attendanceManagementUpdateServiceRequestDto
     ) {
         String memberName = attendanceManagementUpdateServiceRequestDto.memberName();
         LocalDate memberBirthday = attendanceManagementUpdateServiceRequestDto.memberBirthday();
         Member member = getMemberByNameAndBirthday(memberName, memberBirthday);
-        JobPost jobPost = getJobPostById(jobPostId);
         return attendanceManagementRepository.findByMemberAndJobPost(
             member,
             jobPost
         ).orElseThrow(
-            ()-> new NotFoundAttendanceManagementException(AttendanceManagementErrorCode.NOT_FOUND_ATTENDANCE_MANAGEMENT)
+            ()-> new AttendanceManagementException(AttendanceManagementErrorCode.NOT_FOUND_ATTENDANCE_MANAGEMENT)
         );
     }
 
-    private List<AttendanceManagementReadServiceResponseDto> getAttendanceManagementReadServiceResponseDtoList(final Long jobPostId){
+    private List<AttendanceManagementReadServiceResponseDto> getAttendanceManagementReadServiceResponseDtoList(final JobPost jobPost){
         List<AttendanceManagementReadServiceResponseDto> attendanceManagementReadServiceResponseDtoList = new ArrayList<>();
-        JobPost jobPost = getJobPostById(jobPostId);
         List<Role> roleList = roleRepository.findAllByJobPost(jobPost);
         for(Role role : roleList){
             List<ApplicationRequestMember> applicationRequestMemberList =
@@ -161,13 +192,14 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
                 // 출석 여부 정보 확인
                 AttendanceManagement attendanceManagement = attendanceManagementRepository.findByMemberAndJobPost(
                     applicationRequestMember.getMember(),jobPost).orElseThrow(
-                    ()-> new NotFoundAttendanceManagementException(AttendanceManagementErrorCode.NOT_FOUND_ATTENDANCE_MANAGEMENT)
+                    ()-> new AttendanceManagementException(AttendanceManagementErrorCode.NOT_FOUND_ATTENDANCE_MANAGEMENT)
                 );
                 boolean isAttended = Objects.nonNull(attendanceManagement.getClockInTime());
 
                 // dto 구성
                 attendanceManagementReadServiceResponseDtoList.add(
                     AttendanceManagementReadServiceResponseDto.builder()
+                        .Id(attendanceManagement.getId())
                         .memberId(applicationRequestMember.getMember().getId())
                         .memberName(applicationRequestMember.getMember().getName())
                         .roleName(role.getRole_name())

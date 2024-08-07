@@ -28,13 +28,10 @@ public class AttendanceManagement extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "clock_in_time")
     private LocalDateTime clockInTime;
 
-    @Column(name = "clock_out_time")
     private LocalDateTime clockOutTime;
 
-    @Column(name = "meal_count")
     @ColumnDefault("0")
     private Integer mealCount;
 
