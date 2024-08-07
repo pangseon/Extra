@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class JobPostServiceImpl implements JobPostService {
+
     private final JobPostRepository jobPostRepository;
     private final JobPostEntityMapper jobPostEntityMapper;
     private final ScheduleRepository scheduleRepository;
@@ -34,18 +35,19 @@ public class JobPostServiceImpl implements JobPostService {
     public void createJobPost(
         Company company,
         final JobPostCreateServiceRequestDto jobPostCreateServiceRequestDto
-    ){
-        JobPost jobPost = jobPostEntityMapper.toJobPost(jobPostCreateServiceRequestDto,company);
+    ) {
+        JobPost jobPost = jobPostEntityMapper.toJobPost(jobPostCreateServiceRequestDto, company);
         jobPostRepository.save(jobPost);
     }
+
     @Transactional
     public void updateJobPost(
         Long jobPost_id,
         final JobPostUpdateServiceRequestDto jobPostUpdateServiceRequestDto
-        ,Company company
-    ){
-        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id,company)
-            .orElseThrow(()->new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        , Company company
+    ) {
+        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id, company)
+            .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
         jobPost.updateJobPost(
             jobPostUpdateServiceRequestDto.title(),
             jobPostUpdateServiceRequestDto.gatheringLocation(),
@@ -55,27 +57,30 @@ public class JobPostServiceImpl implements JobPostService {
             jobPostUpdateServiceRequestDto.category());
         jobPostRepository.save(jobPost);
     }
+
     public void deleteJobPost(
         Long jobPost_id
-        ,Company company
-    ){
-        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id,company)
-            .orElseThrow(()-> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        , Company company
+    ) {
+        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id, company)
+            .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
         jobPostRepository.delete(jobPost);
     }
 
     @Transactional(readOnly = true)
-    public JobPostServiceResponseDto readOnceJobPost(Long jobPost_id){
+    public JobPostServiceResponseDto readOnceJobPost(Long jobPost_id) {
         return readDto(jobPostRepository.findById(jobPost_id)
-            .orElseThrow(()->new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST)));
+            .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST)));
     }
+
     @Transactional(readOnly = true)
-    public List<JobPostServiceResponseDto> readAllJobPosts(){
+    public List<JobPostServiceResponseDto> readAllJobPosts() {
         return jobPostRepository.findAll()
             .stream()
             .map(this::readDto)
             .toList();
     }
+
     private JobPostServiceResponseDto readDto(JobPost jobPost) {
         return JobPostServiceResponseDto.builder()
             .id(jobPost.getId())
@@ -92,7 +97,7 @@ public class JobPostServiceImpl implements JobPostService {
                 .toList())
             .role_name_list(roleList(jobPost.getId())
                 .stream()
-                .map(Role::getRole_name)
+                .map(Role::getRoleName)
                 .toList())
             .costumeList(roleList(jobPost.getId())
                 .stream()
@@ -112,15 +117,15 @@ public class JobPostServiceImpl implements JobPostService {
                 .toList())
             .check_tattoo_list(roleList(jobPost.getId())
                 .stream()
-                .map(Role::getCheck_tattoo)
+                .map(Role::getCheckTattoo)
                 .toList())
             .current_personnel_list(roleList(jobPost.getId())
                 .stream()
-                .map(Role::getCurrent_personnel)
+                .map(Role::getCurrentPersonnel)
                 .toList())
             .limit_personnel_list(roleList(jobPost.getId())
                 .stream()
-                .map(Role::getLimit_personnel)
+                .map(Role::getLimitPersonnel)
                 .toList())
             .seasonList(roleList(jobPost.getId())
                 .stream()
@@ -128,12 +133,14 @@ public class JobPostServiceImpl implements JobPostService {
                 .toList())
             .build();
     }
-    private List<Role> roleList(Long jobPost_id){
+
+    private List<Role> roleList(Long jobPost_id) {
         return roleRepository.findByJobPostId(jobPost_id)
-            .orElseThrow(()->new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
+            .orElseThrow(() -> new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
     }
-    private List<Schedule> scheduleList(Long jobPost_id){
-       return scheduleRepository.findByJobPostId(jobPost_id)
-            .orElseThrow(()->new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+
+    private List<Schedule> scheduleList(Long jobPost_id) {
+        return scheduleRepository.findByJobPostId(jobPost_id)
+            .orElseThrow(() -> new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
     }
 }

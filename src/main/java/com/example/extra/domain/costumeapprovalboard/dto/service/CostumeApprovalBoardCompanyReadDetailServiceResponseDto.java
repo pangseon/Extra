@@ -22,11 +22,11 @@ public record CostumeApprovalBoardCompanyReadDetailServiceResponseDto(
             .builder()
             .id(costumeApprovalBoard.getId())
             .member_name(costumeApprovalBoard.getMember().getName())
-            .role_name(costumeApprovalBoard.getRole().getRole_name())
+            .role_name(costumeApprovalBoard.getRole().getRoleName())
             .sex(costumeApprovalBoard.getRole().getSex())
             .costume(costumeApprovalBoard.getRole().getCostume())
-            .image_explain(costumeApprovalBoard.getImage_explain())
-            .costume_approve(costumeApprovalBoard.getCostume_approve())
+            .image_explain(costumeApprovalBoard.getImageExplain())
+            .costume_approve(costumeApprovalBoard.getCostumeApprove())
             .build();
     }
 }

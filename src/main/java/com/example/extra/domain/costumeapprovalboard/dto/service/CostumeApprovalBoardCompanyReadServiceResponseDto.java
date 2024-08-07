@@ -18,8 +18,8 @@ public record CostumeApprovalBoardCompanyReadServiceResponseDto(
             .builder()
             .id(costumeApprovalBoard.getId())
             .member_name(costumeApprovalBoard.getMember().getName())
-            .role_name(costumeApprovalBoard.getRole().getRole_name())
-            .costume_approve(costumeApprovalBoard.getCostume_approve())
+            .role_name(costumeApprovalBoard.getRole().getRoleName())
+            .costume_approve(costumeApprovalBoard.getCostumeApprove())
             .build();
     }
 }

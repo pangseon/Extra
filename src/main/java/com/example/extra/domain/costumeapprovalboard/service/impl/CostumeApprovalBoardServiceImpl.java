@@ -242,7 +242,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
         }
 
         // 승인 여부 확인 및 변경
-        if (costumeApprovalBoard.getCostume_approve() == ApplyStatus.APPROVED) {
+        if (costumeApprovalBoard.getCostumeApprove() == ApplyStatus.APPROVED) {
             throw new CostumeApprovalBoardException(CostumeApprovalBoardErrorCode.ALREADY_APPROVED);
         }
         costumeApprovalBoard.updateCostumeApprove(

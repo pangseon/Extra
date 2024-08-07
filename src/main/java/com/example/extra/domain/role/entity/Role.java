@@ -30,7 +30,7 @@ public class Role extends BaseEntity {
     private Long id;
 
     @Column
-    private String role_name;
+    private String roleName;
 
     @Column
     private String costume;
@@ -39,70 +39,73 @@ public class Role extends BaseEntity {
     private Boolean sex;
 
     @Column
-    private LocalDate role_age;
+    private LocalDate roleAge;
 
     @Column
-    private Integer limit_personnel;
+    private Integer limitPersonnel;
 
     @Column
-    private Integer current_personnel;
+    private Integer currentPersonnel;
 
     @Column
     private Season season;
 
     @Column
-    private Boolean check_tattoo;
+    private Boolean checkTattoo;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "job_post_id",nullable = false)
+    @JoinColumn(name = "job_post_id", nullable = false)
     private JobPost jobPost;
+
     @Builder
     public Role(
-        final String  role_name,
+        final String roleName,
         final String costume,
         final Boolean sex,
-        final LocalDate role_age,
-        final Integer limit_personnel,
-        final Integer current_personnel,
+        final LocalDate roleAge,
+        final Integer limitPersonnel,
+        final Integer currentPersonnel,
         final Season season,
-        final Boolean check_tattoo,
+        final Boolean checkTattoo,
         final JobPost jobPost
-    ){
-        this.role_name = role_name;
+    ) {
+        this.roleName = roleName;
         this.costume = costume;
         this.sex = sex;
-        this.role_age = role_age;
-        this.limit_personnel = limit_personnel;
-        this.current_personnel = current_personnel;
+        this.roleAge = roleAge;
+        this.limitPersonnel = limitPersonnel;
+        this.currentPersonnel = currentPersonnel;
         this.season = season;
-        this.check_tattoo=check_tattoo;
+        this.checkTattoo = checkTattoo;
         this.jobPost = jobPost;
     }
+
     public void updateRole(
-        String  role_name,
+        String roleName,
         String costume,
         Boolean sex,
-        LocalDate role_age,
-        Integer limit_personnel,
-        Integer current_personnel,
+        LocalDate roleAge,
+        Integer limitPersonnel,
+        Integer currentPersonnel,
         Season season,
-        Boolean check_tattoo
-    ){
-        this.role_name = role_name;
+        Boolean checkTattoo
+    ) {
+        this.roleName = roleName;
         this.costume = costume;
         this.sex = sex;
-        this.role_age = role_age;
-        this.limit_personnel = limit_personnel;
-        this.current_personnel = current_personnel;
+        this.roleAge = roleAge;
+        this.limitPersonnel = limitPersonnel;
+        this.currentPersonnel = currentPersonnel;
         this.season = season;
-        this.check_tattoo=check_tattoo;
+        this.checkTattoo = checkTattoo;
     }
 
-    public void addOneToCurrentPersonnel(){
-        this.current_personnel += 1;
+    public void addOneToCurrentPersonnel() {
+        this.currentPersonnel += 1;
     }
-    public void subtractOneToCurrentPersonnel(){
-        this.current_personnel -= 1;
+
+    public void subtractOneToCurrentPersonnel() {
+        this.currentPersonnel -= 1;
     }
 }
