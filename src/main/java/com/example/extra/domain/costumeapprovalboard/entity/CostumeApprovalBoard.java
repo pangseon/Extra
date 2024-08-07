@@ -35,13 +35,13 @@ public class CostumeApprovalBoard extends BaseEntity {
     private Long id;
 
     @Column
-    private ApplyStatus costume_approve;
+    private ApplyStatus costumeApprove;
 
     @Column
-    private String costume_image_url;
+    private String costumeImageUrl;
 
     @Column
-    private String image_explain;
+    private String imageExplain;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id")
@@ -58,22 +58,22 @@ public class CostumeApprovalBoard extends BaseEntity {
         final Member member,
         final Role role
     ) {
-        this.costume_approve = ApplyStatus.APPLIED;
-        this.costume_image_url = costumeImageUrl;
-        this.image_explain = imageExplain;
+        this.costumeApprove = ApplyStatus.APPLIED;
+        this.costumeImageUrl = costumeImageUrl;
+        this.imageExplain = imageExplain;
         this.member = member;
         this.role = role;
     }
 
     public void updateImageExplain(String imageExplain) {
-        this.image_explain = imageExplain;
+        this.imageExplain = imageExplain;
     }
 
     public void updateCostumeImageUrl(String costumeImageUrl) {
-        this.costume_image_url = costumeImageUrl;
+        this.costumeImageUrl = costumeImageUrl;
     }
 
     public void updateCostumeApprove(ApplyStatus applyStatus) {
-        this.costume_approve = applyStatus;
+        this.costumeApprove = applyStatus;
     }
 }

@@ -41,12 +41,12 @@ public class Company extends BaseEntity {
     private String name;
 
     @Column
-    private String company_url;
+    private String companyUrl;
 
     @Enumerated(EnumType.STRING)
-    private UserRole user_role;
+    private UserRole userRole;
 
-    private String refresh_token;
+    private String refreshToken;
 
     // TODO - 회사-공고글 양방향 매핑할 지 확인 받기 + cascade 정책 확인 받기
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
@@ -60,18 +60,18 @@ public class Company extends BaseEntity {
         String email,
         String password,
         String name,
-        String company_url
+        String companyUrl
     ) {
         this.email = email;
         this.password = password;
         this.name = name;
-        this.company_url = company_url;
-        this.user_role = UserRole.USER;
-        this.refresh_token = null;
+        this.companyUrl = companyUrl;
+        this.userRole = UserRole.USER;
+        this.refreshToken = null;
     }
 
     public void updateRole() {
-        this.user_role = UserRole.ADMIN;
+        this.userRole = UserRole.ADMIN;
     }
 
     public void encodePassword(String password) {
@@ -79,11 +79,11 @@ public class Company extends BaseEntity {
     }
 
     public void updateRefreshToken(String refreshToken) {
-        this.refresh_token = refreshToken;
+        this.refreshToken = refreshToken;
     }
 
     public void deleteRefreshToken() {
-        this.refresh_token = null;
+        this.refreshToken = null;
     }
 
 }

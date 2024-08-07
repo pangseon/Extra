@@ -29,48 +29,55 @@ public class RoleController {
 
     private final RoleDtoMapper roleDtoMapper;
     private final RoleService roleService;
+
     @PostMapping("/{jobPost_id}/roles/create")
     public ResponseEntity<?> createRole(
-        @PathVariable Long jobPost_id,
+        @PathVariable(name = "jobpost_id") Long jobPostId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody RoleCreateControllerRequestDto roleCreateControllerRequestDto
-    ){
+    ) {
         RoleCreateServiceRequestDto roleCreateServiceRequestDto =
             roleDtoMapper.toRoleCreateServiceDto(roleCreateControllerRequestDto);
-        roleService.createRole(jobPost_id,userDetails.getCompany(),roleCreateServiceRequestDto);
+        roleService.createRole(jobPostId, userDetails.getCompany(), roleCreateServiceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
     @PutMapping("/{jobPost_id}/roles/{role_id}")
     public ResponseEntity<?> updateRole(
-        @PathVariable Long jobPost_id,
-        @PathVariable Long role_id,
+        @PathVariable(name = "jobpost_id") Long jobPostId,
+        @PathVariable(name = "role_id") Long roleId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody RoleUpdateControllerRequestDto roleUpdateControllerRequestDto
-    ){
+    ) {
         RoleUpdateServiceRequestDto roleUpdateServiceRequestDto =
             roleDtoMapper.toRoleUpdateServiceDto(roleUpdateControllerRequestDto);
-        roleService.updateRole(jobPost_id,role_id,userDetails.getCompany(),roleUpdateServiceRequestDto);
+        roleService.updateRole(jobPostId, roleId, userDetails.getCompany(),
+            roleUpdateServiceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
     @DeleteMapping("/{jobPost_id}/roles/{role_id}")
     public ResponseEntity<?> deleteRole(
-        @PathVariable Long jobPost_id,
-        @PathVariable Long role_id,
+        @PathVariable(name = "jobpost_id") Long jobPostId,
+        @PathVariable(name = "role_id") Long roleId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
-    ){
-        roleService.deleteRole(jobPost_id,role_id,userDetails.getCompany());
-        return  ResponseEntity.status(HttpStatus.OK).build();
+    ) {
+        roleService.deleteRole(jobPostId, roleId, userDetails.getCompany());
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
+
     @GetMapping("/{jobPost_id}/roles/{role_id}")
     public RoleServiceReResponseDto readOnceRole(
-        @PathVariable Long jobPost_id,
-        @PathVariable Long role_id
-    ){
-        return roleService.readRole(jobPost_id,role_id);
+        @PathVariable(name = "jobpost_id") Long jobPostId,
+        @PathVariable(name = "role_id") Long roleId
+    ) {
+        return roleService.readRole(jobPostId, roleId);
     }
+
     @GetMapping("/{jobPost_id}/roles")
-    public List<RoleServiceReResponseDto> readAllRile(@PathVariable Long jobPost_id){
-        return roleService.readAllRole(jobPost_id);
+    public List<RoleServiceReResponseDto> readAllRile(
+        @PathVariable(name = "jobpost_id") Long jobPostId) {
+        return roleService.readAllRole(jobPostId);
     }
 
 }

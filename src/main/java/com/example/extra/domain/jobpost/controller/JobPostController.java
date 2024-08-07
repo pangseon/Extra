@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/jobposts")
 @RestController
 public class JobPostController {
+
     private final JobPostDtoMapper jobPostDtoMapper;
     private final JobPostService jobPostService;
     private final RoleDtoMapper roleDtoMapper;
@@ -36,42 +37,46 @@ public class JobPostController {
     public ResponseEntity<?> createJobPost(
         @Valid @RequestBody JobPostCreateControllerRequestDto jobPostCreateControllerRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails
-    ){
+    ) {
         JobPostCreateServiceRequestDto jobPostCreateServiceRequestDto =
             jobPostDtoMapper.toJobPostCreateServiceDto(jobPostCreateControllerRequestDto);
-        jobPostService.createJobPost(userDetails.getCompany(),jobPostCreateServiceRequestDto);
+        jobPostService.createJobPost(userDetails.getCompany(), jobPostCreateServiceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
     @PutMapping("/{jobpost_id}/update")
     public ResponseEntity<?> updateJobPost(
-        @PathVariable Long jobpost_id,
+        @PathVariable(name = "jobpost_id") Long jobpostId,
         @Valid @RequestBody JobPostUpdateControllerRequestDto jobPostUpdateControllerRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails
-    ){
+    ) {
         JobPostUpdateServiceRequestDto jobPostUpdateServiceRequestDto =
             jobPostDtoMapper.toJobPostUpdateServiceDto(jobPostUpdateControllerRequestDto);
         jobPostService.updateJobPost(
-            jobpost_id
-            ,jobPostUpdateServiceRequestDto,
+            jobpostId
+            , jobPostUpdateServiceRequestDto,
             userDetails.getCompany());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
     @DeleteMapping("/{jobpost_id}/delete")
     public ResponseEntity<?> deleteJobPost(
-        @PathVariable Long jobpost_id,
+        @PathVariable(name = "jobpost_id") Long jobpostId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
-        ){
-        jobPostService.deleteJobPost(jobpost_id,userDetails.getCompany());
+    ) {
+        jobPostService.deleteJobPost(jobpostId, userDetails.getCompany());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
     @GetMapping("/{jobpost_id}")
     public JobPostServiceResponseDto readOnceJobPost(
-        @PathVariable Long jobpost_id
-    ){
-        return jobPostService.readOnceJobPost(jobpost_id);
+        @PathVariable(name = "jobpost_id") Long jobpostId
+    ) {
+        return jobPostService.readOnceJobPost(jobpostId);
     }
+
     @GetMapping("")
-    public List<JobPostServiceResponseDto> readAllJobPosts(){
+    public List<JobPostServiceResponseDto> readAllJobPosts() {
         return jobPostService.readAllJobPosts();
     }
 

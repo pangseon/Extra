@@ -20,12 +20,12 @@ public record CostumeApprovalBoardMemberReadServiceResponseDto(
         return CostumeApprovalBoardMemberReadServiceResponseDto
             .builder()
             .id(costumeApprovalBoard.getId())
-            .role_name(costumeApprovalBoard.getRole().getRole_name())
+            .role_name(costumeApprovalBoard.getRole().getRoleName())
             .sex(costumeApprovalBoard.getRole().getSex())
             .costume(costumeApprovalBoard.getRole().getCostume())
-            .image_explain(costumeApprovalBoard.getImage_explain())
-            .image_url(costumeApprovalBoard.getCostume_image_url())
-            .costume_approve(costumeApprovalBoard.getCostume_approve())
+            .image_explain(costumeApprovalBoard.getImageExplain())
+            .image_url(costumeApprovalBoard.getCostumeImageUrl())
+            .costume_approve(costumeApprovalBoard.getCostumeApprove())
             .build();
     }
 }

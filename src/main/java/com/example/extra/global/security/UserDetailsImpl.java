@@ -50,7 +50,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        UserRole role = member == null ? this.company.getUser_role() : this.member.getUserRole();
+        UserRole role = member == null ? this.company.getUserRole() : this.member.getUserRole();
         String authority = role.getAuthority();
 
         SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(authority);
