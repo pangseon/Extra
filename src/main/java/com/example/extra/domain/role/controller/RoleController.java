@@ -4,7 +4,7 @@ import com.example.extra.domain.role.dto.controller.RoleCreateControllerRequestD
 import com.example.extra.domain.role.dto.controller.RoleUpdateControllerRequestDto;
 import com.example.extra.domain.role.dto.service.request.RoleCreateServiceRequestDto;
 import com.example.extra.domain.role.dto.service.request.RoleUpdateServiceRequestDto;
-import com.example.extra.domain.role.dto.service.response.RoleServiceReResponseDto;
+import com.example.extra.domain.role.dto.service.response.RoleServiceResponseDto;
 import com.example.extra.domain.role.mapper.dto.RoleDtoMapper;
 import com.example.extra.domain.role.service.RoleService;
 import com.example.extra.global.security.UserDetailsImpl;
@@ -34,11 +34,11 @@ public class RoleController {
     public ResponseEntity<?> createRole(
         @PathVariable(name = "jobPost_id") Long jobPostId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @RequestBody RoleCreateControllerRequestDto roleCreateControllerRequestDto
+        @RequestBody RoleCreateControllerRequestDto controllerRequestDto
     ) {
-        RoleCreateServiceRequestDto roleCreateServiceRequestDto =
-            roleDtoMapper.toRoleCreateServiceDto(roleCreateControllerRequestDto);
-        roleService.createRole(jobPostId, userDetails.getCompany(), roleCreateServiceRequestDto);
+        RoleCreateServiceRequestDto serviceRequestDto =
+            roleDtoMapper.toRoleCreateServiceDto(controllerRequestDto);
+        roleService.createRole(jobPostId, userDetails.getCompany(), serviceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -47,12 +47,12 @@ public class RoleController {
         @PathVariable(name = "jobPost_id") Long jobPostId,
         @PathVariable(name = "role_id") Long roleId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @RequestBody RoleUpdateControllerRequestDto roleUpdateControllerRequestDto
+        @RequestBody RoleUpdateControllerRequestDto controllerRequestDto
     ) {
-        RoleUpdateServiceRequestDto roleUpdateServiceRequestDto =
-            roleDtoMapper.toRoleUpdateServiceDto(roleUpdateControllerRequestDto);
+        RoleUpdateServiceRequestDto serviceRequestDto =
+            roleDtoMapper.toRoleUpdateServiceDto(controllerRequestDto);
         roleService.updateRole(jobPostId, roleId, userDetails.getCompany(),
-            roleUpdateServiceRequestDto);
+            serviceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -67,7 +67,7 @@ public class RoleController {
     }
 
     @GetMapping("/{jobPost_id}/roles/{role_id}")
-    public RoleServiceReResponseDto readOnceRole(
+    public RoleServiceResponseDto readOnceRole(
         @PathVariable(name = "jobPost_id") Long jobPostId,
         @PathVariable(name = "role_id") Long roleId
     ) {
@@ -75,7 +75,7 @@ public class RoleController {
     }
 
     @GetMapping("/{jobPost_id}/roles")
-    public List<RoleServiceReResponseDto> readAllRile(
+    public List<RoleServiceResponseDto> readAllRile(
         @PathVariable(name = "jobPost_id") Long jobPostId) {
         return roleService.readAllRole(jobPostId);
     }
