@@ -169,4 +169,8 @@ public class Member extends BaseEntity {
         this.refreshToken = null;
     }
 
+    public String tokenId() {
+        return this.id.toString() + "M";
+    }
+
 }

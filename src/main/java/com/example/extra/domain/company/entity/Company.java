@@ -86,4 +86,8 @@ public class Company extends BaseEntity {
         this.refreshToken = null;
     }
 
+    public String tokenId() {
+        return this.id.toString() + "C";
+    }
+
 }

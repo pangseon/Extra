@@ -1,11 +1,14 @@
 package com.example.extra.global.security.service;
 
+import com.example.extra.domain.company.entity.Company;
+import com.example.extra.domain.company.exception.CompanyErrorCode;
+import com.example.extra.domain.company.exception.CompanyException;
+import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.exception.MemberErrorCode;
 import com.example.extra.domain.member.exception.MemberException;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.global.security.JwtUtil;
-import com.example.extra.global.security.UserDetailsImpl;
 import com.example.extra.global.security.exception.TokenErrorCode;
 import com.example.extra.global.security.exception.TokenException;
 import com.example.extra.global.security.repository.RefreshTokenRepository;
@@ -26,9 +29,9 @@ public class RefreshTokenService {
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberRepository memberRepository;
+    private final CompanyRepository companyRepository;
 
-    public void getNewAccessToken(
-        final UserDetailsImpl userDetails,
+    public void getMemberNewAccessToken(
         final HttpServletRequest httpServletRequest,
         final HttpServletResponse httpServletResponse
     ) {
@@ -37,7 +40,7 @@ public class RefreshTokenService {
         Member member = memberRepository.findByRefreshToken(jwtUtil.substringToken(token))
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
 
-        RefreshToken refreshToken = refreshTokenRepository.findById(member.getId())
+        RefreshToken refreshToken = refreshTokenRepository.findById(member.tokenId())
             .orElseThrow(() -> new TokenException(TokenErrorCode.NOT_FOUND_TOKEN));
 
         // redis refresh token == rdb refresh token
@@ -48,7 +51,7 @@ public class RefreshTokenService {
             refreshTokenRepository.delete(refreshToken);
             refreshTokenRepository.save(
                 new RefreshToken(
-                    member.getId(),
+                    member.tokenId(),
                     jwtUtil.substringToken(newRefreshToken)
                 )
             );
@@ -58,6 +61,37 @@ public class RefreshTokenService {
         } else {
             throw new TokenException(TokenErrorCode.INVALID_TOKEN);
         }
+    }
 
+    public void getCompanyNewAccessToken(
+        final HttpServletRequest httpServletRequest,
+        final HttpServletResponse httpServletResponse
+    ) {
+        String token = httpServletRequest.getHeader("Authorization");
+        log.info(token);
+        Company company = companyRepository.findByRefreshToken(jwtUtil.substringToken(token))
+            .orElseThrow(() -> new CompanyException(CompanyErrorCode.NOT_FOUND_COMPANY));
+
+        RefreshToken refreshToken = refreshTokenRepository.findById(company.tokenId())
+            .orElseThrow(() -> new TokenException(TokenErrorCode.NOT_FOUND_TOKEN));
+
+        // redis refresh token == rdb refresh token
+        if (refreshToken.getRefreshToken().equals(company.getRefreshToken())) {
+            String newAccessToken = jwtUtil.createToken(company.getEmail(), company.getUserRole());
+            String newRefreshToken = jwtUtil.createRefreshToken();
+
+            refreshTokenRepository.delete(refreshToken);
+            refreshTokenRepository.save(
+                new RefreshToken(
+                    company.tokenId(),
+                    jwtUtil.substringToken(newRefreshToken)
+                )
+            );
+
+            company.updateRefreshToken(jwtUtil.substringToken(newRefreshToken));
+            jwtUtil.addTokenHeader(newAccessToken, httpServletResponse);
+        } else {
+            throw new TokenException(TokenErrorCode.INVALID_TOKEN);
+        }
     }
 }

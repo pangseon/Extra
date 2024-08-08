@@ -45,11 +45,12 @@ public class SecurityConfig {
 
         httpSecurity.authorizeHttpRequests((authorizeHttpRequests) ->
             authorizeHttpRequests
-                .requestMatchers("/api/v1/members/signup").permitAll()  // 회원 - 회원 가입
-                .requestMatchers("/api/v1/members/login").permitAll()   // 회원 - 로그인
-                .requestMatchers("/api/v1/companies/signup").permitAll()  // 회사 - 회원 가입
-                .requestMatchers("/api/v1/companies/login").permitAll()   // 회사 - 로그인
-                .requestMatchers("/api/v1/token").permitAll()           // 토큰 재발급
+                .requestMatchers("/api/v1/members/signup").permitAll()      // 회원 - 회원 가입
+                .requestMatchers("/api/v1/members/login").permitAll()       // 회원 - 로그인
+                .requestMatchers("/api/v1/companies/signup").permitAll()    // 회사 - 회원 가입
+                .requestMatchers("/api/v1/companies/login").permitAll()     // 회사 - 로그인
+                .requestMatchers("/api/v1/member/token").permitAll()        // 토큰 재발급
+                .requestMatchers("/api/v1/company/token").permitAll()       // 토큰 재발급
                 .anyRequest().authenticated()
         );
 
