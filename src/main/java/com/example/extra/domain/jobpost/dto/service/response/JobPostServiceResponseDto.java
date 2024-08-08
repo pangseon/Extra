@@ -30,5 +30,9 @@ public record JobPostServiceResponseDto(
     List<Season> seasonList,
     List<Boolean> check_tattoo_list
 ) {
-
+    public LocalDate latestCalenderDate() {
+        return calenderList.stream()
+            .max(LocalDate::compareTo)
+            .orElse(LocalDate.MIN);
+    }
 }

@@ -18,6 +18,7 @@ import com.example.extra.domain.schedule.entity.Schedule;
 import com.example.extra.domain.schedule.exception.NotFoundScheduleException;
 import com.example.extra.domain.schedule.exception.ScheduleErrorCode;
 import com.example.extra.domain.schedule.repository.ScheduleRepository;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -78,6 +79,7 @@ public class JobPostServiceImpl implements JobPostService {
         return jobPostRepository.findAll()
             .stream()
             .map(this::readDto)
+            .sorted(Comparator.comparing(JobPostServiceResponseDto::latestCalenderDate).reversed())
             .toList();
     }
 
