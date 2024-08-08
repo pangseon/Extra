@@ -1,14 +1,13 @@
 package com.example.extra.domain.member.controller;
 
-import com.example.extra.domain.member.dto.controller.MemberCreateControllerRequestDto;
 import com.example.extra.domain.member.dto.controller.MemberLoginControllerRequestDto;
+import com.example.extra.domain.member.dto.controller.MemberSignUpControllerRequestDto;
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
 import com.example.extra.domain.member.dto.service.request.MemberLoginServiceRequestDto;
 import com.example.extra.domain.member.dto.service.response.MemberLoginServiceResponseDto;
 import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.member.mapper.dto.MemberDtoMapper;
 import com.example.extra.domain.member.service.MemberService;
-import com.example.extra.domain.tattoo.dto.controller.TattooCreateControllerRequestDto;
 import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import com.example.extra.domain.tattoo.mapper.dto.TattooDtoMapper;
 import com.example.extra.global.security.UserDetailsImpl;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -41,17 +39,18 @@ public class MemberController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(
-        @Valid @RequestPart(value = "memberCreateControllerRequestDto") MemberCreateControllerRequestDto memberControllerRequestDto,
-        @Valid @RequestPart(value = "tattooCreateControllerRequestDto") TattooCreateControllerRequestDto tattooControllerRequestDto
+        @Valid @RequestBody MemberSignUpControllerRequestDto requestDto
     ) {
-        MemberCreateServiceRequestDto memberServiceRequestDto =
-            memberDtoMapper.toMemberCreateServiceRequestDto(memberControllerRequestDto);
-        TattooCreateServiceRequestDto tattooServiceRequestDto =
-            tattooDtoMapper.toTattooCreateServiceRequestDto(tattooControllerRequestDto);
+        MemberCreateServiceRequestDto memberCreateServiceRequestDto =
+            memberDtoMapper.toMemberCreateServiceRequestDto(
+                requestDto.memberCreate());
+        TattooCreateServiceRequestDto tattooCreateServiceRequestDto =
+            tattooDtoMapper.toTattooCreateServiceRequestDto(
+                requestDto.tattooCreate());
 
         memberService.signup(
-            memberServiceRequestDto,
-            tattooServiceRequestDto
+            memberCreateServiceRequestDto,
+            tattooCreateServiceRequestDto
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
