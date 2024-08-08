@@ -7,7 +7,7 @@ import com.example.extra.domain.jobpost.exception.NotFoundJobPostException;
 import com.example.extra.domain.jobpost.repository.JobPostRepository;
 import com.example.extra.domain.role.dto.service.request.RoleCreateServiceRequestDto;
 import com.example.extra.domain.role.dto.service.request.RoleUpdateServiceRequestDto;
-import com.example.extra.domain.role.dto.service.response.RoleServiceReResponseDto;
+import com.example.extra.domain.role.dto.service.response.RoleServiceResponseDto;
 import com.example.extra.domain.role.entity.Role;
 import com.example.extra.domain.role.exception.NotFoundRoleException;
 import com.example.extra.domain.role.exception.RoleErrorCode;
@@ -53,7 +53,7 @@ public class RoleServiceImpl implements RoleService {
             roleUpdateServiceRequestDto.limitPersonnel(),
             roleUpdateServiceRequestDto.currentPersonnel(),
             roleUpdateServiceRequestDto.season(),
-            roleUpdateServiceRequestDto.check_tattoo());
+            roleUpdateServiceRequestDto.checkTattoo());
         roleRepository.save(role);
     }
     public void deleteRole(
@@ -67,7 +67,7 @@ public class RoleServiceImpl implements RoleService {
             .orElseThrow(()->new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
         roleRepository.delete(role);
     }
-    public RoleServiceReResponseDto readRole(
+    public RoleServiceResponseDto readRole(
         Long jobPost_id,
         Long role_id
     ){
@@ -75,12 +75,12 @@ public class RoleServiceImpl implements RoleService {
             .orElseThrow(()->new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
         Role role = roleRepository.findByIdAndJobPost(role_id,jobPost)
             .orElseThrow(()->new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
-        return roleEntityMapper.toRoleServiceReResponseDto(role);
+        return roleEntityMapper.toRoleServiceResponseDto(role);
     }
-    public List<RoleServiceReResponseDto> readAllRole(Long jobPost_id){
+    public List<RoleServiceResponseDto> readAllRole(Long jobPost_id){
         JobPost jobPost =jobPostRepository.findById(jobPost_id)
             .orElseThrow(()->new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
         List<Role> roleList = roleRepository.findAllByJobPost(jobPost);
-        return roleEntityMapper.toListRoleServiceReResponseDto(roleList);
+        return roleEntityMapper.toListRoleServiceResponseDto(roleList);
     }
 }

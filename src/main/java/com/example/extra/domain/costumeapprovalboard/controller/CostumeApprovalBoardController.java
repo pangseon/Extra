@@ -49,13 +49,13 @@ public class CostumeApprovalBoardController {
         @PathVariable Long jobPostId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        List<CostumeApprovalBoardCompanyReadServiceResponseDto> costumeApprovalBoardCompanyReadServiceResponseDtoList =
+        List<CostumeApprovalBoardCompanyReadServiceResponseDto> serviceResponseDtoList =
             costumeApprovalBoardService.getCostumeApprovalBoardForCompany(
                 userDetails.getCompany(),
                 jobPostId
             );
         return ResponseEntity.status(HttpStatus.OK)
-            .body(costumeApprovalBoardCompanyReadServiceResponseDtoList);
+            .body(serviceResponseDtoList);
     }
 
     // 업체가 특정 게시글 조회
@@ -64,13 +64,13 @@ public class CostumeApprovalBoardController {
         @PathVariable Long costumeApprovalBoardId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        CostumeApprovalBoardCompanyReadDetailServiceResponseDto costumeApprovalBoardCompanyReadDetailServiceResponseDto =
+        CostumeApprovalBoardCompanyReadDetailServiceResponseDto serviceResponseDto =
             costumeApprovalBoardService.getCostumeApprovalBoardDetailForCompany(
                 userDetails.getCompany(),
                 costumeApprovalBoardId
             );
         return ResponseEntity.status(HttpStatus.OK)
-            .body(costumeApprovalBoardCompanyReadDetailServiceResponseDto);
+            .body(serviceResponseDto);
     }
 
     // 출연자 본인 역할에 대해 의상 컨펌 조회
@@ -79,13 +79,13 @@ public class CostumeApprovalBoardController {
         @PathVariable Long roleId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        CostumeApprovalBoardMemberReadServiceResponseDto costumeApprovalBoardMemberReadServiceResponseDto =
+        CostumeApprovalBoardMemberReadServiceResponseDto serviceResponseDto =
             costumeApprovalBoardService.getCostumeApprovalBoardForMember(
                 userDetails.getMember(),
                 roleId
             );
         return ResponseEntity.status(HttpStatus.OK)
-            .body(costumeApprovalBoardMemberReadServiceResponseDto);
+            .body(serviceResponseDto);
     }
 
     // TODO - 출연자의 삭제 요청과 회사의 삭제 요청 API상으로 구분할지
@@ -114,7 +114,7 @@ public class CostumeApprovalBoardController {
      *
      * @param userDetails
      * @param roleId
-     * @param costumeApprovalBoardExplainCreateRequestDto : image_explain - Nullable
+     * @param controllerRequestDto : image_explain - Nullable
      * @param multipartFile                               : image file - Not Null
      * @return
      */
@@ -122,20 +122,20 @@ public class CostumeApprovalBoardController {
     public ResponseEntity<?> createCostumeApprovalBoard(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "role_id") Long roleId,
-        @RequestPart(name = "explain") CostumeApprovalBoardExplainCreateRequestDto costumeApprovalBoardExplainCreateRequestDto,
+        @RequestPart(name = "explain") CostumeApprovalBoardExplainCreateRequestDto controllerRequestDto,
         @RequestPart(name = "image") MultipartFile multipartFile
     )throws IOException {
         Member member = userDetails.getMember();
-        CostumeApprovalBoardCreateServiceDto costumeApprovalBoardCreateServiceDto =
+        CostumeApprovalBoardCreateServiceDto serviceRequestDto =
             costumeApprovalBoardDtoMapper.toCostumeApprovalBoardCreateServiceDto(
-                costumeApprovalBoardExplainCreateRequestDto,
+                controllerRequestDto,
                 multipartFile
             );
 
         costumeApprovalBoardService.createCostumeApprovalBoard(
             roleId,
             member,
-            costumeApprovalBoardCreateServiceDto,
+            serviceRequestDto,
             multipartFile
         );
 

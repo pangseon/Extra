@@ -35,13 +35,13 @@ public class CompanyController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(
-        @Valid @RequestBody CompanyCreateControllerRequestDto companyCreateControllerRequestDto
+        @Valid @RequestBody CompanyCreateControllerRequestDto controllerRequestDto
     ) {
-        CompanyCreateServiceRequestDto companyCreateServiceRequestDto =
-            companyDtoMapper.toCompanyCreateServiceRequestDto(companyCreateControllerRequestDto);
+        CompanyCreateServiceRequestDto serviceRequestDto =
+            companyDtoMapper.toCompanyCreateServiceRequestDto(controllerRequestDto);
 
         companyService.signup(
-            companyCreateServiceRequestDto
+            serviceRequestDto
         );
 
         return ResponseEntity.status(CREATED).build();
@@ -49,19 +49,19 @@ public class CompanyController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
-        @Valid @RequestBody CompanyLoginControllerRequestDto companyLoginControllerRequestDto
+        @Valid @RequestBody CompanyLoginControllerRequestDto controllerRequestDto
     ) {
-        CompanyLoginServiceRequestDto companyLoginServiceRequestDto =
-            companyDtoMapper.toCompanyLoginServiceRequestDto(companyLoginControllerRequestDto);
+        CompanyLoginServiceRequestDto serviceRequestDto =
+            companyDtoMapper.toCompanyLoginServiceRequestDto(controllerRequestDto);
 
-        CompanyLoginServiceResponseDto companyLoginServiceResponseDto =
-            companyService.login(companyLoginServiceRequestDto);
+        CompanyLoginServiceResponseDto serviceResponseDto =
+            companyService.login(serviceRequestDto);
 
         return ResponseEntity
             .status(OK)
             .header(
                 AUTHORIZATION_HEADER,
-                companyLoginServiceResponseDto.token()
+                serviceResponseDto.token()
             )
             .build();
     }
@@ -80,10 +80,10 @@ public class CompanyController {
     public ResponseEntity<?> readOnceCompany(
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        CompanyReadOnceServiceResponseDto companyReadOnceServiceResponseDto =
+        CompanyReadOnceServiceResponseDto serviceResponseDto =
             companyService.readOnceCompany(userDetails.getCompany());
         return ResponseEntity
             .status(OK)
-            .body(companyReadOnceServiceResponseDto);
+            .body(serviceResponseDto);
     }
 }

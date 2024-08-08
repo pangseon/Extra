@@ -41,17 +41,17 @@ public class MemberController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(
-        @Valid @RequestPart(value = "memberCreateControllerRequestDto") MemberCreateControllerRequestDto memberCreateControllerRequestDto,
-        @Valid @RequestPart(value = "tattooCreateControllerRequestDto") TattooCreateControllerRequestDto tattooCreateControllerRequestDto
+        @Valid @RequestPart(value = "memberCreateControllerRequestDto") MemberCreateControllerRequestDto memberControllerRequestDto,
+        @Valid @RequestPart(value = "tattooCreateControllerRequestDto") TattooCreateControllerRequestDto tattooControllerRequestDto
     ) {
-        MemberCreateServiceRequestDto memberCreateServiceRequestDto =
-            memberDtoMapper.toMemberCreateServiceRequestDto(memberCreateControllerRequestDto);
-        TattooCreateServiceRequestDto tattooCreateServiceRequestDto =
-            tattooDtoMapper.toTattooCreateServiceRequestDto(tattooCreateControllerRequestDto);
+        MemberCreateServiceRequestDto memberServiceRequestDto =
+            memberDtoMapper.toMemberCreateServiceRequestDto(memberControllerRequestDto);
+        TattooCreateServiceRequestDto tattooServiceRequestDto =
+            tattooDtoMapper.toTattooCreateServiceRequestDto(tattooControllerRequestDto);
 
         memberService.signup(
-            memberCreateServiceRequestDto,
-            tattooCreateServiceRequestDto
+            memberServiceRequestDto,
+            tattooServiceRequestDto
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -59,19 +59,19 @@ public class MemberController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
-        @Valid @RequestBody MemberLoginControllerRequestDto memberLoginControllerRequestDto
+        @Valid @RequestBody MemberLoginControllerRequestDto controllerRequestDto
     ) {
-        MemberLoginServiceRequestDto memberLoginServiceRequestDto =
-            memberDtoMapper.toMemberLoginServiceRequestDto(memberLoginControllerRequestDto);
+        MemberLoginServiceRequestDto serviceRequestDto =
+            memberDtoMapper.toMemberLoginServiceRequestDto(controllerRequestDto);
 
-        MemberLoginServiceResponseDto memberLoginServiceResponseDto =
-            memberService.login(memberLoginServiceRequestDto);
+        MemberLoginServiceResponseDto serviceResponseDto =
+            memberService.login(serviceRequestDto);
 
         return ResponseEntity
             .status(HttpStatus.OK)
             .header(
                 AUTHORIZATION_HEADER,
-                memberLoginServiceResponseDto.token()
+                serviceResponseDto.token()
             )
             .build();
     }
@@ -90,12 +90,12 @@ public class MemberController {
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @NotNull HttpServletRequest request
     ) {
-        MemberReadServiceResponseDto memberReadServiceResponseDto =
+        MemberReadServiceResponseDto serviceResponseDto =
             memberService.readUser(
                 userDetails,
                 request
             );
-        return ResponseEntity.status(HttpStatus.OK).body(memberReadServiceResponseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(serviceResponseDto);
     }
 
     @DeleteMapping("/{member_id}")

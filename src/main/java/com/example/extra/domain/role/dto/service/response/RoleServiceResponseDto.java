@@ -1,9 +1,10 @@
-package com.example.extra.domain.role.dto.service.request;
+package com.example.extra.domain.role.dto.service.response;
 
 import com.example.extra.global.enums.Season;
 import java.time.LocalDate;
 
-public record RoleUpdateServiceRequestDto(
+public record RoleServiceResponseDto(
+    Long id,
     String roleName,
     String costume,
     Boolean sex,
