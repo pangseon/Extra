@@ -37,13 +37,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         @NotNull FilterChain filterChain
     ) throws ServletException, IOException {
         String url = request.getRequestURI();
-        if (url.equals("/api/v1/member/token") ||           // 회원 - 토큰 재발급
-            url.equals("/api/v1/members/signup") ||         // 회원 - 회원 가입
-            url.equals("/api/v1/members/login") ||          // 회원 - 로그인
-            url.equals("/api/v1/company/token") ||          // 회사 - 토큰 재발급
-            url.equals("/api/v1/companies/signup") ||       // 회사 - 회원 가입
-            url.equals("/api/v1/companies/login")           // 회사 - 로그인
-        ) {
+        if (checkUrl(url)) {
             log.info("다음 필터");
             filterChain.doFilter(request, response);
             return;
@@ -74,6 +68,17 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private boolean checkUrl(String url) {
+        return url.equals("/api/v1/member/token") ||        // 회원 - 토큰 재발급
+            url.equals("/api/v1/members/signup") ||         // 회원 - 회원 가입
+            url.equals("/api/v1/members/login") ||          // 회원 - 로그인
+            url.equals("/api/v1/company/token") ||          // 회사 - 토큰 재발급
+            url.equals("/api/v1/companies/signup") ||       // 회사 - 회원 가입
+            url.equals("/api/v1/companies/login") ||        // 회사 - 로그인
+            url.equals("/swagger-ui/**") ||
+            url.equals("/v3/api-docs/**");
     }
 
     public void setAuthentication(String username) {
