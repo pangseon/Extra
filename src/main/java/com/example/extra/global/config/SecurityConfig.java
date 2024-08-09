@@ -51,6 +51,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/companies/login").permitAll()     // 회사 - 로그인
                 .requestMatchers("/api/v1/member/token").permitAll()        // 토큰 재발급
                 .requestMatchers("/api/v1/company/token").permitAll()       // 토큰 재발급
+                .requestMatchers("/", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .anyRequest().authenticated()
         );
 
