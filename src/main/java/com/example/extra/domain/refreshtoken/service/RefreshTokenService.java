@@ -1,4 +1,4 @@
-package com.example.extra.global.security.service;
+package com.example.extra.domain.refreshtoken.service;
 
 import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.company.exception.CompanyErrorCode;
@@ -8,11 +8,11 @@ import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.exception.MemberErrorCode;
 import com.example.extra.domain.member.exception.MemberException;
 import com.example.extra.domain.member.repository.MemberRepository;
+import com.example.extra.domain.refreshtoken.exception.TokenErrorCode;
+import com.example.extra.domain.refreshtoken.exception.TokenException;
+import com.example.extra.domain.refreshtoken.repository.RefreshTokenRepository;
+import com.example.extra.domain.refreshtoken.token.RefreshToken;
 import com.example.extra.global.security.JwtUtil;
-import com.example.extra.global.security.exception.TokenErrorCode;
-import com.example.extra.global.security.exception.TokenException;
-import com.example.extra.global.security.repository.RefreshTokenRepository;
-import com.example.extra.global.security.token.RefreshToken;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

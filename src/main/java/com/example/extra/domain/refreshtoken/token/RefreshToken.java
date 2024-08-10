@@ -1,4 +1,4 @@
-package com.example.extra.global.security.token;
+package com.example.extra.domain.refreshtoken.token;
 
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;

@@ -1,9 +1,9 @@
 package com.example.extra.global.filter;
 
+import com.example.extra.domain.refreshtoken.exception.TokenErrorCode;
 import com.example.extra.global.exception.ErrorCode;
 import com.example.extra.global.exception.dto.CustomExceptionResponseDto;
 import com.example.extra.global.security.JwtUtil;
-import com.example.extra.global.security.exception.TokenErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
