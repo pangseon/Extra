@@ -2,6 +2,7 @@ package com.example.extra.global.config;
 
 import com.example.extra.global.filter.JwtAuthorizationFilter;
 import com.example.extra.global.security.JwtUtil;
+import com.example.extra.global.security.oauth.service.KakaoServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,7 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final KakaoServiceImpl kakaoService;
 
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
@@ -52,6 +54,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/member/token").permitAll()        // 토큰 재발급
                 .requestMatchers("/api/v1/company/token").permitAll()       // 토큰 재발급
                 .requestMatchers("/", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/api/v1/oauth/**").permitAll()
                 .anyRequest().authenticated()
         );
 

@@ -78,7 +78,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             url.equals("/api/v1/companies/signup") ||       // 회사 - 회원 가입
             url.equals("/api/v1/companies/login") ||        // 회사 - 로그인
             url.equals("/swagger-ui/**") ||
-            url.equals("/v3/api-docs/**");
+            url.equals("/v3/api-docs/**") ||
+            url.equals("/api/v1/oauth/**")
+            ;
     }
 
     public void setAuthentication(String username) {
