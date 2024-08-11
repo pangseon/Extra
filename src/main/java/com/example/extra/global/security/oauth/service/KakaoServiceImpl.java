@@ -6,7 +6,6 @@ import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.member.exception.MemberErrorCode;
 import com.example.extra.domain.member.exception.MemberException;
 import com.example.extra.domain.member.repository.MemberRepository;
-import com.example.extra.global.security.oauth.dto.service.response.KakaoInfoReadServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoTokenInfoServiceResponseDto;
 import com.example.extra.global.security.oauth.entity.KakaoInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -97,7 +96,7 @@ public class KakaoServiceImpl {
             });
     }
 
-    public KakaoInfoReadServiceResponseDto getKakaoInfo(String accessToken)
+    public KakaoInfo getKakaoInfo(String accessToken)
         throws JsonProcessingException {
         // HTTP Header
         HttpHeaders headers = new HttpHeaders();
@@ -127,13 +126,17 @@ public class KakaoServiceImpl {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
 
+        Long id = jsonNode
+            .get("id")
+            .asLong();
         String email = jsonNode
             .get("kakao_account")
             .get("email")
             .asText();
 
-        validate(new KakaoInfo(email));
+        KakaoInfo kakaoInfo = new KakaoInfo(id, email);
+        validate(kakaoInfo.getId().toString());
 
-        return new KakaoInfoReadServiceResponseDto(email);
+        return kakaoInfo;
     }
 }
