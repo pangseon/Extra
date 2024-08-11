@@ -1,5 +1,8 @@
 package com.example.extra.global.security.oauth.service;
 
+import com.example.extra.domain.company.exception.CompanyErrorCode;
+import com.example.extra.domain.company.exception.CompanyException;
+import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.member.exception.MemberErrorCode;
 import com.example.extra.domain.member.exception.MemberException;
 import com.example.extra.domain.member.repository.MemberRepository;
@@ -25,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 public class KakaoServiceImpl {
 
     private final MemberRepository memberRepository;
+    private final CompanyRepository companyRepository;
 
     @Value("${kakao.client.id}")
     String clientId;
@@ -81,12 +85,15 @@ public class KakaoServiceImpl {
             .build();
     }
 
-    private void validate(final KakaoInfo kakaoInfo) {
-        // 중복 확인
-        String email = kakaoInfo.getEmail();
+    // 중복 확인
+    private void validate(final String email) {
         memberRepository.findByEmail(email)
             .ifPresent(m -> {
                 throw new MemberException(MemberErrorCode.ALREADY_EXIST_MEMBER);
+            });
+        companyRepository.findByEmail(email)
+            .ifPresent(m -> {
+                throw new CompanyException(CompanyErrorCode.ALREADY_EXIST_EMAIL);
             });
     }
 
