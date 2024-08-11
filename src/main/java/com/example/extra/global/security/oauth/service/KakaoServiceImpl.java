@@ -30,12 +30,10 @@ public class KakaoServiceImpl {
     String clientId;
     @Value("${kakao.redirect.uri}")
     String redirectUri;
-    @Value("${kakao.client.secret}")
-    String clientSecret;
 
     public String authorize() {
         String url = "https://kauth.kakao.com/oauth/authorize" +
-            "client_id=" + clientId +
+            "&client_id=" + clientId +
             "&redirect_uri=" + redirectUri +
             "&response_type=code";
 
@@ -56,7 +54,6 @@ public class KakaoServiceImpl {
         body.add("client_id", clientId);
         body.add("redirect_uri", redirectUri);
         body.add("code", code);
-        body.add("client_secret", clientSecret);
 
         // HTTP request
         HttpEntity<MultiValueMap<String, String>> request =
