@@ -3,31 +3,43 @@ package com.example.extra.global.security.oauth.service;
 import com.example.extra.domain.company.exception.CompanyErrorCode;
 import com.example.extra.domain.company.exception.CompanyException;
 import com.example.extra.domain.company.repository.CompanyRepository;
+import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.exception.MemberErrorCode;
 import com.example.extra.domain.member.exception.MemberException;
 import com.example.extra.domain.member.repository.MemberRepository;
+import com.example.extra.domain.refreshtoken.repository.RefreshTokenRepository;
+import com.example.extra.domain.refreshtoken.token.RefreshToken;
+import com.example.extra.global.security.JwtUtil;
+import com.example.extra.global.security.oauth.dto.service.request.KakaoLoginServiceRequestDto;
+import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoTokenInfoServiceResponseDto;
 import com.example.extra.global.security.oauth.entity.KakaoInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class KakaoServiceImpl {
 
     private final MemberRepository memberRepository;
     private final CompanyRepository companyRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtUtil jwtUtil;
 
     @Value("${kakao.client.id}")
     String clientId;
@@ -138,5 +150,42 @@ public class KakaoServiceImpl {
         validate(kakaoInfo.getId().toString());
 
         return kakaoInfo;
+    }
+
+    @Transactional
+    public KakaoLoginServiceResponseDto signup(
+        final KakaoLoginServiceRequestDto serviceRequestDto
+    ) {
+        String email = serviceRequestDto.email();
+        validate(email);
+
+        String uuid = UUID.randomUUID()
+            .toString()
+            .replace("-", "");
+
+        Member member = Member.builder()
+            .email(email)
+            .password(uuid)
+            .build();
+
+        // jwt 토큰 생성
+        String accessToken = jwtUtil.createToken(
+            member.getEmail(),
+            member.getUserRole()
+        );
+        String refreshToken = jwtUtil.createRefreshToken();
+        log.info("access token: " + accessToken);
+        log.info("refresh token: " + refreshToken);
+
+        member.updateRefreshToken(jwtUtil.substringToken(refreshToken));
+
+        refreshTokenRepository.save(
+            new RefreshToken(
+                member.tokenId(),
+                jwtUtil.substringToken(refreshToken)
+            )
+        );
+
+        return new KakaoLoginServiceResponseDto(accessToken);
     }
 }
