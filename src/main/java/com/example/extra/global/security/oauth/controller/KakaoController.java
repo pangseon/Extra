@@ -1,9 +1,11 @@
 package com.example.extra.global.security.oauth.controller;
 
-import com.example.extra.global.security.oauth.dto.service.response.KakaoInfoReadServiceResponseDto;
+import com.example.extra.global.security.oauth.dto.service.request.KakaoLoginServiceRequestDto;
+import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginServiceResponseDto;
+import com.example.extra.global.security.oauth.dto.service.response.KakaoTokenInfoServiceResponseDto;
+import com.example.extra.global.security.oauth.entity.KakaoInfo;
 import com.example.extra.global.security.oauth.service.KakaoServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,32 +33,41 @@ public class KakaoController {
 
     // access token & refresh token 발급, kakao email 발급
     @PostMapping("/kakao")
-    public ResponseEntity<?> getAccessToken(@RequestParam String code)
+    public ResponseEntity<?> kakaoLogin(@RequestParam String code)
         throws JsonProcessingException {
 
-        List<String> tokenList;
+        KakaoTokenInfoServiceResponseDto tokenInfoServiceResponseDto;
         try {
             // [0] accessToken, [1] refreshToken
-            tokenList = oauthKakaoService.getToken(code);
+            tokenInfoServiceResponseDto = oauthKakaoService.getToken(code);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
 
-        String accessToken = tokenList.get(0);
+        String accessToken = tokenInfoServiceResponseDto.accessToken();
 
-        KakaoInfoReadServiceResponseDto responseDto = null;
+        KakaoInfo kakaoInfo = null;
         try {
-            responseDto = oauthKakaoService.getKakaoInfo(accessToken);
+            kakaoInfo = oauthKakaoService.getKakaoInfo(accessToken);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+
+        // 현재 kakao에서 email 정보 가져오기 불가능
+        // 고유 회원번호로 email 대체
+        String email = kakaoInfo.getId().toString();
+        KakaoLoginServiceRequestDto loginServiceRequestDto
+            = new KakaoLoginServiceRequestDto(email);
+
+        KakaoLoginServiceResponseDto loginServiceResponseDto =
+            oauthKakaoService.signup(loginServiceRequestDto);
 
         return ResponseEntity
             .status(HttpStatus.OK)
             .header(
                 AUTHORIZATION_HEADER,
-                accessToken
+                loginServiceResponseDto.accessToken()
             )
-            .body(responseDto);
+            .body(tokenInfoServiceResponseDto);
     }
 }
