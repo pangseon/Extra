@@ -4,12 +4,11 @@ import com.example.extra.domain.member.exception.MemberErrorCode;
 import com.example.extra.domain.member.exception.MemberException;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoInfoReadServiceResponseDto;
+import com.example.extra.global.security.oauth.dto.service.response.KakaoTokenInfoServiceResponseDto;
 import com.example.extra.global.security.oauth.entity.KakaoInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -43,7 +42,7 @@ public class KakaoServiceImpl {
         return "redirect:" + url;
     }
 
-    public List<String> getToken(String code) throws JsonProcessingException {
+    public KakaoTokenInfoServiceResponseDto getToken(String code) throws JsonProcessingException {
         // HTTP Header
         HttpHeaders headers = new HttpHeaders();
         headers.add(
@@ -76,12 +75,13 @@ public class KakaoServiceImpl {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
 
-        // [0] accessToken, [1] refreshToken
-        List<String> tokenList = new ArrayList<>();
-        tokenList.add(jsonNode.get("access_token").asText());
-        tokenList.add(jsonNode.get("refresh_token").asText());
-
-        return tokenList;
+        return KakaoTokenInfoServiceResponseDto.builder()
+            .tokenType("Bearer")
+            .accessToken(jsonNode.get("access_token").asText())
+            .expiresIn(jsonNode.get("expires_in").asInt())
+            .refreshToken(jsonNode.get("refresh_token").asText())
+            .refreshTokenExpiresIn(jsonNode.get("refresh_token_expires_in").asInt())
+            .build();
     }
 
     private void validate(final KakaoInfo kakaoInfo) {
