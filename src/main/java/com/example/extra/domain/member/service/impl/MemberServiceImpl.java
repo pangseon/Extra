@@ -15,7 +15,6 @@ import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.member.service.MemberService;
 import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import com.example.extra.domain.tattoo.entity.Tattoo;
-import com.example.extra.domain.tattoo.mapper.entity.TattooEntityMapper;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
 import com.example.extra.global.security.JwtUtil;
 import com.example.extra.global.security.UserDetailsImpl;
@@ -41,7 +40,6 @@ public class MemberServiceImpl implements MemberService {
 
     // mapper
     private final MemberEntityMapper memberEntityMapper;
-    private final TattooEntityMapper tattooEntityMapper;
 
     // security
     private final PasswordEncoder passwordEncoder;
@@ -68,9 +66,8 @@ public class MemberServiceImpl implements MemberService {
             });
 
         Member member = memberEntityMapper.toMember(memberCreateServiceRequestDto);
-        Tattoo tattoo = tattooEntityMapper.toTattoo(tattooCreateServiceRequestDto, member);
-
-        tattooRepository.save(tattoo);
+        Tattoo tattoo = tattooRepository.findByTattooCreateServiceRequestDto(tattooCreateServiceRequestDto)
+            .orElseThrow(()-> new MemberException(MemberErrorCode.NOT_FOUND_TATTOO));
 
         member.updateTattoo(tattoo);
         member.encodePassword(passwordEncoder.encode(member.getPassword()));
@@ -163,7 +160,6 @@ public class MemberServiceImpl implements MemberService {
             .back(tattoo.getBack())
             .hand(tattoo.getHand())
             .feet(tattoo.getFeet())
-            .etc(tattoo.getEtc())
             .build();
     }
 
