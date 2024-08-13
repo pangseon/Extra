@@ -1,7 +1,5 @@
 package com.example.extra.domain.member.service.impl;
 
-import com.example.extra.domain.company.exception.CompanyErrorCode;
-import com.example.extra.domain.company.exception.CompanyException;
 import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
 import com.example.extra.domain.member.dto.service.request.MemberLoginServiceRequestDto;
@@ -56,33 +54,11 @@ public class MemberServiceImpl implements MemberService {
         final MemberCreateServiceRequestDto memberCreateServiceRequestDto,
         final TattooCreateServiceRequestDto tattooCreateServiceRequestDto
     ) {
-        // 이메일 중복 검사
-        String email = memberCreateServiceRequestDto.email();
-        memberRepository.findByEmail(email)
-            .ifPresent(m -> {
-                throw new MemberException(MemberErrorCode.ALREADY_EXIST_MEMBER);
-            });
-        companyRepository.findByEmail(email)
-            .ifPresent(m -> {
-                throw new CompanyException(CompanyErrorCode.ALREADY_EXIST_EMAIL);
-            });
-
         Member member = memberEntityMapper.toMember(memberCreateServiceRequestDto);
         Tattoo tattoo = tattooEntityMapper.toTattoo(tattooCreateServiceRequestDto, member);
 
         tattooRepository.save(tattoo);
-
         member.updateTattoo(tattoo);
-        member.encodePassword(passwordEncoder.encode(member.getPassword()));
-
-        // role 변경 (ROLE_USER -> ROLE_ADMIN)
-        if (memberCreateServiceRequestDto.isAdmin()) {
-            if (!ADMIN_TOKEN.equals(memberCreateServiceRequestDto.adminToken())) {
-                throw new IllegalArgumentException("관리자 암호 아님");
-            }
-            member.updateRole();
-        }
-
         memberRepository.save(member);
     }
 
