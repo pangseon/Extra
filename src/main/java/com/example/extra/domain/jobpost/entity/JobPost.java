@@ -48,9 +48,6 @@ public class JobPost extends BaseEntity {
     private Boolean status;
 
     @Column
-    private Integer hourPay;
-
-    @Column
     private Category category;
 
     @ManyToOne
@@ -70,7 +67,6 @@ public class JobPost extends BaseEntity {
         final String gatheringLocation,
         final LocalDateTime gatheringTime,
         final Boolean status,
-        final Integer hourPay,
         final Category category,
         final Company company
     ){
@@ -78,7 +74,6 @@ public class JobPost extends BaseEntity {
         this.gatheringLocation = gatheringLocation;
         this.gatheringTime = gatheringTime;
         this.status = status;
-        this.hourPay = hourPay;
         this.category = category;
         this.company = company;
     }
@@ -87,14 +82,12 @@ public class JobPost extends BaseEntity {
          String gatheringLocation,
          LocalDateTime gatheringTime,
          Boolean status,
-         Integer hourPay,
          Category category
     ){
         this.title = dramaTitle;
         this.gatheringLocation = gatheringLocation;
         this.gatheringTime = gatheringTime;
         this.status = status;
-        this.hourPay = hourPay;
         this.category = category;
     }
 
