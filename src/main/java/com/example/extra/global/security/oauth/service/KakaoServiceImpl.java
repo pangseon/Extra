@@ -48,9 +48,9 @@ public class KakaoServiceImpl {
 
     public String authorize() {
         String url = "https://kauth.kakao.com/oauth/authorize" +
+            "&response_type=code" +
             "&client_id=" + clientId +
-            "&redirect_uri=" + redirectUri +
-            "&response_type=code";
+            "&redirect_uri=" + redirectUri;
 
         return "redirect:" + url;
     }
