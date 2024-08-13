@@ -5,8 +5,6 @@ import com.example.extra.domain.account.exception.AccountErrorCode;
 import com.example.extra.domain.account.exception.AccountException;
 import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.domain.company.dto.service.request.CompanyCreateServiceRequestDto;
-import com.example.extra.domain.company.dto.service.request.CompanyLoginServiceRequestDto;
-import com.example.extra.domain.company.dto.service.response.CompanyLoginServiceResponseDto;
 import com.example.extra.domain.company.dto.service.response.CompanyReadOnceServiceResponseDto;
 import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.company.exception.CompanyErrorCode;
@@ -16,7 +14,6 @@ import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.company.service.CompanyService;
 import com.example.extra.global.security.JwtUtil;
 import com.example.extra.global.security.repository.RefreshTokenRepository;
-import com.example.extra.global.security.token.RefreshToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,54 +55,6 @@ public class CompanyServiceImpl implements CompanyService {
             serviceRequestDto,
             account
         );
-        companyRepository.save(company);
-    }
-
-    @Override
-    @Transactional
-    public CompanyLoginServiceResponseDto login(
-        final CompanyLoginServiceRequestDto companyLoginServiceRequestDto
-    ) {
-        Company company = findByEmail(companyLoginServiceRequestDto.email());
-
-        if (!passwordEncoder.matches(
-            companyLoginServiceRequestDto.password(),
-            company.getPassword()
-        )) {
-            throw new CompanyException(CompanyErrorCode.INVALID_PASSWORD);
-        }
-
-        // jwt 토큰 생성
-        String accessToken = jwtUtil.createToken(
-            company.getEmail(),
-            company.getUserRole()
-        );
-        String refreshToken = jwtUtil.createRefreshToken();
-        log.info("access token: " + accessToken);
-        log.info("refresh token: " + refreshToken);
-
-        company.updateRefreshToken(jwtUtil.substringToken(refreshToken));
-
-        refreshTokenRepository.save(
-            new RefreshToken(
-                company.tokenId(),
-                jwtUtil.substringToken(refreshToken)
-            )
-        );
-
-        return new CompanyLoginServiceResponseDto(accessToken);
-    }
-
-    @Override
-    @Transactional
-    public void logout(
-        final Company company
-    ) {
-        RefreshToken refreshToken = refreshTokenRepository.findById(company.tokenId())
-            .orElseThrow(() -> new CompanyException(CompanyErrorCode.FORBIDDEN));
-        refreshTokenRepository.delete(refreshToken);
-
-        company.deleteRefreshToken();
         companyRepository.save(company);
     }
 

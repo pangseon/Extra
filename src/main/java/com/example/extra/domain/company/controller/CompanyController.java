@@ -4,10 +4,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.example.extra.domain.company.dto.controller.CompanyCreateControllerRequestDto;
-import com.example.extra.domain.company.dto.controller.CompanyLoginControllerRequestDto;
 import com.example.extra.domain.company.dto.service.request.CompanyCreateServiceRequestDto;
-import com.example.extra.domain.company.dto.service.request.CompanyLoginServiceRequestDto;
-import com.example.extra.domain.company.dto.service.response.CompanyLoginServiceResponseDto;
 import com.example.extra.domain.company.dto.service.response.CompanyReadOnceServiceResponseDto;
 import com.example.extra.domain.company.mapper.dto.CompanyDtoMapper;
 import com.example.extra.domain.company.service.CompanyService;
@@ -45,35 +42,6 @@ public class CompanyController {
         );
 
         return ResponseEntity.status(CREATED).build();
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(
-        @Valid @RequestBody CompanyLoginControllerRequestDto controllerRequestDto
-    ) {
-        CompanyLoginServiceRequestDto serviceRequestDto =
-            companyDtoMapper.toCompanyLoginServiceRequestDto(controllerRequestDto);
-
-        CompanyLoginServiceResponseDto serviceResponseDto =
-            companyService.login(serviceRequestDto);
-
-        return ResponseEntity
-            .status(OK)
-            .header(
-                AUTHORIZATION_HEADER,
-                serviceResponseDto.token()
-            )
-            .build();
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(
-        @AuthenticationPrincipal UserDetailsImpl userDetails
-    ) {
-        companyService.logout(userDetails.getCompany());
-        return ResponseEntity
-            .status(OK)
-            .build();
     }
 
     @GetMapping("")
