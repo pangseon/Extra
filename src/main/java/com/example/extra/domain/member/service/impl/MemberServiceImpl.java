@@ -63,7 +63,7 @@ public class MemberServiceImpl implements MemberService {
         final UserDetailsImpl userDetails,
         final HttpServletRequest request
     ) {
-        Member member = findByEmail(userDetails.getUsername());
+        Member member = findById(userDetails.getMember().getId());
         Tattoo tattoo = member.getTattoo();
         return MemberReadServiceResponseDto.builder()
             .name(member.getName())
@@ -93,12 +93,12 @@ public class MemberServiceImpl implements MemberService {
         final UserDetailsImpl userDetails,
         final HttpServletRequest request
     ) {
-        Member member = findByEmail(userDetails.getUsername());
+        Member member = findById(userDetails.getMember().getId());
         memberRepository.delete(member);
     }
 
-    private Member findByEmail(String email) {
-        return memberRepository.findByEmail(email)
+    private Member findById(Long id) {
+        return memberRepository.findById(id)
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
     }
 
