@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 public record JobPostUpdateServiceRequestDto(
     String title,
     String gatheringLocation,
-    LocalDateTime gatheringTime,
+    String gatheringTime,
     String imageUrl,
     Boolean status,
     Category category

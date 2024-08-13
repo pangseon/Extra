@@ -42,7 +42,7 @@ public class JobPost extends BaseEntity {
     private String gatheringLocation;
 
     @Column
-    private LocalDateTime gatheringTime;
+    private String gatheringTime;
 
     @Column
     private Boolean status;
@@ -65,7 +65,7 @@ public class JobPost extends BaseEntity {
     public JobPost(
         final String title,
         final String gatheringLocation,
-        final LocalDateTime gatheringTime,
+        final String gatheringTime,
         final Boolean status,
         final Category category,
         final Company company
@@ -80,7 +80,7 @@ public class JobPost extends BaseEntity {
     public void updateJobPost(
          String dramaTitle,
          String gatheringLocation,
-         LocalDateTime gatheringTime,
+        String gatheringTime,
          Boolean status,
          Category category
     ){
