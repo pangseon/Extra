@@ -6,10 +6,12 @@ import com.example.extra.domain.account.dto.service.request.AccountCreateService
 import com.example.extra.domain.account.dto.service.request.AccountLoginServiceRequestDto;
 import com.example.extra.domain.account.mapper.dto.AccountDtoMapper;
 import com.example.extra.domain.account.service.AccountService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +28,9 @@ public class AccountController {
     public static final String AUTHORIZATION_HEADER = "Authorization";
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(AccountCreateControllerRequestDto controllerRequestDto) {
+    public ResponseEntity<?> signup(
+        @Valid @RequestBody AccountCreateControllerRequestDto controllerRequestDto
+    ) {
         AccountCreateServiceRequestDto serviceRequestDto =
             accountDtoMapper.toAccountCreateServiceRequestDto(controllerRequestDto);
 
@@ -36,7 +40,9 @@ public class AccountController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(AccountLoginControllerRequestDto controllerRequestDto) {
+    public ResponseEntity<?> login(
+        @Valid @RequestBody AccountLoginControllerRequestDto controllerRequestDto
+    ) {
         AccountLoginServiceRequestDto serviceRequestDto =
             accountDtoMapper.toAccountLoginServiceRequestDto(controllerRequestDto);
 
