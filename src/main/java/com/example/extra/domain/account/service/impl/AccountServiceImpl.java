@@ -63,7 +63,10 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountRepository.findByEmail(serviceRequestDto.email())
             .orElseThrow(() -> new AccountException(AccountErrorCode.INVALID_EMAIL));
 
-        if (!passwordEncoder.matches(serviceRequestDto.password(), account.getPassword())) {
+        if (!passwordEncoder.matches(
+            serviceRequestDto.password(),
+            account.getPassword()
+        )) {
             throw new AccountException(AccountErrorCode.INVALID_PASSWORD);
         }
 
