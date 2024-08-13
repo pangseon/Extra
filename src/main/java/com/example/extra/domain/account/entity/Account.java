@@ -58,10 +58,6 @@ public class Account {
         this.userRole = userRole;
     }
 
-    public void encodePassword(String password) {
-        this.password = password;
-    }
-
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }

@@ -39,8 +39,11 @@ public class AccountServiceImpl implements AccountService {
         final AccountCreateServiceRequestDto serviceRequestDto
     ) {
         checkEmailDuplication(serviceRequestDto); // 이메일 중복 검사
-        Account account = accountEntityMapper.toAccount(serviceRequestDto);
-        account.encodePassword(passwordEncoder.encode(account.getPassword())); // 패스워드 인코딩
+        Account account = Account.builder()
+            .email(serviceRequestDto.email())
+            .password(passwordEncoder.encode(serviceRequestDto.password()))
+            .userRole(serviceRequestDto.userRole())
+            .build();
 
         return new AccountCreateServiceResponseDto(accountRepository.save(account).getId());
     }
