@@ -3,6 +3,7 @@ package com.example.extra.domain.member.dto.controller;
 import java.time.LocalDate;
 
 public record MemberCreateControllerRequestDto(
+    Long accountId,
     String phone,
     String name,
     LocalDate birthday,
