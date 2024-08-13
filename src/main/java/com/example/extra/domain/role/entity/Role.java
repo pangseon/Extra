@@ -42,6 +42,12 @@ public class Role extends BaseEntity {
     private LocalDate roleAge;
 
     @Column
+    private LocalDate minAge;
+
+    @Column
+    private LocalDate maxAge;
+
+    @Column
     private Integer limitPersonnel;
 
     @Column
@@ -64,6 +70,8 @@ public class Role extends BaseEntity {
         final String costume,
         final Boolean sex,
         final LocalDate roleAge,
+        final LocalDate minAge,
+        final LocalDate maxAge,
         final Integer limitPersonnel,
         final Integer currentPersonnel,
         final Season season,
@@ -74,6 +82,8 @@ public class Role extends BaseEntity {
         this.costume = costume;
         this.sex = sex;
         this.roleAge = roleAge;
+        this.minAge = minAge;
+        this.maxAge = maxAge;
         this.limitPersonnel = limitPersonnel;
         this.currentPersonnel = currentPersonnel;
         this.season = season;
@@ -86,6 +96,8 @@ public class Role extends BaseEntity {
         String costume,
         Boolean sex,
         LocalDate roleAge,
+        LocalDate minAge,
+        LocalDate maxAge,
         Integer limitPersonnel,
         Integer currentPersonnel,
         Season season,
@@ -95,6 +107,8 @@ public class Role extends BaseEntity {
         this.costume = costume;
         this.sex = sex;
         this.roleAge = roleAge;
+        this.minAge = minAge;
+        this.maxAge = maxAge;
         this.limitPersonnel = limitPersonnel;
         this.currentPersonnel = currentPersonnel;
         this.season = season;
