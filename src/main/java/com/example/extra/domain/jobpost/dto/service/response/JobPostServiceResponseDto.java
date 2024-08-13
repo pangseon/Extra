@@ -12,7 +12,7 @@ public record JobPostServiceResponseDto(
     Long id,
     String title,
     String gatheringLocation,
-    LocalDateTime gatheringTime,
+    String gatheringTime,
     String imageUrl,
     Boolean status,
     Integer hourPay,

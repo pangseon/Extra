@@ -8,6 +8,8 @@ public record RoleUpdateServiceRequestDto(
     String costume,
     Boolean sex,
     LocalDate roleAge,
+    LocalDate minAge,
+    LocalDate maxAge,
     Integer limitPersonnel,
     Integer currentPersonnel,
     Season season,

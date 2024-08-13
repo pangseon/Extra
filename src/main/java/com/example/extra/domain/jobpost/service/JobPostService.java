@@ -27,5 +27,5 @@ public interface JobPostService {
     JobPostServiceResponseDto readOnceJobPost(
         Long jobPost_id);
 
-    List<JobPostServiceResponseDto> readAllJobPosts();
+    List<JobPostServiceResponseDto> readAllJobPosts(int page);
 }

@@ -24,8 +24,11 @@ import com.example.extra.domain.schedule.entity.Schedule;
 import com.example.extra.domain.schedule.exception.NotFoundScheduleException;
 import com.example.extra.domain.schedule.exception.ScheduleErrorCode;
 import com.example.extra.domain.schedule.repository.ScheduleRepository;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,7 +76,6 @@ public class JobPostServiceImpl implements JobPostService {
             jobPostUpdateServiceRequestDto.gatheringLocation(),
             jobPostUpdateServiceRequestDto.gatheringTime(),
             jobPostUpdateServiceRequestDto.status(),
-            jobPostUpdateServiceRequestDto.hourPay(),
             jobPostUpdateServiceRequestDto.category());
         jobPostRepository.save(jobPost);
     }
@@ -95,9 +97,13 @@ public class JobPostServiceImpl implements JobPostService {
     }
 
     @Transactional(readOnly = true)
-    public List<JobPostServiceResponseDto> readAllJobPosts() {
-        return jobPostRepository.findAll()
-            .stream()
+    public List<JobPostServiceResponseDto> readAllJobPosts(int page) {
+        Pageable pageable = PageRequest.of(page,5);
+            return scheduleRepository.findAll(pageable)
+                .stream()
+                .sorted(Comparator.comparing(Schedule::getCalender).reversed()) // LocalDate를 기준으로 최신 날짜 순으로 정렬
+                .map(Schedule::getJobPost)
+                .distinct()
             .map(this::readDto)
             .toList();
     }
@@ -109,7 +115,6 @@ public class JobPostServiceImpl implements JobPostService {
             .gatheringLocation(jobPost.getGatheringLocation())
             .gatheringTime(jobPost.getGatheringTime())
             .status(jobPost.getStatus())
-            .hourPay(jobPost.getHourPay())
             .category(jobPost.getCategory())
             .companyName(jobPost.getCompany().getName())
             .calenderList(scheduleList(jobPost.getId())
