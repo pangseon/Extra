@@ -8,6 +8,8 @@ public record RoleServiceResponseDto(
     String roleName,
     String costume,
     Boolean sex,
+    Integer min_Age,
+    Integer max_Age,
     Integer limitPersonnel,
     Integer currentPersonnel,
     Season season,
