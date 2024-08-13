@@ -1,5 +1,8 @@
 package com.example.extra.domain.schedule.service.impl;
 
+import com.example.extra.domain.account.entity.Account;
+import com.example.extra.domain.account.exception.AccountErrorCode;
+import com.example.extra.domain.account.exception.AccountException;
 import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.jobpost.entity.JobPost;
@@ -15,8 +18,6 @@ import com.example.extra.domain.schedule.exception.ScheduleErrorCode;
 import com.example.extra.domain.schedule.mapper.service.ScheduleEntityMapper;
 import com.example.extra.domain.schedule.repository.ScheduleRepository;
 import com.example.extra.domain.schedule.service.ScheduleService;
-import com.example.extra.sample.exception.NotFoundTestException;
-import com.example.extra.sample.exception.TestErrorCode;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,62 +25,75 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
+
     private final JobPostRepository jobPostRepository;
     private final ScheduleEntityMapper scheduleEntityMapper;
     private final CompanyRepository companyRepository;
     private final ScheduleRepository scheduleRepository;
 
+    private Company getCompanyByAccount(final Account account) {
+        return companyRepository.findByAccount(account)
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
+    }
+
     public void createSchedule(
         Long jobPost_id,
-        Company company,
+        final Account account,
         ScheduleCreateServiceRequestDto scheduleCreateServiceRequestDto
-    ){
+    ) {
         JobPost jobPost = jobPostRepository.findByIdAndCompany(
             jobPost_id,
-            company
-        ).orElseThrow(()-> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
-        Schedule schedule = scheduleEntityMapper.toSchedule(scheduleCreateServiceRequestDto,jobPost);
+            getCompanyByAccount(account)
+        ).orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        Schedule schedule = scheduleEntityMapper.toSchedule(scheduleCreateServiceRequestDto,
+            jobPost);
         scheduleRepository.save(schedule);
 
     }
+
     public void updateSchedule(
         Long jobPost_id,
         Long schedule_id,
-        Company company,
+        final Account account,
         ScheduleUpdateServiceRequestDto scheduleUpdateServiceRequestDto
-    ){
-        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id,company)
-            .orElseThrow(()->new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
-        Schedule schedule = scheduleRepository.findByIdAndJobPost(schedule_id,jobPost)
-            .orElseThrow(()->new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+    ) {
+        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id,
+                getCompanyByAccount(account))
+            .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        Schedule schedule = scheduleRepository.findByIdAndJobPost(schedule_id, jobPost)
+            .orElseThrow(() -> new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
         schedule.updateSchedule(scheduleUpdateServiceRequestDto.calender());
         scheduleRepository.save(schedule);
     }
+
     public void deleteSchedule(
         Long jobPost_id,
         Long schedule_id,
-        Company company
-    ){
-        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id,company)
-            .orElseThrow(()->new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
-        Schedule schedule = scheduleRepository.findByIdAndJobPost(schedule_id,jobPost)
-            .orElseThrow(()->new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+        final Account account
+    ) {
+        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id,
+                getCompanyByAccount(account))
+            .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        Schedule schedule = scheduleRepository.findByIdAndJobPost(schedule_id, jobPost)
+            .orElseThrow(() -> new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
         scheduleRepository.delete(schedule);
     }
+
     public ScheduleServiceResponseDto readSchedule(
         Long jobPost_id,
-        Long schedule_id){
+        Long schedule_id) {
         JobPost jobPost = jobPostRepository.findById(jobPost_id)
-            .orElseThrow(()->new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
-        Schedule schedule = scheduleRepository.findByIdAndJobPost(schedule_id,jobPost)
-            .orElseThrow(()->new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+            .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        Schedule schedule = scheduleRepository.findByIdAndJobPost(schedule_id, jobPost)
+            .orElseThrow(() -> new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
         return scheduleEntityMapper.toScheduleServiceResponseDto(schedule);
     }
-    public List<ScheduleServiceResponseDto> readAllSchedule(Long jobPost_id){
+
+    public List<ScheduleServiceResponseDto> readAllSchedule(Long jobPost_id) {
         JobPost jobPost = jobPostRepository.findById(jobPost_id)
-            .orElseThrow(()->new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+            .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
         List<Schedule> scheduleList = scheduleRepository.findByJobPostId(jobPost.getId())
-            .orElseThrow(()->new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+            .orElseThrow(() -> new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
         return scheduleEntityMapper.toListScheduleServiceResponseDto(scheduleList);
     }
 }

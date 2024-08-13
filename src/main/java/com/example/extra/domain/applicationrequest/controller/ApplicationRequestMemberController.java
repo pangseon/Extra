@@ -7,7 +7,6 @@ import com.example.extra.domain.applicationrequest.dto.service.ApplicationReques
 import com.example.extra.domain.applicationrequest.mapper.dto.ApplicationRequestDtoMapper;
 import com.example.extra.domain.applicationrequest.service.ApplicationRequestMemberService;
 import com.example.extra.global.enums.ApplyStatus;
-import com.example.extra.global.exception.dto.BeanValidationExceptionResponseDto;
 import com.example.extra.global.exception.dto.CustomExceptionResponseDto;
 import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
@@ -19,7 +18,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,13 +25,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/application-request")
 @RestController
 public class ApplicationRequestMemberController {
+
     private final ApplicationRequestMemberService applicationRequestMemberService;
     private final ApplicationRequestDtoMapper applicationRequestDtoMapper;
 
@@ -42,40 +40,42 @@ public class ApplicationRequestMemberController {
     public ResponseEntity<?> readAllApplicationRequestMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PageableDefault(size = 10, sort = "createdAt", direction = Direction.DESC) Pageable pageable
-    ){
-        List<ApplicationRequestMemberReadServiceResponseDto> ApplicationRequestMemberReadServiceResponseDtoList =
+    ) {
+        List<ApplicationRequestMemberReadServiceResponseDto> serviceResponseDtoList =
             applicationRequestMemberService.getAppliedRoles(
-                userDetails.getMember(),
+                userDetails.getAccount(),
                 pageable
             );
 
         return ResponseEntity.status(HttpStatus.OK)
-            .body(ApplicationRequestMemberReadServiceResponseDtoList);
+            .body(serviceResponseDtoList);
     }
+
     // 사용자가 지원한 역할들 중 특정 상태인 것들만 확인
     @GetMapping("/member/roles/{status}")
     public ResponseEntity<?> readAllApplicationRequestMemberByStatus(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "status") String applyStatusString,
         @PageableDefault(size = 10, sort = "createdAt", direction = Direction.DESC) Pageable pageable
-    ){
+    ) {
         ApplyStatus applyStatus = ApplyStatus.fromString(applyStatusString);
-        if (applyStatus == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CustomExceptionResponseDto.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .name("applyStatus")
-                .message("유효하지 않은 apply status입니다.")
-                .build());
+        if (applyStatus == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(CustomExceptionResponseDto.builder()
+                    .status(HttpStatus.BAD_REQUEST.value())
+                    .name("applyStatus")
+                    .message("유효하지 않은 apply status입니다.")
+                    .build());
 
         }
-        List<ApplicationRequestMemberReadServiceResponseDto> appliedRoleList =
+        List<ApplicationRequestMemberReadServiceResponseDto> serviceResponseDtoList =
             applicationRequestMemberService.getAppliedRolesByStatus(
-                userDetails.getMember(),
+                userDetails.getAccount(),
                 applyStatus,
                 pageable
             );
         return ResponseEntity.status(HttpStatus.OK)
-            .body(appliedRoleList);
+            .body(serviceResponseDtoList);
     }
 
     // 사용자가 특정 역할에 지원
@@ -83,9 +83,9 @@ public class ApplicationRequestMemberController {
     public ResponseEntity<?> createApplicationRequestMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "roleId") Long roleId
-    ){
+    ) {
         applicationRequestMemberService.createApplicationRequestMember(
-            userDetails.getMember(),
+            userDetails.getAccount(),
             roleId
         );
 
@@ -97,9 +97,9 @@ public class ApplicationRequestMemberController {
     public ResponseEntity<?> deleteApplicationRequestMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "applicationRequestId") Long applicationRequestId
-    ){
+    ) {
         applicationRequestMemberService.deleteApplicationRequestMember(
-            userDetails.getMember(),
+            userDetails.getAccount(),
             applicationRequestId
         );
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -111,36 +111,37 @@ public class ApplicationRequestMemberController {
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "roleId") Long roleId,
         @PageableDefault(size = 10, sort = "createdAt", direction = Direction.ASC) Pageable pageable
-    ){
-        List<ApplicationRequestCompanyReadServiceResponseDto> applicationRequestCompanyReadServiceResponseDtoList =
+    ) {
+        List<ApplicationRequestCompanyReadServiceResponseDto> serviceResponseDtoList =
             applicationRequestMemberService.getAppliedMembersByRole(
-                userDetails.getCompany(),
+                userDetails.getAccount(),
                 roleId,
                 pageable
             );
         return ResponseEntity.status(HttpStatus.OK)
-            .body(applicationRequestCompanyReadServiceResponseDtoList);
+            .body(serviceResponseDtoList);
     }
+
     // 요청 승인 및 거절(지원현황 화면)
     @PutMapping("/company/application-requests/{applicationRequestId}")
     public ResponseEntity<?> updateApplicationRequestMemberStatusToRejected(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "applicationRequestId") Long applicationRequestId,
-        @Valid @RequestBody ApplicationRequestMemberUpdateControllerRequestDto applicationRequestMemberUpdateControllerRequestDto
+        @Valid @RequestBody ApplicationRequestMemberUpdateControllerRequestDto controllerRequestDto
     ) {
-        ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto =
+        ApplicationRequestMemberUpdateServiceRequestDto serviceRequestDto =
             applicationRequestDtoMapper.toApplicationRequestMemberUpdateServiceRequestDto(
-                applicationRequestMemberUpdateControllerRequestDto
+                controllerRequestDto
             );
         applicationRequestMemberService.updateStatus(
-            userDetails.getCompany(),
+            userDetails.getAccount(),
             applicationRequestId,
-            applicationRequestMemberUpdateServiceRequestDto
+            serviceRequestDto
         );
-        if (applicationRequestMemberUpdateServiceRequestDto.applyStatus() == ApplyStatus.APPROVED) {
+        if (serviceRequestDto.applyStatus() == ApplyStatus.APPROVED) {
             applicationRequestMemberService.createAttendanceManagementIfApproved(
                 applicationRequestId,
-                applicationRequestMemberUpdateServiceRequestDto
+                serviceRequestDto
             );
         }
         return ResponseEntity.status(HttpStatus.OK).build();

@@ -27,13 +27,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/attendance-management/company")
 @RestController
 public class AttendanceManagementController {
+
     private final AttendanceManagementService attendanceManagementService;
     private final AttendanceManagementDtoMapper attendanceManagementDtoMapper;
 
@@ -43,70 +43,74 @@ public class AttendanceManagementController {
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "jobPostId") Long jobPostId,
         @PageableDefault(size = 10, sort = "roleName", direction = Direction.ASC) Pageable pageable
-    ){
-        List<AttendanceManagementReadServiceResponseDto> attendanceManagementReadServiceResponseDtoList =
+    ) {
+        List<AttendanceManagementReadServiceResponseDto> serviceResponseDtoList =
             attendanceManagementService.getApprovedMemberInfo(
-                userDetails.getCompany(),
+                userDetails.getAccount(),
                 jobPostId,
                 pageable
             );
         return ResponseEntity.status(HttpStatus.OK)
-            .body(attendanceManagementReadServiceResponseDtoList);
+            .body(serviceResponseDtoList);
     }
+
     // QR 출근 체크
     @PutMapping("/jobposts/{jobPostId}/clock-in")
     public ResponseEntity<?> updateAttendanceManagementClockInTime(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "jobPostId") Long jobPostId,
-        @Valid @RequestBody AttendanceManagementUpdateControllerRequestDto attendanceManagementUpdateControllerRequestDto
+        @Valid @RequestBody AttendanceManagementUpdateControllerRequestDto controllerRequestDto
     ) {
-        AttendanceManagementUpdateServiceRequestDto attendanceManagementUpdateServiceRequestDto =
+        AttendanceManagementUpdateServiceRequestDto serviceRequestDto =
             attendanceManagementDtoMapper.toAttendanceManagementUpdateServiceRequestDto(
-                attendanceManagementUpdateControllerRequestDto
+                controllerRequestDto
             );
         attendanceManagementService.updateClockInTime(
-            userDetails.getCompany(),
+            userDetails.getAccount(),
             jobPostId,
-            attendanceManagementUpdateServiceRequestDto
+            serviceRequestDto
         );
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
     // QR 퇴근 체크
     @PutMapping("/jobposts/{jobPostId}/clock-out")
     public ResponseEntity<?> updateAttendanceManagementClockOutTime(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "jobPostId") Long jobPostId,
-        @Valid @RequestBody AttendanceManagementUpdateControllerRequestDto attendanceManagementUpdateControllerRequestDto
+        @Valid @RequestBody AttendanceManagementUpdateControllerRequestDto controllerRequestDto
     ) {
-        AttendanceManagementUpdateServiceRequestDto attendanceManagementUpdateServiceRequestDto =
+        AttendanceManagementUpdateServiceRequestDto serviceRequestDto =
             attendanceManagementDtoMapper.toAttendanceManagementUpdateServiceRequestDto(
-                attendanceManagementUpdateControllerRequestDto
+                controllerRequestDto
             );
         attendanceManagementService.updateClockOutTime(
-            userDetails.getCompany(),
+            userDetails.getAccount(),
             jobPostId,
-            attendanceManagementUpdateServiceRequestDto
+            serviceRequestDto
         );
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
     // QR 식사 체크
     @PutMapping("/jobposts/{jobPostId}/meal-count")
     public ResponseEntity<?> updateAttendanceManagementMealCount(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "jobPostId") Long jobPostId,
-        @Valid @RequestBody AttendanceManagementUpdateMealCountControllerRequestDto attendanceManagementUpdateMealCountControllerRequestDto
+        @Valid @RequestBody AttendanceManagementUpdateMealCountControllerRequestDto controllerRequestDto
     ) {
-        AttendanceManagementUpdateServiceRequestDto attendanceManagementUpdateServiceRequestDto =
+        AttendanceManagementUpdateServiceRequestDto serviceRequestDto =
             attendanceManagementDtoMapper.toAttendanceManagementUpdateServiceRequestDto(
-                attendanceManagementUpdateMealCountControllerRequestDto
+                controllerRequestDto
             );
         attendanceManagementService.updateMealCount(
-            userDetails.getCompany(),
+            userDetails.getAccount(),
             jobPostId,
-            attendanceManagementUpdateServiceRequestDto
+            serviceRequestDto
         );
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
     // 출퇴근 정보 엑셀 파일
     @GetMapping("/jobposts/{jobPostId}/excel")
     public void downloadAttendanceInfo(
@@ -114,12 +118,12 @@ public class AttendanceManagementController {
         @PathVariable(name = "jobPostId") Long jobPostId,
         HttpServletResponse response
     ) throws IOException {
-        List<AttendanceManagementCreateExcelServiceResponseDto> attendanceManagementCreateExcelServiceResponseDtoList =
+        List<AttendanceManagementCreateExcelServiceResponseDto> serviceResponseDtoList =
             attendanceManagementService.getExcelInfo(
-                userDetails.getCompany(),
+                userDetails.getAccount(),
                 jobPostId
             );
-        ExcelFile excelFile = new ExcelFile(attendanceManagementCreateExcelServiceResponseDtoList);
+        ExcelFile excelFile = new ExcelFile(serviceResponseDtoList);
 
         String fileName = attendanceManagementService.getJobPostTitle(jobPostId).concat(".xlsx");
         // UTF-8로 파일명 인코딩
@@ -128,7 +132,8 @@ public class AttendanceManagementController {
         String headerKey = "Content-Disposition";
         String headerValue = "attachment; filename*=utf-8''" + encodedFileName + ";";
 
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setContentType(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader(headerKey, headerValue);
 
         excelFile.write(response.getOutputStream());

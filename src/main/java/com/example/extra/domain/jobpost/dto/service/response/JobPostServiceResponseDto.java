@@ -17,18 +17,18 @@ public record JobPostServiceResponseDto(
     Boolean status,
     Integer hourPay,
     Category category,
-    String company_name,
-    List<Long> schedule_id_List,
+    String companyName,
+    List<Long> scheduleIdList,
     List<LocalDate> calenderList,
-    List<Long> role_id_list,
-    List<String> role_name_list,
+    List<Long> roleIdList,
+    List<String> roleNameList,
     List<String> costumeList,
     List<Boolean> sexList,
-    List<LocalDate> role_age_list,
-    List<Integer> limit_personnel_list,
-    List<Integer> current_personnel_list,
+    List<LocalDate> roleAgeList,
+    List<Integer> limitPersonnelList,
+    List<Integer> currentPersonnelList,
     List<Season> seasonList,
-    List<Boolean> check_tattoo_list
+    List<Boolean> checkTattooList
 ) {
 
 }

@@ -1,5 +1,6 @@
 package com.example.extra.domain.costumeapprovalboard.controller;
 
+import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardApplyStatusUpdateControllerRequestDto;
 import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardExplainCreateRequestDto;
 import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardExplainUpdateControllerRequestDto;
@@ -11,11 +12,9 @@ import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApproval
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.mapper.dto.CostumeApprovalBoardDtoMapper;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
-import com.example.extra.domain.member.entity.Member;
 import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -49,13 +48,13 @@ public class CostumeApprovalBoardController {
         @PathVariable Long jobPostId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        List<CostumeApprovalBoardCompanyReadServiceResponseDto> costumeApprovalBoardCompanyReadServiceResponseDtoList =
+        List<CostumeApprovalBoardCompanyReadServiceResponseDto> serviceResponseDtoList =
             costumeApprovalBoardService.getCostumeApprovalBoardForCompany(
-                userDetails.getCompany(),
+                userDetails.getAccount(),
                 jobPostId
             );
         return ResponseEntity.status(HttpStatus.OK)
-            .body(costumeApprovalBoardCompanyReadServiceResponseDtoList);
+            .body(serviceResponseDtoList);
     }
 
     // 업체가 특정 게시글 조회
@@ -64,13 +63,13 @@ public class CostumeApprovalBoardController {
         @PathVariable Long costumeApprovalBoardId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        CostumeApprovalBoardCompanyReadDetailServiceResponseDto costumeApprovalBoardCompanyReadDetailServiceResponseDto =
+        CostumeApprovalBoardCompanyReadDetailServiceResponseDto serviceResponseDto =
             costumeApprovalBoardService.getCostumeApprovalBoardDetailForCompany(
-                userDetails.getCompany(),
+                userDetails.getAccount(),
                 costumeApprovalBoardId
             );
         return ResponseEntity.status(HttpStatus.OK)
-            .body(costumeApprovalBoardCompanyReadDetailServiceResponseDto);
+            .body(serviceResponseDto);
     }
 
     // 출연자 본인 역할에 대해 의상 컨펌 조회
@@ -79,13 +78,13 @@ public class CostumeApprovalBoardController {
         @PathVariable Long roleId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        CostumeApprovalBoardMemberReadServiceResponseDto costumeApprovalBoardMemberReadServiceResponseDto =
+        CostumeApprovalBoardMemberReadServiceResponseDto serviceResponseDto =
             costumeApprovalBoardService.getCostumeApprovalBoardForMember(
-                userDetails.getMember(),
+                userDetails.getAccount(),
                 roleId
             );
         return ResponseEntity.status(HttpStatus.OK)
-            .body(costumeApprovalBoardMemberReadServiceResponseDto);
+            .body(serviceResponseDto);
     }
 
     // TODO - 출연자의 삭제 요청과 회사의 삭제 요청 API상으로 구분할지
@@ -95,14 +94,14 @@ public class CostumeApprovalBoardController {
         @PathVariable Long costumeApprovalBoardId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        if (Objects.nonNull(userDetails.getMember())) {
+        if (Objects.nonNull(userDetails.getAccount())) {
             costumeApprovalBoardService.deleteCostumeApprovalBoardByMember(
-                userDetails.getMember(),
+                userDetails.getAccount(),
                 costumeApprovalBoardId
             );
         } else {
             costumeApprovalBoardService.deleteCostumeApprovalBoardByCompany(
-                userDetails.getCompany(),
+                userDetails.getAccount(),
                 costumeApprovalBoardId
             );
         }
@@ -114,28 +113,28 @@ public class CostumeApprovalBoardController {
      *
      * @param userDetails
      * @param roleId
-     * @param costumeApprovalBoardExplainCreateRequestDto : image_explain - Nullable
-     * @param multipartFile                               : image file - Not Null
+     * @param controllerRequestDto : image_explain - Nullable
+     * @param multipartFile        : image file - Not Null
      * @return
      */
     @PostMapping("/roles/{role_id}")
     public ResponseEntity<?> createCostumeApprovalBoard(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "role_id") Long roleId,
-        @RequestPart(name = "explain") CostumeApprovalBoardExplainCreateRequestDto costumeApprovalBoardExplainCreateRequestDto,
+        @RequestPart(name = "explain") CostumeApprovalBoardExplainCreateRequestDto controllerRequestDto,
         @RequestPart(name = "image") MultipartFile multipartFile
-    )throws IOException {
-        Member member = userDetails.getMember();
-        CostumeApprovalBoardCreateServiceDto costumeApprovalBoardCreateServiceDto =
+    ) throws IOException {
+        Account account = userDetails.getAccount();
+        CostumeApprovalBoardCreateServiceDto serviceRequestDto =
             costumeApprovalBoardDtoMapper.toCostumeApprovalBoardCreateServiceDto(
-                costumeApprovalBoardExplainCreateRequestDto,
+                controllerRequestDto,
                 multipartFile
             );
 
         costumeApprovalBoardService.createCostumeApprovalBoard(
             roleId,
-            member,
-            costumeApprovalBoardCreateServiceDto,
+            account,
+            serviceRequestDto,
             multipartFile
         );
 
@@ -168,7 +167,7 @@ public class CostumeApprovalBoardController {
 
         costumeApprovalBoardService.updateCostumeApprovalBoardByMember(
             costumeApprovalBoardId,
-            userDetails.getMember(),
+            userDetails.getAccount(),
             serviceRequestDto
         );
 
@@ -196,7 +195,7 @@ public class CostumeApprovalBoardController {
                 controllerRequestDto);
 
         costumeApprovalBoardService.updateCostumeApprovalBoardByCompany(
-            userDetails.getCompany(),
+            userDetails.getAccount(),
             costumeApprovalBoardId,
             serviceRequestDto
         );

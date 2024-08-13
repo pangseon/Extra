@@ -4,10 +4,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.example.extra.domain.company.dto.controller.CompanyCreateControllerRequestDto;
-import com.example.extra.domain.company.dto.controller.CompanyLoginControllerRequestDto;
 import com.example.extra.domain.company.dto.service.request.CompanyCreateServiceRequestDto;
-import com.example.extra.domain.company.dto.service.request.CompanyLoginServiceRequestDto;
-import com.example.extra.domain.company.dto.service.response.CompanyLoginServiceResponseDto;
 import com.example.extra.domain.company.dto.service.response.CompanyReadOnceServiceResponseDto;
 import com.example.extra.domain.company.mapper.dto.CompanyDtoMapper;
 import com.example.extra.domain.company.service.CompanyService;
@@ -35,55 +32,26 @@ public class CompanyController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(
-        @Valid @RequestBody CompanyCreateControllerRequestDto companyCreateControllerRequestDto
+        @Valid @RequestBody CompanyCreateControllerRequestDto controllerRequestDto
     ) {
-        CompanyCreateServiceRequestDto companyCreateServiceRequestDto =
-            companyDtoMapper.toCompanyCreateServiceRequestDto(companyCreateControllerRequestDto);
+        CompanyCreateServiceRequestDto serviceRequestDto =
+            companyDtoMapper.toCompanyCreateServiceRequestDto(controllerRequestDto);
 
         companyService.signup(
-            companyCreateServiceRequestDto
+            serviceRequestDto
         );
 
         return ResponseEntity.status(CREATED).build();
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(
-        @Valid @RequestBody CompanyLoginControllerRequestDto companyLoginControllerRequestDto
-    ) {
-        CompanyLoginServiceRequestDto companyLoginServiceRequestDto =
-            companyDtoMapper.toCompanyLoginServiceRequestDto(companyLoginControllerRequestDto);
-
-        CompanyLoginServiceResponseDto companyLoginServiceResponseDto =
-            companyService.login(companyLoginServiceRequestDto);
-
-        return ResponseEntity
-            .status(OK)
-            .header(
-                AUTHORIZATION_HEADER,
-                companyLoginServiceResponseDto.token()
-            )
-            .build();
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(
-        @AuthenticationPrincipal UserDetailsImpl userDetails
-    ) {
-        companyService.logout(userDetails.getCompany());
-        return ResponseEntity
-            .status(OK)
-            .build();
     }
 
     @GetMapping("")
     public ResponseEntity<?> readOnceCompany(
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        CompanyReadOnceServiceResponseDto companyReadOnceServiceResponseDto =
-            companyService.readOnceCompany(userDetails.getCompany());
+        CompanyReadOnceServiceResponseDto serviceResponseDto =
+            companyService.readOnceCompany(userDetails);
         return ResponseEntity
             .status(OK)
-            .body(companyReadOnceServiceResponseDto);
+            .body(serviceResponseDto);
     }
 }

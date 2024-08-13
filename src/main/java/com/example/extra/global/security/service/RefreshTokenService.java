@@ -1,11 +1,10 @@
 package com.example.extra.global.security.service;
 
-import com.example.extra.domain.member.entity.Member;
-import com.example.extra.domain.member.exception.MemberErrorCode;
-import com.example.extra.domain.member.exception.MemberException;
-import com.example.extra.domain.member.repository.MemberRepository;
+import com.example.extra.domain.account.entity.Account;
+import com.example.extra.domain.account.exception.AccountErrorCode;
+import com.example.extra.domain.account.exception.AccountException;
+import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.global.security.JwtUtil;
-import com.example.extra.global.security.UserDetailsImpl;
 import com.example.extra.global.security.exception.TokenErrorCode;
 import com.example.extra.global.security.exception.TokenException;
 import com.example.extra.global.security.repository.RefreshTokenRepository;
@@ -25,39 +24,37 @@ public class RefreshTokenService {
 
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final MemberRepository memberRepository;
+    private final AccountRepository accountRepository;
 
     public void getNewAccessToken(
-        final UserDetailsImpl userDetails,
         final HttpServletRequest httpServletRequest,
         final HttpServletResponse httpServletResponse
     ) {
         String token = httpServletRequest.getHeader("Authorization");
         log.info(token);
-        Member member = memberRepository.findByRefreshToken(jwtUtil.substringToken(token))
-            .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
+        Account account = accountRepository.findByRefreshToken(jwtUtil.substringToken(token))
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
 
-        RefreshToken refreshToken = refreshTokenRepository.findById(member.getId())
+        RefreshToken refreshToken = refreshTokenRepository.findById(account.getId().toString())
             .orElseThrow(() -> new TokenException(TokenErrorCode.NOT_FOUND_TOKEN));
 
         // redis refresh token == rdb refresh token
-        if (refreshToken.getRefreshToken().equals(member.getRefreshToken())) {
-            String newAccessToken = jwtUtil.createToken(member.getEmail(), member.getUserRole());
+        if (refreshToken.getRefreshToken().equals(account.getRefreshToken())) {
+            String newAccessToken = jwtUtil.createToken(account.getEmail(), account.getUserRole());
             String newRefreshToken = jwtUtil.createRefreshToken();
 
             refreshTokenRepository.delete(refreshToken);
             refreshTokenRepository.save(
                 new RefreshToken(
-                    member.getId(),
+                    account.getId().toString(),
                     jwtUtil.substringToken(newRefreshToken)
                 )
             );
 
-            member.updateRefreshToken(jwtUtil.substringToken(newRefreshToken));
+            account.updateRefreshToken(jwtUtil.substringToken(newRefreshToken));
             jwtUtil.addTokenHeader(newAccessToken, httpServletResponse);
         } else {
             throw new TokenException(TokenErrorCode.INVALID_TOKEN);
         }
-
     }
 }
