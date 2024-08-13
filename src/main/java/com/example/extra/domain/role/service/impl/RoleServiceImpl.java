@@ -50,6 +50,8 @@ public class RoleServiceImpl implements RoleService {
             roleUpdateServiceRequestDto.costume(),
             roleUpdateServiceRequestDto.sex(),
                 roleUpdateServiceRequestDto.roleAge(),
+            roleUpdateServiceRequestDto.minAge(),
+            roleUpdateServiceRequestDto.maxAge(),
             roleUpdateServiceRequestDto.limitPersonnel(),
             roleUpdateServiceRequestDto.currentPersonnel(),
             roleUpdateServiceRequestDto.season(),
