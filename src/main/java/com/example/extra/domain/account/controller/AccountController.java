@@ -24,11 +24,8 @@ public class AccountController {
         AccountCreateServiceRequestDto serviceRequestDto =
             accountDtoMapper.toAccountCreateServiceRequestDto(controllerRequestDto);
 
-        accountService.signup(serviceRequestDto);
-        
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .build();
+            .body(accountService.signup(serviceRequestDto));
     }
-
 }
