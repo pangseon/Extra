@@ -45,6 +45,12 @@ public class CompanyServiceImpl implements CompanyService {
         Account account = accountRepository.findById(serviceRequestDto.accountId())
             .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
 
+        // 이미 회원 가입한 계정
+        companyRepository.findByAccount(account)
+            .ifPresent(a -> {
+                throw new AccountException(AccountErrorCode.DUPLICATION_ACCOUNT);
+            });
+
         // Account 권한이 업체가 아닌 경우 -> throw error
         if (!account.getUserRole().getAuthority().equals("ROLE_COMPANY")) {
             throw new AccountException(AccountErrorCode.INVALID_ROLE_COMPANY);
