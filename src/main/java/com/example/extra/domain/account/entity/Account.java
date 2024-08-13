@@ -57,4 +57,8 @@ public class Account {
         this.folderUrl = folderUrl;
         this.userRole = userRole;
     }
+
+    public void encodePassword(String password) {
+        this.password = password;
+    }
 }
