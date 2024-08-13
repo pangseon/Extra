@@ -1,6 +1,5 @@
 package com.example.extra.domain.member.service.impl;
 
-import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
 import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.member.entity.Member;
@@ -13,13 +12,10 @@ import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRe
 import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.domain.tattoo.mapper.entity.TattooEntityMapper;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
-import com.example.extra.global.security.JwtUtil;
 import com.example.extra.global.security.UserDetailsImpl;
-import com.example.extra.global.security.repository.RefreshTokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,19 +26,11 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final TattooRepository tattooRepository;
-    private final CompanyRepository companyRepository;
 
     // mapper
     private final MemberEntityMapper memberEntityMapper;
     private final TattooEntityMapper tattooEntityMapper;
-
-    // security
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
-    private final RefreshTokenRepository refreshTokenRepository;
-
-    private final String ADMIN_TOKEN = "admintoken";
-
+    
     @Override
     @Transactional
     public void signup(
