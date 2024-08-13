@@ -64,7 +64,7 @@ public class MemberServiceImpl implements MemberService {
         final UserDetailsImpl userDetails,
         final HttpServletRequest request
     ) {
-        Member member = findById(userDetails.getMember().getId());
+        Member member = findById(userDetails.getAccount().getId());
         Tattoo tattoo = member.getTattoo();
         return MemberReadServiceResponseDto.builder()
             .name(member.getName())
@@ -94,7 +94,7 @@ public class MemberServiceImpl implements MemberService {
         final UserDetailsImpl userDetails,
         final HttpServletRequest request
     ) {
-        Member member = findById(userDetails.getMember().getId());
+        Member member = findById(userDetails.getAccount().getId());
         memberRepository.delete(member);
     }
 
