@@ -9,7 +9,6 @@ public record JobPostUpdateServiceRequestDto(
     LocalDateTime gatheringTime,
     String imageUrl,
     Boolean status,
-    Integer hourPay,
     Category category
 ) {
 

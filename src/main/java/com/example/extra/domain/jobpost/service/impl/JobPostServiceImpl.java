@@ -95,7 +95,6 @@ public class JobPostServiceImpl implements JobPostService {
             .gatheringLocation(jobPost.getGatheringLocation())
             .gatheringTime(jobPost.getGatheringTime())
             .status(jobPost.getStatus())
-            .hourPay(jobPost.getHourPay())
             .category(jobPost.getCategory())
             .company_name(jobPost.getCompany().getName())
             .calenderList(scheduleList(jobPost.getId())
