@@ -21,7 +21,7 @@ import lombok.ToString;
 @Table(name = "TB_TATTOO")
 @Entity
 @ToString
-public class Tattoo extends BaseEntity {
+public class Tattoo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,12 +51,6 @@ public class Tattoo extends BaseEntity {
     @Column(columnDefinition = "boolean default false")
     private Boolean feet;
 
-    private String etc;
-
-    @OneToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
-
     @Builder
     public Tattoo(
         Boolean face,
@@ -66,9 +60,7 @@ public class Tattoo extends BaseEntity {
         Boolean shoulder,
         Boolean back,
         Boolean hand,
-        Boolean feet,
-        String etc,
-        Member member
+        Boolean feet
     ) {
         this.face = face;
         this.chest = chest;
@@ -78,7 +70,5 @@ public class Tattoo extends BaseEntity {
         this.back = back;
         this.hand = hand;
         this.feet = feet;
-        this.etc = etc;
-        this.member = member;
     }
 }
