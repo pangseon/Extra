@@ -1,5 +1,6 @@
 package com.example.extra.domain.account.service.impl;
 
+import com.example.extra.domain.account.mapper.entity.AccountEntityMapper;
 import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.domain.account.service.AccountService;
 import lombok.RequiredArgsConstructor;
@@ -11,4 +12,6 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
 
+    // mapper
+    private final AccountEntityMapper accountEntityMapper;
 }
