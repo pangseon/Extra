@@ -2,8 +2,6 @@ package com.example.extra.domain.member.service.impl;
 
 import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
-import com.example.extra.domain.member.dto.service.request.MemberLoginServiceRequestDto;
-import com.example.extra.domain.member.dto.service.response.MemberLoginServiceResponseDto;
 import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.exception.MemberErrorCode;
@@ -18,10 +16,7 @@ import com.example.extra.domain.tattoo.repository.TattooRepository;
 import com.example.extra.global.security.JwtUtil;
 import com.example.extra.global.security.UserDetailsImpl;
 import com.example.extra.global.security.repository.RefreshTokenRepository;
-import com.example.extra.global.security.token.RefreshToken;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -59,57 +54,6 @@ public class MemberServiceImpl implements MemberService {
 
         tattooRepository.save(tattoo);
         member.updateTattoo(tattoo);
-        memberRepository.save(member);
-    }
-
-    @Override
-    @Transactional
-    public MemberLoginServiceResponseDto login(
-        final MemberLoginServiceRequestDto memberLoginServiceRequestDto
-    ) {
-        Member member = findByEmail(memberLoginServiceRequestDto.email());
-
-        if (!passwordEncoder.matches(
-            memberLoginServiceRequestDto.password(),
-            member.getPassword()
-        )) {
-            throw new MemberException(MemberErrorCode.INVALID_PASSWORD);
-        }
-
-        // jwt 토큰 생성
-        String accessToken = jwtUtil.createToken(
-            member.getEmail(),
-            member.getUserRole()
-        );
-        String refreshToken = jwtUtil.createRefreshToken();
-        log.info("access token: " + accessToken);
-        log.info("refresh token: " + refreshToken);
-
-        member.updateRefreshToken(jwtUtil.substringToken(refreshToken));
-
-        refreshTokenRepository.save(
-            new RefreshToken(
-                member.tokenId(),
-                jwtUtil.substringToken(refreshToken)
-            )
-        );
-
-        return new MemberLoginServiceResponseDto(accessToken);
-    }
-
-    @Override
-    @Transactional
-    public void logout(
-        final UserDetailsImpl userDetails,
-        final HttpServletRequest request
-    ) throws ServletException, IOException {
-        Member member = userDetails.getMember();
-
-        RefreshToken refreshToken = refreshTokenRepository.findById(member.tokenId())
-            .orElseThrow(() -> new MemberException(MemberErrorCode.UNAUTHORIZED));
-        refreshTokenRepository.delete(refreshToken);
-
-        member.deleteRefreshToken();
         memberRepository.save(member);
     }
 
