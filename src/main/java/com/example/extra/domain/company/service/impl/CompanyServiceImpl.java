@@ -7,12 +7,11 @@ import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.domain.company.dto.service.request.CompanyCreateServiceRequestDto;
 import com.example.extra.domain.company.dto.service.response.CompanyReadOnceServiceResponseDto;
 import com.example.extra.domain.company.entity.Company;
-import com.example.extra.domain.company.exception.CompanyErrorCode;
-import com.example.extra.domain.company.exception.CompanyException;
 import com.example.extra.domain.company.mapper.entity.CompanyEntityMapper;
 import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.company.service.CompanyService;
 import com.example.extra.global.security.JwtUtil;
+import com.example.extra.global.security.UserDetailsImpl;
 import com.example.extra.global.security.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,13 +60,10 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional(readOnly = true)
     public CompanyReadOnceServiceResponseDto readOnceCompany(
-        Company company
+        UserDetailsImpl userDetails
     ) {
+        Company company = companyRepository.findByAccount(userDetails.getAccount())
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
         return companyEntityMapper.toCompanyReadOnceServiceResponseDto(company);
-    }
-
-    private Company findByEmail(String email) {
-        return companyRepository.findByEmail(email)
-            .orElseThrow(() -> new CompanyException(CompanyErrorCode.NOT_FOUND_COMPANY));
     }
 }

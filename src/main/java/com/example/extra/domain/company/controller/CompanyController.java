@@ -49,7 +49,7 @@ public class CompanyController {
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         CompanyReadOnceServiceResponseDto serviceResponseDto =
-            companyService.readOnceCompany(userDetails.getCompany());
+            companyService.readOnceCompany(userDetails);
         return ResponseEntity
             .status(OK)
             .body(serviceResponseDto);

@@ -2,7 +2,7 @@ package com.example.extra.domain.company.service;
 
 import com.example.extra.domain.company.dto.service.request.CompanyCreateServiceRequestDto;
 import com.example.extra.domain.company.dto.service.response.CompanyReadOnceServiceResponseDto;
-import com.example.extra.domain.company.entity.Company;
+import com.example.extra.global.security.UserDetailsImpl;
 
 public interface CompanyService {
 
@@ -11,6 +11,6 @@ public interface CompanyService {
     );
 
     CompanyReadOnceServiceResponseDto readOnceCompany(
-        final Company company
+        final UserDetailsImpl userDetails
     );
 }
