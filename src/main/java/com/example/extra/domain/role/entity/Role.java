@@ -118,7 +118,6 @@ public class Role extends BaseEntity {
     public void addOneToCurrentPersonnel() {
         this.currentPersonnel += 1;
     }
-
     public void subtractOneToCurrentPersonnel() {
         this.currentPersonnel -= 1;
     }
