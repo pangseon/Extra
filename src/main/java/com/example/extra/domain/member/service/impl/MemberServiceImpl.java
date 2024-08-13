@@ -1,5 +1,9 @@
 package com.example.extra.domain.member.service.impl;
 
+import com.example.extra.domain.account.entity.Account;
+import com.example.extra.domain.account.exception.AccountErrorCode;
+import com.example.extra.domain.account.exception.AccountException;
+import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
 import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.member.entity.Member;
@@ -26,18 +30,27 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final TattooRepository tattooRepository;
+    private final AccountRepository accountRepository;
 
     // mapper
     private final MemberEntityMapper memberEntityMapper;
     private final TattooEntityMapper tattooEntityMapper;
-    
+
     @Override
     @Transactional
     public void signup(
         final MemberCreateServiceRequestDto memberCreateServiceRequestDto,
         final TattooCreateServiceRequestDto tattooCreateServiceRequestDto
     ) {
-        Member member = memberEntityMapper.toMember(memberCreateServiceRequestDto);
+        Account account = accountRepository.findById(memberCreateServiceRequestDto.accountId())
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
+
+        // Account 권한이 개인 회원자가 아닌 경우 -> throw error
+        if (!account.getUserRole().getAuthority().equals("ROLE_USER")) {
+            throw new AccountException(AccountErrorCode.INVALID_ROLE_USER);
+        }
+
+        Member member = memberEntityMapper.toMember(memberCreateServiceRequestDto, account);
         Tattoo tattoo = tattooEntityMapper.toTattoo(tattooCreateServiceRequestDto, member);
 
         tattooRepository.save(tattoo);
