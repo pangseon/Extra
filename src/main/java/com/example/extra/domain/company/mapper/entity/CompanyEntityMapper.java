@@ -2,6 +2,7 @@ package com.example.extra.domain.company.mapper.entity;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
+import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.company.dto.service.request.CompanyCreateServiceRequestDto;
 import com.example.extra.domain.company.dto.service.response.CompanyReadOnceServiceResponseDto;
 import com.example.extra.domain.company.entity.Company;
@@ -11,7 +12,8 @@ import org.mapstruct.Mapper;
 public interface CompanyEntityMapper {
 
     Company toCompany(
-        CompanyCreateServiceRequestDto companyCreateServiceRequestDto
+        CompanyCreateServiceRequestDto companyCreateServiceRequestDto,
+        Account account
     );
 
     CompanyReadOnceServiceResponseDto toCompanyReadOnceServiceResponseDto(

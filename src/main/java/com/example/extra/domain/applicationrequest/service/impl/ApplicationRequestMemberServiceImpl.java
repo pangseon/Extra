@@ -1,5 +1,8 @@
 package com.example.extra.domain.applicationrequest.service.impl;
 
+import com.example.extra.domain.account.entity.Account;
+import com.example.extra.domain.account.exception.AccountErrorCode;
+import com.example.extra.domain.account.exception.AccountException;
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestCompanyReadServiceResponseDto;
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestMemberReadServiceResponseDto;
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestMemberUpdateServiceRequestDto;
@@ -12,7 +15,9 @@ import com.example.extra.domain.applicationrequest.service.ApplicationRequestMem
 import com.example.extra.domain.attendancemanagement.entity.AttendanceManagement;
 import com.example.extra.domain.attendancemanagement.repository.AttendanceManagementRepository;
 import com.example.extra.domain.company.entity.Company;
+import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.member.entity.Member;
+import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.role.entity.Role;
 import com.example.extra.domain.role.exception.NotFoundRoleException;
 import com.example.extra.domain.role.exception.RoleErrorCode;
@@ -29,22 +34,27 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMemberService {
+
     private final ApplicationRequestMemberRepository applicationRequestMemberRepository;
     private final RoleRepository roleRepository;
     private final ApplicationRequestEntityMapper applicationRequestEntityMapper;
     private final AttendanceManagementRepository attendanceManagementRepository;
+    private final MemberRepository memberRepository;
+    private final CompanyRepository companyRepository;
 
     // 출연자가 특정 역할에 지원할 때
     @Override
     @Transactional
     public void createApplicationRequestMember(
-        final Member member,
+        final Account account,
         final Long roleId
     ) {
+        Member member = getMemberByAccount(account);
+
         Role role = getRoleById(roleId);
         Boolean isStillRecruiting = role.getJobPost().getStatus();
         // 모집이 마감된 경우 지원 불가
-        if (!isStillRecruiting){
+        if (!isStillRecruiting) {
             throw new ApplicationRequestException(
                 ApplicationRequestErrorCode.NOT_ABLE_TO_APPLY_TO_JOB_POST
             );
@@ -54,7 +64,7 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
                 .applyStatus(ApplyStatus.APPLIED)
                 .member(member)
                 .role(role)
-            .build()
+                .build()
         );
         role.addOneToCurrentPersonnel();
     }
@@ -63,49 +73,55 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
     @Override
     @Transactional(readOnly = true)
     public List<ApplicationRequestMemberReadServiceResponseDto> getAppliedRoles(
-        final Member member,
+        final Account account,
         final Pageable pageable
     ) {
         Slice<ApplicationRequestMember> applicationRequestMemberSlice =
             applicationRequestMemberRepository.findAllByMember(
-                member,
+                getMemberByAccount(account),
                 pageable
             );
-        return applicationRequestEntityMapper.toApplicationRequestMemberReadServiceResponseDtoList(applicationRequestMemberSlice);
+        return applicationRequestEntityMapper.toApplicationRequestMemberReadServiceResponseDtoList(
+            applicationRequestMemberSlice);
     }
 
     // 출연자가 특정 상태(지원중, 미승인, 승인)에 따라 본인이 지원한 역할들 보려 할 때
     @Override
     @Transactional(readOnly = true)
     public List<ApplicationRequestMemberReadServiceResponseDto> getAppliedRolesByStatus(
-        final Member member,
+        final Account account,
         final ApplyStatus applyStatus,
         final Pageable pageable
     ) {
         Slice<ApplicationRequestMember> applicationRequestMemberSlice =
             applicationRequestMemberRepository.findAllByMemberAndApplyStatus(
-                member,
+                getMemberByAccount(account),
                 applyStatus,
                 pageable
             );
-        return applicationRequestEntityMapper.toApplicationRequestMemberReadServiceResponseDtoList(applicationRequestMemberSlice);
+        return applicationRequestEntityMapper.toApplicationRequestMemberReadServiceResponseDtoList(
+            applicationRequestMemberSlice);
     }
 
     // 출연자가 지원 요청을 취소할 때
     @Override
     @Transactional
     public void deleteApplicationRequestMember(
-        final Member member,
+        final Account account,
         final Long applicationRequestMemberId
     ) {
-        ApplicationRequestMember applicationRequestMember = getApplicationRequestMemberById(applicationRequestMemberId);
+        Member member = getMemberByAccount(account);
+        ApplicationRequestMember applicationRequestMember = getApplicationRequestMemberById(
+            applicationRequestMemberId);
         // 본인이 지원한 역할에 대해서만 삭제 가능
-        if (!Objects.equals(applicationRequestMember.getMember().getId(), member.getId())){
-            throw new ApplicationRequestException(ApplicationRequestErrorCode.NOT_ABLE_TO_ACCESS_APPLICATION_REQUEST_MEMBER);
+        if (!Objects.equals(applicationRequestMember.getMember().getId(), member.getId())) {
+            throw new ApplicationRequestException(
+                ApplicationRequestErrorCode.NOT_ABLE_TO_ACCESS_APPLICATION_REQUEST_MEMBER);
         }
         // 승인 상태에서 삭제 불가
-        if (applicationRequestMember.getApplyStatus() == ApplyStatus.APPROVED){
-            throw new ApplicationRequestException(ApplicationRequestErrorCode.NOT_ABLE_TO_CANCEL_IN_APPROVED);
+        if (applicationRequestMember.getApplyStatus() == ApplyStatus.APPROVED) {
+            throw new ApplicationRequestException(
+                ApplicationRequestErrorCode.NOT_ABLE_TO_CANCEL_IN_APPROVED);
         }
         Role role = applicationRequestMember.getRole();
         applicationRequestMemberRepository.delete(applicationRequestMember);
@@ -116,48 +132,57 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
     @Override
     @Transactional(readOnly = true)
     public List<ApplicationRequestCompanyReadServiceResponseDto> getAppliedMembersByRole(
-        final Company company,
+        final Account account,
         final long roleId,
         final Pageable pageable
     ) {
+        Company company = getCompanyByAccount(account);
         Role role = getRoleById(roleId);
         // 업체가 작성한 공고의 역할만 확인 가능
-        if (!Objects.equals(role.getJobPost().getCompany().getId(), company.getId())){
-            throw new ApplicationRequestException(ApplicationRequestErrorCode.NOT_ABLE_TO_ACCESS_APPLICATION_REQUEST_MEMBER);
+        if (!Objects.equals(role.getJobPost().getCompany().getId(), company.getId())) {
+            throw new ApplicationRequestException(
+                ApplicationRequestErrorCode.NOT_ABLE_TO_ACCESS_APPLICATION_REQUEST_MEMBER);
         }
         Slice<ApplicationRequestMember> applicationRequestMemberSlice =
             applicationRequestMemberRepository.findAllByRole(
                 role,
                 pageable
             );
-        return applicationRequestEntityMapper.toApplicationRequestCompanyReadServiceResponseDtoList(applicationRequestMemberSlice);
+        return applicationRequestEntityMapper.toApplicationRequestCompanyReadServiceResponseDtoList(
+            applicationRequestMemberSlice);
     }
 
     // 업체가 해당 역할에 지원한 출연자들에 대해 승인/거절할 때
     @Override
     @Transactional
     public void updateStatus(
-        final Company company,
+        final Account account,
         final Long applicationRequestMemberId,
         final ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
     ) {
-        ApplicationRequestMember applicationRequestMember = getApplicationRequestMemberById(applicationRequestMemberId);
+        Company company = getCompanyByAccount(account);
+        ApplicationRequestMember applicationRequestMember = getApplicationRequestMemberById(
+            applicationRequestMemberId);
 
         // 업체가 작성한 공고의 역할만 승인/거절 가능
-        if (!Objects.equals(applicationRequestMember.getRole().getJobPost().getCompany().getId(), company.getId())){
-            throw new ApplicationRequestException(ApplicationRequestErrorCode.NOT_ABLE_TO_ACCESS_APPLICATION_REQUEST_MEMBER);
+        if (!Objects.equals(applicationRequestMember.getRole().getJobPost().getCompany().getId(),
+            company.getId())) {
+            throw new ApplicationRequestException(
+                ApplicationRequestErrorCode.NOT_ABLE_TO_ACCESS_APPLICATION_REQUEST_MEMBER);
         }
         ApplyStatus applyStatus = applicationRequestMemberUpdateServiceRequestDto.applyStatus();
         applicationRequestMember.updateStatusTo(applyStatus);
     }
+
     // 업체가 해당 역할에 지원한 출연자들에 대해 승인할 때 attendance management 추가
     @Override
     @Transactional
     public void createAttendanceManagementIfApproved(
         final Long applicationRequestMemberId,
         final ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
-    ){
-        ApplicationRequestMember applicationRequestMember = getApplicationRequestMemberById(applicationRequestMemberId);
+    ) {
+        ApplicationRequestMember applicationRequestMember = getApplicationRequestMemberById(
+            applicationRequestMemberId);
         attendanceManagementRepository.save(
             AttendanceManagement.builder()
                 .member(applicationRequestMember.getMember())
@@ -168,17 +193,30 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
                 .build()
         );
     }
-    private Role getRoleById(final Long roleId){
+
+    private Role getRoleById(final Long roleId) {
         return roleRepository.findById(roleId).orElseThrow(
-            ()-> new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE)
+            () -> new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE)
         );
     }
-    private ApplicationRequestMember getApplicationRequestMemberById(Long applicationRequestMemberId){
+
+    private ApplicationRequestMember getApplicationRequestMemberById(
+        Long applicationRequestMemberId) {
         return applicationRequestMemberRepository.findById(applicationRequestMemberId).orElseThrow(
             // 지원 상태 업데이트 하려 했는데 없으면 예외 발생.
-            ()-> new ApplicationRequestException(
+            () -> new ApplicationRequestException(
                 ApplicationRequestErrorCode.NOT_FOUND_APPLICATION_REQUEST_MEMBER
             )
         );
+    }
+
+    private Member getMemberByAccount(final Account account) {
+        return memberRepository.findByAccount(account)
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
+    }
+
+    private Company getCompanyByAccount(final Account account) {
+        return companyRepository.findByAccount(account)
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
     }
 }

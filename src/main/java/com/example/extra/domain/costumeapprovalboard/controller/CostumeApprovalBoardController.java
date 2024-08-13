@@ -1,5 +1,6 @@
 package com.example.extra.domain.costumeapprovalboard.controller;
 
+import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardApplyStatusUpdateControllerRequestDto;
 import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardExplainCreateRequestDto;
 import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardExplainUpdateControllerRequestDto;
@@ -11,11 +12,9 @@ import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApproval
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.mapper.dto.CostumeApprovalBoardDtoMapper;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
-import com.example.extra.domain.member.entity.Member;
 import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -51,7 +50,7 @@ public class CostumeApprovalBoardController {
     ) {
         List<CostumeApprovalBoardCompanyReadServiceResponseDto> serviceResponseDtoList =
             costumeApprovalBoardService.getCostumeApprovalBoardForCompany(
-                userDetails.getCompany(),
+                userDetails.getAccount(),
                 jobPostId
             );
         return ResponseEntity.status(HttpStatus.OK)
@@ -66,7 +65,7 @@ public class CostumeApprovalBoardController {
     ) {
         CostumeApprovalBoardCompanyReadDetailServiceResponseDto serviceResponseDto =
             costumeApprovalBoardService.getCostumeApprovalBoardDetailForCompany(
-                userDetails.getCompany(),
+                userDetails.getAccount(),
                 costumeApprovalBoardId
             );
         return ResponseEntity.status(HttpStatus.OK)
@@ -81,7 +80,7 @@ public class CostumeApprovalBoardController {
     ) {
         CostumeApprovalBoardMemberReadServiceResponseDto serviceResponseDto =
             costumeApprovalBoardService.getCostumeApprovalBoardForMember(
-                userDetails.getMember(),
+                userDetails.getAccount(),
                 roleId
             );
         return ResponseEntity.status(HttpStatus.OK)
@@ -95,14 +94,14 @@ public class CostumeApprovalBoardController {
         @PathVariable Long costumeApprovalBoardId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        if (Objects.nonNull(userDetails.getMember())) {
+        if (Objects.nonNull(userDetails.getAccount())) {
             costumeApprovalBoardService.deleteCostumeApprovalBoardByMember(
-                userDetails.getMember(),
+                userDetails.getAccount(),
                 costumeApprovalBoardId
             );
         } else {
             costumeApprovalBoardService.deleteCostumeApprovalBoardByCompany(
-                userDetails.getCompany(),
+                userDetails.getAccount(),
                 costumeApprovalBoardId
             );
         }
@@ -115,7 +114,7 @@ public class CostumeApprovalBoardController {
      * @param userDetails
      * @param roleId
      * @param controllerRequestDto : image_explain - Nullable
-     * @param multipartFile                               : image file - Not Null
+     * @param multipartFile        : image file - Not Null
      * @return
      */
     @PostMapping("/roles/{role_id}")
@@ -124,8 +123,8 @@ public class CostumeApprovalBoardController {
         @PathVariable(name = "role_id") Long roleId,
         @RequestPart(name = "explain") CostumeApprovalBoardExplainCreateRequestDto controllerRequestDto,
         @RequestPart(name = "image") MultipartFile multipartFile
-    )throws IOException {
-        Member member = userDetails.getMember();
+    ) throws IOException {
+        Account account = userDetails.getAccount();
         CostumeApprovalBoardCreateServiceDto serviceRequestDto =
             costumeApprovalBoardDtoMapper.toCostumeApprovalBoardCreateServiceDto(
                 controllerRequestDto,
@@ -134,7 +133,7 @@ public class CostumeApprovalBoardController {
 
         costumeApprovalBoardService.createCostumeApprovalBoard(
             roleId,
-            member,
+            account,
             serviceRequestDto,
             multipartFile
         );
@@ -168,7 +167,7 @@ public class CostumeApprovalBoardController {
 
         costumeApprovalBoardService.updateCostumeApprovalBoardByMember(
             costumeApprovalBoardId,
-            userDetails.getMember(),
+            userDetails.getAccount(),
             serviceRequestDto
         );
 
@@ -196,7 +195,7 @@ public class CostumeApprovalBoardController {
                 controllerRequestDto);
 
         costumeApprovalBoardService.updateCostumeApprovalBoardByCompany(
-            userDetails.getCompany(),
+            userDetails.getAccount(),
             costumeApprovalBoardId,
             serviceRequestDto
         );

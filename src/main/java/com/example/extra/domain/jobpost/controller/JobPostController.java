@@ -7,7 +7,6 @@ import com.example.extra.domain.jobpost.dto.service.request.JobPostUpdateService
 import com.example.extra.domain.jobpost.dto.service.response.JobPostServiceResponseDto;
 import com.example.extra.domain.jobpost.mapper.dto.JobPostDtoMapper;
 import com.example.extra.domain.jobpost.service.JobPostService;
-import com.example.extra.domain.role.mapper.dto.RoleDtoMapper;
 import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -39,7 +38,7 @@ public class JobPostController {
     ) {
         JobPostCreateServiceRequestDto serviceRequestDto =
             jobPostDtoMapper.toJobPostCreateServiceDto(controllerRequestDto);
-        jobPostService.createJobPost(userDetails.getCompany(), serviceRequestDto);
+        jobPostService.createJobPost(userDetails.getAccount(), serviceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -54,7 +53,7 @@ public class JobPostController {
         jobPostService.updateJobPost(
             jobpostId
             , serviceRequestDto,
-            userDetails.getCompany());
+            userDetails.getAccount());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -63,7 +62,7 @@ public class JobPostController {
         @PathVariable(name = "jobpost_id") Long jobpostId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        jobPostService.deleteJobPost(jobpostId, userDetails.getCompany());
+        jobPostService.deleteJobPost(jobpostId, userDetails.getAccount());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

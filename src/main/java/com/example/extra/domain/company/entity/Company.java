@@ -1,17 +1,17 @@
 package com.example.extra.domain.company.entity;
 
+import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.global.entity.BaseEntity;
-import com.example.extra.global.enums.UserRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -32,21 +32,16 @@ public class Company extends BaseEntity {
     private Long id;
 
     @NotNull
-    private String email;
-
-    @NotNull
-    private String password;
-
-    @NotNull
     private String name;
 
     @Column
     private String companyUrl;
 
-    @Enumerated(EnumType.STRING)
-    private UserRole userRole;
-
-    private String refreshToken;
+    @OneToOne(
+        optional = false,
+        fetch = FetchType.LAZY
+    )
+    private Account account;
 
     // TODO - 회사-공고글 양방향 매핑할 지 확인 받기 + cascade 정책 확인 받기
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
@@ -57,33 +52,13 @@ public class Company extends BaseEntity {
 
     @Builder
     public Company(
-        String email,
-        String password,
-        String name,
-        String companyUrl
+        final String name,
+        final String companyUrl,
+        final Account account
     ) {
-        this.email = email;
-        this.password = password;
         this.name = name;
         this.companyUrl = companyUrl;
-        this.userRole = UserRole.USER;
-        this.refreshToken = null;
-    }
-
-    public void updateRole() {
-        this.userRole = UserRole.ADMIN;
-    }
-
-    public void encodePassword(String password) {
-        this.password = password;
-    }
-
-    public void updateRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
-    public void deleteRefreshToken() {
-        this.refreshToken = null;
+        this.account = account;
     }
 
     public String tokenId() {
