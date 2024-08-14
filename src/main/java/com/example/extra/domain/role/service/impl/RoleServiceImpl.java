@@ -18,6 +18,8 @@ import com.example.extra.domain.role.exception.RoleErrorCode;
 import com.example.extra.domain.role.mapper.service.RoleEntityMapper;
 import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.domain.role.service.RoleService;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -92,13 +94,24 @@ public class RoleServiceImpl implements RoleService {
             .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
         Role role = roleRepository.findByIdAndJobPost(role_id, jobPost)
             .orElseThrow(() -> new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
-        return roleEntityMapper.toRoleServiceResponseDto(role);
+        int minAge = AgeCalculator(LocalDate.now(),role.getMinAge());
+        int maxAge = AgeCalculator(LocalDate.now(),role.getMaxAge());
+        return roleEntityMapper.toRoleServiceResponseDto(role,minAge,maxAge);
+    }
+    private Integer AgeCalculator(LocalDate localDateNow,LocalDate localDate){
+        return Period.between(localDate,localDateNow).getYears();
     }
 
     public List<RoleServiceResponseDto> readAllRole(Long jobPost_id) {
         JobPost jobPost = jobPostRepository.findById(jobPost_id)
             .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
-        List<Role> roleList = roleRepository.findAllByJobPost(jobPost);
-        return roleEntityMapper.toListRoleServiceResponseDto(roleList);
+        return roleRepository.findAllByJobPost(jobPost)
+            .stream()
+            .map(role -> {
+                int minAge = AgeCalculator(LocalDate.now(), role.getMinAge());
+                int maxAge = AgeCalculator(LocalDate.now(), role.getMaxAge());
+                return roleEntityMapper.toRoleServiceResponseDto(role, minAge, maxAge);
+            })
+            .toList();
     }
 }
