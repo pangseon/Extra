@@ -11,6 +11,7 @@ import com.example.extra.domain.tattoo.dto.controller.TattooCreateControllerRequ
 import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import com.example.extra.domain.tattoo.mapper.dto.TattooDtoMapper;
 import com.example.extra.global.security.UserDetailsImpl;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -74,15 +75,19 @@ public class MemberController {
     @PutMapping("")
     public ResponseEntity<?> update(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @RequestPart(name = "member") MemberUpdateControllerRequestDto memberUpdateControllerRequestDto,
-        @RequestPart(name = "tattoo") TattooCreateControllerRequestDto tattooCreateControllerRequestDto,
-        @RequestPart MultipartFile multipartFile
+        @Nullable @RequestPart(name = "member") MemberUpdateControllerRequestDto memberUpdateControllerRequestDto,
+        @Nullable @RequestPart(name = "tattoo") TattooCreateControllerRequestDto tattooCreateControllerRequestDto,
+        @Nullable @RequestPart(name = "image") MultipartFile multipartFile
     ) throws IOException {
         MemberUpdateServiceRequestDto memberServiceRequestDto =
-            memberDtoMapper.toMemberUpdateServiceRequestDto(memberUpdateControllerRequestDto);
+            memberUpdateControllerRequestDto == null ?
+                null :
+                memberDtoMapper.toMemberUpdateServiceRequestDto(memberUpdateControllerRequestDto);
 
         TattooCreateServiceRequestDto tattooServiceRequestDto =
-            tattooDtoMapper.toTattooCreateServiceRequestDto(tattooCreateControllerRequestDto);
+            tattooCreateControllerRequestDto == null ?
+                null :
+                tattooDtoMapper.toTattooCreateServiceRequestDto(tattooCreateControllerRequestDto);
 
         memberService.update(
             userDetails.getAccount(),
