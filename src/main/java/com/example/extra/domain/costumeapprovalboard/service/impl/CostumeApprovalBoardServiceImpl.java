@@ -42,6 +42,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,11 +53,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardService {
 
     private final CostumeApprovalBoardRepository costumeApprovalBoardRepository;
-    private final JobPostRepository jobPostRepository;
     private final RoleRepository roleRepository;
     private final ApplicationRequestMemberRepository applicationRequestMemberRepository;
     private final ApplicationRequestCompanyRepository applicationRequestCompanyRepository;
-    private final AccountRepository accountRepository;
     private final MemberRepository memberRepository;
     private final CompanyRepository companyRepository;
     private final S3Provider s3Provider;
@@ -71,7 +71,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
         return companyRepository.findByAccount(account)
             .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
     }
-
+    @Transactional(readOnly = true)
     public CostumeApprovalBoardMemberReadServiceResponseDto getCostumeApprovalBoardForMember(
         final Account account,
         final Long roleId
@@ -89,22 +89,26 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     @Transactional(readOnly = true)
     public List<CostumeApprovalBoardCompanyReadServiceResponseDto> getCostumeApprovalBoardForCompany(
         final Account account,
-        final Long jobPostId
+        final Long roleId,
+        final String memberName,
+        final Pageable pageable
     ) {
         // 해당 업체가 올린 공고가 아니면 예외 처리
-        JobPost jobPost = jobPostRepository.findById(jobPostId)
+        Role role = roleRepository.findById(roleId)
             .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
-        if (!Objects.equals(jobPost.getCompany().getId(), jobPostId)) {
+        if (!Objects.equals(role.getJobPost().getCompany().getId(), getCompanyByAccount(account).getId())) {
             throw new CostumeApprovalBoardException(
                 CostumeApprovalBoardErrorCode.NOT_ABLE_TO_ACCESS_COSTUME_APPROVAL_BOARD);
         }
 
-        return jobPost.getRoleList().stream()
-            .map(costumeApprovalBoardRepository::findAllByRole)
-            .filter(Optional::isPresent)
-            .flatMap(costumeApprovalBoardList -> costumeApprovalBoardList.get().stream())
+        Slice<CostumeApprovalBoard> costumeApprovalBoardSlice;
+        costumeApprovalBoardSlice = (memberName != null)
+            ? costumeApprovalBoardRepository.findAllByRoleAndMember_NameContaining(role, memberName, pageable)
+            : costumeApprovalBoardRepository.findAllByRole(role, pageable);
+
+        return costumeApprovalBoardSlice.stream()
             .map(CostumeApprovalBoardCompanyReadServiceResponseDto::from)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @Override
