@@ -8,7 +8,7 @@ import lombok.Builder;
 public record CostumeApprovalBoardCompanyReadServiceResponseDto(
     Long id,
     String member_name,
-    String role_name,
+    String imageUrl,
     ApplyStatus costume_approve
 ) {
 
@@ -16,10 +16,10 @@ public record CostumeApprovalBoardCompanyReadServiceResponseDto(
         CostumeApprovalBoard costumeApprovalBoard) {
         return CostumeApprovalBoardCompanyReadServiceResponseDto
             .builder()
-            .id(costumeApprovalBoard.getId())
-            .member_name(costumeApprovalBoard.getMember().getName())
-            .role_name(costumeApprovalBoard.getRole().getRoleName())
-            .costume_approve(costumeApprovalBoard.getCostumeApprove())
+                .id(costumeApprovalBoard.getId())
+                .member_name(costumeApprovalBoard.getMember().getName())
+                .imageUrl(costumeApprovalBoard.getMember().getAccount().getImageUrl())
+                .costume_approve(costumeApprovalBoard.getCostumeApprove())
             .build();
     }
 }
