@@ -3,7 +3,6 @@ package com.example.extra.global.security.oauth.controller;
 import com.example.extra.global.security.oauth.dto.controller.KakaoLoginControllerRequestDto;
 import com.example.extra.global.security.oauth.dto.service.request.KakaoLoginServiceRequestDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginCheckServiceResponseDto;
-import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoTokenInfoServiceResponseDto;
 import com.example.extra.global.security.oauth.entity.KakaoInfo;
 import com.example.extra.global.security.oauth.service.KakaoServiceImpl;
@@ -73,16 +72,18 @@ public class KakaoController {
 
         // 회원 가입을 한 경우 -> login
         // 회원 가입을 하지 않은 경우 -> signup
-        KakaoLoginServiceResponseDto loginServiceResponseDto = isSignup ?
-            oauthKakaoService.login(loginServiceRequestDto) :
-            oauthKakaoService.signup(loginServiceRequestDto);
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .header(
-                AUTHORIZATION_HEADER,
-                loginServiceResponseDto.accessToken()
-            )
-            .body(tokenInfoServiceResponseDto);
+        if (isSignup) {
+            return ResponseEntity
+                .status(HttpStatus.OK)
+                .header(AUTHORIZATION_HEADER,
+                    oauthKakaoService.login(loginServiceRequestDto).accessToken())
+                .build();
+        } else {
+            return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                    oauthKakaoService.signup(loginServiceRequestDto)
+                );
+        }
     }
 }
