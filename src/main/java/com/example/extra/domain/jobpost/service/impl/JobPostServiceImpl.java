@@ -24,8 +24,11 @@ import com.example.extra.domain.schedule.entity.Schedule;
 import com.example.extra.domain.schedule.exception.NotFoundScheduleException;
 import com.example.extra.domain.schedule.exception.ScheduleErrorCode;
 import com.example.extra.domain.schedule.repository.ScheduleRepository;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -106,6 +109,42 @@ public class JobPostServiceImpl implements JobPostService {
                 .distinct()
             .map(this::readDto)
             .toList();
+    }
+    @Transactional(readOnly = true)
+    public List<JobPostServiceResponseDto> readAllByCalenderJobPosts(int page, int year, int month) {
+        Pageable pageable = PageRequest.of(page, 5);
+        // 특정 연도와 월에 해당하는 Schedule들을 필터링
+        List<Schedule> filteredSchedules = scheduleRepository.findAll(pageable)
+            .stream()
+            .filter(schedule -> {
+                LocalDate date = schedule.getCalender();
+                return date.getYear() == year && date.getMonthValue() == month;
+            })
+            .toList();
+        // 필터링된 Schedule 리스트에서 JobPost 객체들을 추출하여 중복 제거 후 DTO로 변환
+        return filteredSchedules.stream()
+            .map(Schedule::getJobPost) // Schedule에서 JobPost를 추출
+            .distinct() // 중복 제거
+            .map(this::readDto) // DTO로 변환
+            .toList();
+    }
+    @Transactional(readOnly = true)
+    public Map<LocalDate, List<Long>> readJobPostIdsByMonth(int year, int month) {
+        // 해당 연도와 월에 해당하는 LocalDate 범위를 생성
+        LocalDate startOfMonth = LocalDate.of(year, month, 1);
+        LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
+
+        // 특정 월에 해당하는 Schedule들을 필터링하고, 날짜별로 JobPost ID를 매핑
+        return scheduleRepository.findAll() // 페이징이 필요 없으므로 findAll() 사용
+            .stream()
+            .filter(schedule -> {
+                LocalDate date = schedule.getCalender();
+                return !date.isBefore(startOfMonth) && !date.isAfter(endOfMonth); // 해당 월에 속하는 Schedule만 필터링
+            })
+            .collect(Collectors.groupingBy(
+                Schedule::getCalender, // LocalDate를 기준으로 그룹화
+                Collectors.mapping(schedule -> schedule.getJobPost().getId(), Collectors.toList()) // JobPost ID를 리스트로 매핑
+            ));
     }
 
     private JobPostServiceResponseDto readDto(JobPost jobPost) {
