@@ -41,16 +41,15 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build Docker images using Docker Compose
-        run: docker-compose -f compose.yml build
-
-      - name: Push Docker images to ECR
+      - name: Build and tag Docker image
         run: |
-          IMAGE_NAME=${{ steps.login-ecr.outputs.registry }}/extra-server
-          docker tag extra-server:latest $IMAGE_NAME:latest
-          docker push $IMAGE_NAME:latest
+          docker build -t extra-server .
+          docker tag extra-server:latest 992382625968.dkr.ecr.ap-northeast-2.amazonaws.com/extra-server:latest
 
-      - name: Deploy to EC2 via SSH
+      - name: Push Docker image to ECR
+        run: docker push 992382625968.dkr.ecr.ap-northeast-2.amazonaws.com/extra-server:latest
+
+      - name: Deploy to EC2 via SSH and update services
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -58,7 +57,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
-            cd /extra-server
+            cd ~/extra-server
             docker-compose down
-            docker-compose pull
+            docker-compose pull 992382625968.dkr.ecr.ap-northeast-2.amazonaws.com/extra-server:latest
             docker-compose up -d
