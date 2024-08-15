@@ -48,8 +48,9 @@ public interface CostumeApprovalBoardService {
     void updateCostumeApprovalBoardByMember(
         final Long costumeApprovalBoardId,
         final Account account,
-        final CostumeApprovalBoardExplainUpdateServiceRequestDto serviceRequestDto
-    );
+        final CostumeApprovalBoardExplainUpdateServiceRequestDto serviceRequestDto,
+        final MultipartFile multipartFile
+    )throws IOException;
 
     void updateCostumeApprovalBoardByCompany(
         final Account account,

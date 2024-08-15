@@ -4,7 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public record CostumeApprovalBoardExplainUpdateServiceRequestDto(
     String image_explain,
-    MultipartFile multipartFile
-) {
+    Boolean imageChange)
+{
 
 }

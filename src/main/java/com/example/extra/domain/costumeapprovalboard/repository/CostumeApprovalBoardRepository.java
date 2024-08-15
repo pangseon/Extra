@@ -17,4 +17,5 @@ public interface CostumeApprovalBoardRepository extends JpaRepository<CostumeApp
         Member member,
         Role role
     );
+    Optional<CostumeApprovalBoard> findByIdAndMember(Long id,Member member);
 }
