@@ -9,6 +9,7 @@ import com.example.extra.domain.applicationrequest.service.ApplicationRequestMem
 import com.example.extra.global.enums.ApplyStatus;
 import com.example.extra.global.exception.dto.CustomExceptionResponseDto;
 import com.example.extra.global.security.UserDetailsImpl;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public class ApplicationRequestMemberController {
     @GetMapping("/member/roles")
     public ResponseEntity<?> readAllApplicationRequestMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @PageableDefault(size = 10, sort = "createdAt", direction = Direction.DESC) Pageable pageable,
+        @PageableDefault(size = 5, sort = "createdAt", direction = Direction.DESC) @Parameter(hidden = true) Pageable pageable,
         @RequestParam(required = false) Integer year,
         @RequestParam(required = false) Integer month
     ) {
@@ -61,7 +62,7 @@ public class ApplicationRequestMemberController {
     public ResponseEntity<?> readAllApplicationRequestMemberByStatus(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "status") String applyStatusString,
-        @PageableDefault(size = 10, sort = "createdAt", direction = Direction.DESC) Pageable pageable
+        @PageableDefault(size = 5, sort = "createdAt", direction = Direction.DESC) @Parameter(hidden = true) Pageable pageable
     ) {
         ApplyStatus applyStatus = ApplyStatus.fromString(applyStatusString);
         if (applyStatus == null) {
@@ -115,7 +116,7 @@ public class ApplicationRequestMemberController {
     public ResponseEntity<?> readAllApplicationRequestMemberByStatus(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "roleId") Long roleId,
-        @PageableDefault(size = 10, sort = "createdAt", direction = Direction.ASC) Pageable pageable
+        @PageableDefault(size = 5, sort = "createdAt", direction = Direction.DESC) @Parameter(hidden = true) Pageable pageable
     ) {
         List<ApplicationRequestCompanyReadServiceResponseDto> serviceResponseDtoList =
             applicationRequestMemberService.getAppliedMembersByRole(
