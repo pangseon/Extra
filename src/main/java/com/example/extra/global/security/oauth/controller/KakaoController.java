@@ -2,6 +2,7 @@ package com.example.extra.global.security.oauth.controller;
 
 import com.example.extra.global.security.oauth.dto.controller.KakaoLoginControllerRequestDto;
 import com.example.extra.global.security.oauth.dto.service.request.KakaoLoginServiceRequestDto;
+import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginCheckServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoTokenInfoServiceResponseDto;
 import com.example.extra.global.security.oauth.entity.KakaoInfo;
@@ -51,8 +52,12 @@ public class KakaoController {
         String accessToken = tokenInfoServiceResponseDto.accessToken();
 
         KakaoInfo kakaoInfo = null;
+        boolean isSignup = false;
         try {
-            kakaoInfo = oauthKakaoService.getKakaoInfo(accessToken);
+            KakaoLoginCheckServiceResponseDto loginCheckServiceResponseDto =
+                oauthKakaoService.getKakaoInfo(accessToken);
+            kakaoInfo = loginCheckServiceResponseDto.kakaoInfo();
+            isSignup = loginCheckServiceResponseDto.isSignup();
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -66,7 +71,10 @@ public class KakaoController {
             .userRole(controllerRequestDto.userRole())
             .build();
 
-        KakaoLoginServiceResponseDto loginServiceResponseDto =
+        // 회원 가입을 한 경우 -> login
+        // 회원 가입을 하지 않은 경우 -> signup
+        KakaoLoginServiceResponseDto loginServiceResponseDto = isSignup ?
+            oauthKakaoService.login(loginServiceRequestDto) :
             oauthKakaoService.signup(loginServiceRequestDto);
 
         return ResponseEntity
