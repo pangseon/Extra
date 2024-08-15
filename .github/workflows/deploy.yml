@@ -8,50 +8,56 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Github Repository 파일 불러오기
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: JDK 17버전 설치
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: application.yml 파일 만들기
+      - name: Create application.yml file
         run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application-dev.yml
 
-      - name: 테스트 및 빌드하기
+      - name: Build the project
         run: ./gradlew clean build
 
-      - name: AWS Resource에 접근할 수 있게 AWS credentials 설정
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ap-northeast-2
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: ECR에 로그인하기
+
+      - name: Log in to ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Docker 이미지 생성
-        run: docker build -t extra-server .
+      - name: Build and tag Docker image
+        run: |
+          docker build -t extra-server .
+          docker tag extra-server:latest 992382625968.dkr.ecr.ap-northeast-2.amazonaws.com/extra-server:latest
 
-      - name: Docker 이미지에 Tag 붙이기
-        run: docker tag extra-server ${{ steps.login-ecr.outputs.registry }}/extra-server:latest
+      - name: Push Docker image to ECR
+        run: docker push 992382625968.dkr.ecr.ap-northeast-2.amazonaws.com/extra-server:latest
 
-      - name: ECR에 Docker 이미지 Push하기
-        run: docker push ${{ steps.login-ecr.outputs.registry }}/extra-server:latest
-
-      - name: SSH로 EC2에 접속하기
+      - name: Deploy to EC2 via SSH and update services
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script_stop: true
-          script: |
-            docker stop extra-server || true
-            docker rm extra-server || true
-            docker pull ${{ steps.login-ecr.outputs.registry }}/extra-server:latest
-            docker run -d --name extra-server -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/extra-server:latest
+            host: ${{ secrets.EC2_HOST }}
+            username: ${{ secrets.EC2_USERNAME }}
+            key: ${{ secrets.EC2_PRIVATE_KEY }}
+            script_stop: true
+            script: |
+              cd ~/extra-server
+              docker-compose down
+              docker-compose pull
+              docker-compose up -d
