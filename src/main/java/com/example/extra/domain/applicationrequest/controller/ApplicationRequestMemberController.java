@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -39,11 +40,15 @@ public class ApplicationRequestMemberController {
     @GetMapping("/member/roles")
     public ResponseEntity<?> readAllApplicationRequestMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @PageableDefault(size = 10, sort = "createdAt", direction = Direction.DESC) Pageable pageable
+        @PageableDefault(size = 10, sort = "createdAt", direction = Direction.DESC) Pageable pageable,
+        @RequestParam(required = false) Integer year,
+        @RequestParam(required = false) Integer month
     ) {
         List<ApplicationRequestMemberReadServiceResponseDto> serviceResponseDtoList =
             applicationRequestMemberService.getAppliedRoles(
                 userDetails.getAccount(),
+                year,
+                month,
                 pageable
             );
 
