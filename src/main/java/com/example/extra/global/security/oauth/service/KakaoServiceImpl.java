@@ -8,6 +8,7 @@ import com.example.extra.domain.refreshtoken.repository.RefreshTokenRepository;
 import com.example.extra.domain.refreshtoken.token.RefreshToken;
 import com.example.extra.global.security.JwtUtil;
 import com.example.extra.global.security.oauth.dto.service.request.KakaoLoginServiceRequestDto;
+import com.example.extra.global.security.oauth.dto.service.response.KakaoAuthServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginCheckServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoSignupServiceResponseDto;
@@ -47,13 +48,13 @@ public class KakaoServiceImpl {
     @Value("${kakao.redirect.uri}")
     String redirectUri;
 
-    public String authorize() {
+    public KakaoAuthServiceResponseDto authorize() {
         String url = "https://kauth.kakao.com/oauth/authorize" +
             "?response_type=code" +
             "&client_id=" + clientId +
             "&redirect_uri=" + redirectUri;
 
-        return "redirect:" + url;
+        return new KakaoAuthServiceResponseDto(url);
     }
 
     public KakaoTokenInfoServiceResponseDto getToken(String code) throws JsonProcessingException {
