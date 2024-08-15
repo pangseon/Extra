@@ -42,7 +42,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build Docker images using Docker Compose
-        run: docker-compose -f docker-compose.yml build
+        run: docker-compose -f compose.yml build
 
       - name: Push Docker images to ECR
         run: |
@@ -58,7 +58,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
-            cd /path/to/docker-compose-directory
+            cd /extra-server
             docker-compose down
             docker-compose pull
             docker-compose up -d
