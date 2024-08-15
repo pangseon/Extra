@@ -10,6 +10,7 @@ import com.example.extra.global.security.JwtUtil;
 import com.example.extra.global.security.oauth.dto.service.request.KakaoLoginServiceRequestDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginCheckServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginServiceResponseDto;
+import com.example.extra.global.security.oauth.dto.service.response.KakaoSignupServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoTokenInfoServiceResponseDto;
 import com.example.extra.global.security.oauth.entity.KakaoInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -152,7 +153,7 @@ public class KakaoServiceImpl {
     }
 
     @Transactional
-    public KakaoLoginServiceResponseDto signup(
+    public KakaoSignupServiceResponseDto signup(
         final KakaoLoginServiceRequestDto serviceRequestDto
     ) {
         String password = passwordEncoder.encode(
@@ -160,32 +161,13 @@ public class KakaoServiceImpl {
                 .toString()
                 .replace("-", ""));
 
-        Account account = Account.builder()
+        Account account = accountRepository.save(Account.builder()
             .email(serviceRequestDto.email())
             .password(password)
             .userRole(serviceRequestDto.userRole())
-            .build();
+            .build());
 
-        // jwt 토큰 생성
-        String accessToken = jwtUtil.createToken(
-            account.getEmail(),
-            account.getUserRole()
-        );
-        String refreshToken = jwtUtil.createRefreshToken();
-        log.info("access token: " + accessToken);
-        log.info("refresh token: " + refreshToken);
-
-        account.updateRefreshToken(jwtUtil.substringToken(refreshToken));
-
-        accountRepository.save(account);
-        refreshTokenRepository.save(
-            new RefreshToken(
-                account.getId().toString(),
-                jwtUtil.substringToken(refreshToken)
-            )
-        );
-
-        return new KakaoLoginServiceResponseDto(accessToken);
+        return new KakaoSignupServiceResponseDto(account.getId());
     }
 
     @Transactional
