@@ -1,11 +1,10 @@
 package com.example.extra.domain.member.service.impl;
 
-import com.example.extra.domain.company.exception.CompanyErrorCode;
-import com.example.extra.domain.company.exception.CompanyException;
-import com.example.extra.domain.company.repository.CompanyRepository;
+import com.example.extra.domain.account.entity.Account;
+import com.example.extra.domain.account.exception.AccountErrorCode;
+import com.example.extra.domain.account.exception.AccountException;
+import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
-import com.example.extra.domain.member.dto.service.request.MemberLoginServiceRequestDto;
-import com.example.extra.domain.member.dto.service.response.MemberLoginServiceResponseDto;
 import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.exception.MemberErrorCode;
@@ -15,18 +14,11 @@ import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.member.service.MemberService;
 import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import com.example.extra.domain.tattoo.entity.Tattoo;
-import com.example.extra.domain.tattoo.mapper.entity.TattooEntityMapper;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
-import com.example.extra.global.security.JwtUtil;
 import com.example.extra.global.security.UserDetailsImpl;
-import com.example.extra.global.security.repository.RefreshTokenRepository;
-import com.example.extra.global.security.token.RefreshToken;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,18 +29,10 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final TattooRepository tattooRepository;
-    private final CompanyRepository companyRepository;
+    private final AccountRepository accountRepository;
 
     // mapper
     private final MemberEntityMapper memberEntityMapper;
-    private final TattooEntityMapper tattooEntityMapper;
-
-    // security
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
-    private final RefreshTokenRepository refreshTokenRepository;
-
-    private final String ADMIN_TOKEN = "admintoken";
 
     @Override
     @Transactional
@@ -56,84 +40,25 @@ public class MemberServiceImpl implements MemberService {
         final MemberCreateServiceRequestDto memberCreateServiceRequestDto,
         final TattooCreateServiceRequestDto tattooCreateServiceRequestDto
     ) {
-        // 이메일 중복 검사
-        String email = memberCreateServiceRequestDto.email();
-        memberRepository.findByEmail(email)
-            .ifPresent(m -> {
-                throw new MemberException(MemberErrorCode.ALREADY_EXIST_MEMBER);
-            });
-        companyRepository.findByEmail(email)
-            .ifPresent(m -> {
-                throw new CompanyException(CompanyErrorCode.ALREADY_EXIST_EMAIL);
+        Account account = accountRepository.findById(memberCreateServiceRequestDto.accountId())
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
+
+        // 이미 회원 가입한 계정
+        memberRepository.findByAccount(account)
+            .ifPresent(a -> {
+                throw new AccountException(AccountErrorCode.DUPLICATION_ACCOUNT);
             });
 
-        Member member = memberEntityMapper.toMember(memberCreateServiceRequestDto);
-        Tattoo tattoo = tattooEntityMapper.toTattoo(tattooCreateServiceRequestDto, member);
+        // Account 권한이 개인 회원자가 아닌 경우 -> throw error
+        if (!account.getUserRole().getAuthority().equals("ROLE_USER")) {
+            throw new AccountException(AccountErrorCode.INVALID_ROLE_USER);
+        }
 
-        tattooRepository.save(tattoo);
+        Member member = memberEntityMapper.toMember(memberCreateServiceRequestDto, account);
+        Tattoo tattoo = tattooRepository.findByTattooCreateServiceRequestDto(tattooCreateServiceRequestDto)
+            .orElseThrow(()-> new MemberException(MemberErrorCode.NOT_FOUND_TATTOO));
 
         member.updateTattoo(tattoo);
-        member.encodePassword(passwordEncoder.encode(member.getPassword()));
-
-        // role 변경 (ROLE_USER -> ROLE_ADMIN)
-        if (memberCreateServiceRequestDto.isAdmin()) {
-            if (!ADMIN_TOKEN.equals(memberCreateServiceRequestDto.adminToken())) {
-                throw new IllegalArgumentException("관리자 암호 아님");
-            }
-            member.updateRole();
-        }
-
-        memberRepository.save(member);
-    }
-
-    @Override
-    @Transactional
-    public MemberLoginServiceResponseDto login(
-        final MemberLoginServiceRequestDto memberLoginServiceRequestDto
-    ) {
-        Member member = findByEmail(memberLoginServiceRequestDto.email());
-
-        if (!passwordEncoder.matches(
-            memberLoginServiceRequestDto.password(),
-            member.getPassword()
-        )) {
-            throw new MemberException(MemberErrorCode.INVALID_PASSWORD);
-        }
-
-        // jwt 토큰 생성
-        String accessToken = jwtUtil.createToken(
-            member.getEmail(),
-            member.getUserRole()
-        );
-        String refreshToken = jwtUtil.createRefreshToken();
-        log.info("access token: " + accessToken);
-        log.info("refresh token: " + refreshToken);
-
-        member.updateRefreshToken(jwtUtil.substringToken(refreshToken));
-
-        refreshTokenRepository.save(
-            new RefreshToken(
-                member.tokenId(),
-                jwtUtil.substringToken(refreshToken)
-            )
-        );
-
-        return new MemberLoginServiceResponseDto(accessToken);
-    }
-
-    @Override
-    @Transactional
-    public void logout(
-        final UserDetailsImpl userDetails,
-        final HttpServletRequest request
-    ) throws ServletException, IOException {
-        Member member = userDetails.getMember();
-
-        RefreshToken refreshToken = refreshTokenRepository.findById(member.tokenId())
-            .orElseThrow(() -> new MemberException(MemberErrorCode.UNAUTHORIZED));
-        refreshTokenRepository.delete(refreshToken);
-
-        member.deleteRefreshToken();
         memberRepository.save(member);
     }
 
@@ -143,7 +68,7 @@ public class MemberServiceImpl implements MemberService {
         final UserDetailsImpl userDetails,
         final HttpServletRequest request
     ) {
-        Member member = findByEmail(userDetails.getUsername());
+        Member member = findById(userDetails.getAccount().getId());
         Tattoo tattoo = member.getTattoo();
         return MemberReadServiceResponseDto.builder()
             .name(member.getName())
@@ -163,7 +88,6 @@ public class MemberServiceImpl implements MemberService {
             .back(tattoo.getBack())
             .hand(tattoo.getHand())
             .feet(tattoo.getFeet())
-            .etc(tattoo.getEtc())
             .build();
     }
 
@@ -173,12 +97,12 @@ public class MemberServiceImpl implements MemberService {
         final UserDetailsImpl userDetails,
         final HttpServletRequest request
     ) {
-        Member member = findByEmail(userDetails.getUsername());
+        Member member = findById(userDetails.getAccount().getId());
         memberRepository.delete(member);
     }
 
-    private Member findByEmail(String email) {
-        return memberRepository.findByEmail(email)
+    private Member findById(Long id) {
+        return memberRepository.findById(id)
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
     }
 

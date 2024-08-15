@@ -1,13 +1,9 @@
 package com.example.extra.global.security.service;
 
-import com.example.extra.domain.company.entity.Company;
-import com.example.extra.domain.company.exception.CompanyErrorCode;
-import com.example.extra.domain.company.exception.CompanyException;
-import com.example.extra.domain.company.repository.CompanyRepository;
-import com.example.extra.domain.member.entity.Member;
-import com.example.extra.domain.member.exception.MemberErrorCode;
-import com.example.extra.domain.member.exception.MemberException;
-import com.example.extra.domain.member.repository.MemberRepository;
+import com.example.extra.domain.account.entity.Account;
+import com.example.extra.domain.account.exception.AccountErrorCode;
+import com.example.extra.domain.account.exception.AccountException;
+import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.global.security.JwtUtil;
 import com.example.extra.global.security.exception.TokenErrorCode;
 import com.example.extra.global.security.exception.TokenException;
@@ -28,67 +24,34 @@ public class RefreshTokenService {
 
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final MemberRepository memberRepository;
-    private final CompanyRepository companyRepository;
+    private final AccountRepository accountRepository;
 
-    public void getMemberNewAccessToken(
+    public void getNewAccessToken(
         final HttpServletRequest httpServletRequest,
         final HttpServletResponse httpServletResponse
     ) {
         String token = httpServletRequest.getHeader("Authorization");
         log.info(token);
-        Member member = memberRepository.findByRefreshToken(jwtUtil.substringToken(token))
-            .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
+        Account account = accountRepository.findByRefreshToken(jwtUtil.substringToken(token))
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
 
-        RefreshToken refreshToken = refreshTokenRepository.findById(member.tokenId())
+        RefreshToken refreshToken = refreshTokenRepository.findById(account.getId().toString())
             .orElseThrow(() -> new TokenException(TokenErrorCode.NOT_FOUND_TOKEN));
 
         // redis refresh token == rdb refresh token
-        if (refreshToken.getRefreshToken().equals(member.getRefreshToken())) {
-            String newAccessToken = jwtUtil.createToken(member.getEmail(), member.getUserRole());
+        if (refreshToken.getRefreshToken().equals(account.getRefreshToken())) {
+            String newAccessToken = jwtUtil.createToken(account.getEmail(), account.getUserRole());
             String newRefreshToken = jwtUtil.createRefreshToken();
 
             refreshTokenRepository.delete(refreshToken);
             refreshTokenRepository.save(
                 new RefreshToken(
-                    member.tokenId(),
+                    account.getId().toString(),
                     jwtUtil.substringToken(newRefreshToken)
                 )
             );
 
-            member.updateRefreshToken(jwtUtil.substringToken(newRefreshToken));
-            jwtUtil.addTokenHeader(newAccessToken, httpServletResponse);
-        } else {
-            throw new TokenException(TokenErrorCode.INVALID_TOKEN);
-        }
-    }
-
-    public void getCompanyNewAccessToken(
-        final HttpServletRequest httpServletRequest,
-        final HttpServletResponse httpServletResponse
-    ) {
-        String token = httpServletRequest.getHeader("Authorization");
-        log.info(token);
-        Company company = companyRepository.findByRefreshToken(jwtUtil.substringToken(token))
-            .orElseThrow(() -> new CompanyException(CompanyErrorCode.NOT_FOUND_COMPANY));
-
-        RefreshToken refreshToken = refreshTokenRepository.findById(company.tokenId())
-            .orElseThrow(() -> new TokenException(TokenErrorCode.NOT_FOUND_TOKEN));
-
-        // redis refresh token == rdb refresh token
-        if (refreshToken.getRefreshToken().equals(company.getRefreshToken())) {
-            String newAccessToken = jwtUtil.createToken(company.getEmail(), company.getUserRole());
-            String newRefreshToken = jwtUtil.createRefreshToken();
-
-            refreshTokenRepository.delete(refreshToken);
-            refreshTokenRepository.save(
-                new RefreshToken(
-                    company.tokenId(),
-                    jwtUtil.substringToken(newRefreshToken)
-                )
-            );
-
-            company.updateRefreshToken(jwtUtil.substringToken(newRefreshToken));
+            account.updateRefreshToken(jwtUtil.substringToken(newRefreshToken));
             jwtUtil.addTokenHeader(newAccessToken, httpServletResponse);
         } else {
             throw new TokenException(TokenErrorCode.INVALID_TOKEN);

@@ -1,21 +1,18 @@
 package com.example.extra.domain.company.service.impl;
 
+import com.example.extra.domain.account.entity.Account;
+import com.example.extra.domain.account.exception.AccountErrorCode;
+import com.example.extra.domain.account.exception.AccountException;
+import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.domain.company.dto.service.request.CompanyCreateServiceRequestDto;
-import com.example.extra.domain.company.dto.service.request.CompanyLoginServiceRequestDto;
-import com.example.extra.domain.company.dto.service.response.CompanyLoginServiceResponseDto;
 import com.example.extra.domain.company.dto.service.response.CompanyReadOnceServiceResponseDto;
 import com.example.extra.domain.company.entity.Company;
-import com.example.extra.domain.company.exception.CompanyErrorCode;
-import com.example.extra.domain.company.exception.CompanyException;
 import com.example.extra.domain.company.mapper.entity.CompanyEntityMapper;
 import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.company.service.CompanyService;
-import com.example.extra.domain.member.exception.MemberErrorCode;
-import com.example.extra.domain.member.exception.MemberException;
-import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.global.security.JwtUtil;
+import com.example.extra.global.security.UserDetailsImpl;
 import com.example.extra.global.security.repository.RefreshTokenRepository;
-import com.example.extra.global.security.token.RefreshToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
-    private final MemberRepository memberRepository;
+    private final AccountRepository accountRepository;
 
     // mapper
     private final CompanyEntityMapper companyEntityMapper;
@@ -43,91 +40,36 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional
     public void signup(
-        final CompanyCreateServiceRequestDto companyCreateServiceRequestDto
+        final CompanyCreateServiceRequestDto serviceRequestDto
     ) {
-        // 이메일 중복 검사
-        String email = companyCreateServiceRequestDto.email();
-        companyRepository.findByEmail(email)
-            .ifPresent(c -> {
-                throw new CompanyException(CompanyErrorCode.ALREADY_EXIST_EMAIL);
-            });
-        memberRepository.findByEmail(email)
-            .ifPresent(m -> {
-                throw new MemberException(MemberErrorCode.ALREADY_EXIST_MEMBER);
+        Account account = accountRepository.findById(serviceRequestDto.accountId())
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
+
+        // 이미 회원 가입한 계정
+        companyRepository.findByAccount(account)
+            .ifPresent(a -> {
+                throw new AccountException(AccountErrorCode.DUPLICATION_ACCOUNT);
             });
 
-        Company company = companyEntityMapper.toCompany(companyCreateServiceRequestDto);
-        company.encodePassword(passwordEncoder.encode(company.getPassword()));
-        companyRepository.save(company);
-
-        // role 변경 (ROLE_USER -> ROLE_ADMIN)
-        if (companyCreateServiceRequestDto.isAdmin()) {
-            if (!ADMIN_TOKEN.equals(companyCreateServiceRequestDto.adminToken())) {
-                throw new IllegalArgumentException("관리자 암호 아님");
-            }
-            company.updateRole();
-            companyRepository.save(company);
-        }
-    }
-
-    @Override
-    @Transactional
-    public CompanyLoginServiceResponseDto login(
-        final CompanyLoginServiceRequestDto companyLoginServiceRequestDto
-    ) {
-        Company company = findByEmail(companyLoginServiceRequestDto.email());
-
-        if (!passwordEncoder.matches(
-            companyLoginServiceRequestDto.password(),
-            company.getPassword()
-        )) {
-            throw new CompanyException(CompanyErrorCode.INVALID_PASSWORD);
+        // Account 권한이 업체가 아닌 경우 -> throw error
+        if (!account.getUserRole().getAuthority().equals("ROLE_COMPANY")) {
+            throw new AccountException(AccountErrorCode.INVALID_ROLE_COMPANY);
         }
 
-        // jwt 토큰 생성
-        String accessToken = jwtUtil.createToken(
-            company.getEmail(),
-            company.getUserRole()
+        Company company = companyEntityMapper.toCompany(
+            serviceRequestDto,
+            account
         );
-        String refreshToken = jwtUtil.createRefreshToken();
-        log.info("access token: " + accessToken);
-        log.info("refresh token: " + refreshToken);
-
-        company.updateRefreshToken(jwtUtil.substringToken(refreshToken));
-
-        refreshTokenRepository.save(
-            new RefreshToken(
-                company.tokenId(),
-                jwtUtil.substringToken(refreshToken)
-            )
-        );
-
-        return new CompanyLoginServiceResponseDto(accessToken);
-    }
-
-    @Override
-    @Transactional
-    public void logout(
-        final Company company
-    ) {
-        RefreshToken refreshToken = refreshTokenRepository.findById(company.tokenId())
-            .orElseThrow(() -> new CompanyException(CompanyErrorCode.FORBIDDEN));
-        refreshTokenRepository.delete(refreshToken);
-
-        company.deleteRefreshToken();
         companyRepository.save(company);
     }
 
     @Override
     @Transactional(readOnly = true)
     public CompanyReadOnceServiceResponseDto readOnceCompany(
-        Company company
+        UserDetailsImpl userDetails
     ) {
+        Company company = companyRepository.findByAccount(userDetails.getAccount())
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
         return companyEntityMapper.toCompanyReadOnceServiceResponseDto(company);
-    }
-
-    private Company findByEmail(String email) {
-        return companyRepository.findByEmail(email)
-            .orElseThrow(() -> new CompanyException(CompanyErrorCode.NOT_FOUND_COMPANY));
     }
 }

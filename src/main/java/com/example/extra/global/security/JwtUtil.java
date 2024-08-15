@@ -1,9 +1,7 @@
 package com.example.extra.global.security;
 
-import com.example.extra.domain.company.entity.Company;
-import com.example.extra.domain.company.repository.CompanyRepository;
-import com.example.extra.domain.member.entity.Member;
-import com.example.extra.domain.member.repository.MemberRepository;
+import com.example.extra.domain.account.entity.Account;
+import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.global.enums.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -44,8 +42,7 @@ public class JwtUtil {
     private Key key;
 
     // repository
-    private final MemberRepository memberRepository;
-    private final CompanyRepository companyRepository;
+    private final AccountRepository accountRepository;
 
     @PostConstruct
     protected void init() {
@@ -127,12 +124,9 @@ public class JwtUtil {
         try {
             Claims info = getUserInfoFromToken(token);
             log.info(info.toString());
-            Member member = memberRepository.findByEmail(info.getSubject()).orElse(null);
-            Company company = companyRepository.findByEmail(info.getSubject()).orElse(null);
+            Account account = accountRepository.findByEmail(info.getSubject()).orElse(null);
 
-            if ((member != null && member.getRefreshToken() != null) ||
-                (company != null && company.getRefreshToken() != null)
-            ) {
+            if (account != null && account.getRefreshToken() != null) {
                 // access token 유효/만료 확인
                 return !isExpired(token);
             }

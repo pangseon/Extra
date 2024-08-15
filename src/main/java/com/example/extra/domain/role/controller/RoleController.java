@@ -38,7 +38,7 @@ public class RoleController {
     ) {
         RoleCreateServiceRequestDto serviceRequestDto =
             roleDtoMapper.toRoleCreateServiceDto(controllerRequestDto);
-        roleService.createRole(jobPostId, userDetails.getCompany(), serviceRequestDto);
+        roleService.createRole(jobPostId, userDetails.getAccount(), serviceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -51,7 +51,7 @@ public class RoleController {
     ) {
         RoleUpdateServiceRequestDto serviceRequestDto =
             roleDtoMapper.toRoleUpdateServiceDto(controllerRequestDto);
-        roleService.updateRole(jobPostId, roleId, userDetails.getCompany(),
+        roleService.updateRole(jobPostId, roleId, userDetails.getAccount(),
             serviceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -62,7 +62,7 @@ public class RoleController {
         @PathVariable(name = "role_id") Long roleId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        roleService.deleteRole(jobPostId, roleId, userDetails.getCompany());
+        roleService.deleteRole(jobPostId, roleId, userDetails.getAccount());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

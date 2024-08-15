@@ -13,6 +13,5 @@ import org.mapstruct.Mapper;
 public interface RoleEntityMapper {
 
     Role toRole(RoleCreateServiceRequestDto roleCreateServiceRequestDto, JobPost jobPost);
-    RoleServiceResponseDto toRoleServiceResponseDto(Role role);
-    List<RoleServiceResponseDto> toListRoleServiceResponseDto(List<Role> roleList);
+    RoleServiceResponseDto toRoleServiceResponseDto(Role role,Integer min_Age,Integer max_Age);
 }

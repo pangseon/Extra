@@ -28,7 +28,7 @@ public interface ApplicationRequestEntityMapper {
         // 공고글의 정보
         Category category = jobPost.getCategory();
         String title = jobPost.getTitle();
-        LocalDateTime gatheringTime = jobPost.getGatheringTime();
+        String  gatheringTime = jobPost.getGatheringTime();
         String gatheringLocation = jobPost.getGatheringLocation();
 
         // 업체의 정보

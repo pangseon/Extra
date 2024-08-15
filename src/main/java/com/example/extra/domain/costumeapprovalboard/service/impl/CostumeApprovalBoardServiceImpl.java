@@ -1,5 +1,9 @@
 package com.example.extra.domain.costumeapprovalboard.service.impl;
 
+import com.example.extra.domain.account.entity.Account;
+import com.example.extra.domain.account.exception.AccountErrorCode;
+import com.example.extra.domain.account.exception.AccountException;
+import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.domain.applicationrequest.entity.ApplicationRequestCompany;
 import com.example.extra.domain.applicationrequest.entity.ApplicationRequestMember;
 import com.example.extra.domain.applicationrequest.exception.ApplicationRequestErrorCode;
@@ -7,6 +11,7 @@ import com.example.extra.domain.applicationrequest.exception.ApplicationRequestE
 import com.example.extra.domain.applicationrequest.repository.ApplicationRequestCompanyRepository;
 import com.example.extra.domain.applicationrequest.repository.ApplicationRequestMemberRepository;
 import com.example.extra.domain.company.entity.Company;
+import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardApplyStatusUpdateServiceRequestDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadServiceResponseDto;
@@ -23,6 +28,7 @@ import com.example.extra.domain.jobpost.exception.JobPostErrorCode;
 import com.example.extra.domain.jobpost.exception.NotFoundJobPostException;
 import com.example.extra.domain.jobpost.repository.JobPostRepository;
 import com.example.extra.domain.member.entity.Member;
+import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.role.entity.Role;
 import com.example.extra.domain.role.exception.NotFoundRoleException;
 import com.example.extra.domain.role.exception.RoleErrorCode;
@@ -49,16 +55,28 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     private final RoleRepository roleRepository;
     private final ApplicationRequestMemberRepository applicationRequestMemberRepository;
     private final ApplicationRequestCompanyRepository applicationRequestCompanyRepository;
+    private final AccountRepository accountRepository;
+    private final MemberRepository memberRepository;
+    private final CompanyRepository companyRepository;
     private final S3Provider s3Provider;
     private final String s3url = "https://light-house-ai.s3.ap-northeast-2.amazonaws.com/";
     private final String SEPARATOR = "/";
 
+    private Member getMemberByAccount(final Account account) {
+        return memberRepository.findByAccount(account)
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
+    }
 
+    private Company getCompanyByAccount(final Account account) {
+        return companyRepository.findByAccount(account)
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
+    }
 
     public CostumeApprovalBoardMemberReadServiceResponseDto getCostumeApprovalBoardForMember(
-        Member member,
-        Long roleId
+        final Account account,
+        final Long roleId
     ) {
+        Member member = getMemberByAccount(account);
         CostumeApprovalBoard costumeApprovalBoard = costumeApprovalBoardRepository.findByMemberAndRoleId(
                 member, roleId)
             .orElseThrow(() -> new CostumeApprovalBoardException(
@@ -70,7 +88,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     @Override
     @Transactional(readOnly = true)
     public List<CostumeApprovalBoardCompanyReadServiceResponseDto> getCostumeApprovalBoardForCompany(
-        final Company company,
+        final Account account,
         final Long jobPostId
     ) {
         // 해당 업체가 올린 공고가 아니면 예외 처리
@@ -92,7 +110,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     @Override
     @Transactional(readOnly = true)
     public CostumeApprovalBoardCompanyReadDetailServiceResponseDto getCostumeApprovalBoardDetailForCompany(
-        final Company company,
+        final Account account,
         final Long costumeApprovalBoardId
     ) {
         CostumeApprovalBoard costumeApprovalBoard = costumeApprovalBoardRepository.findById(
@@ -101,7 +119,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
                 CostumeApprovalBoardErrorCode.NOT_FOUND_COSTUME_APPROVAL_BOARD)
             );
         if (!Objects.equals(costumeApprovalBoard.getRole().getJobPost().getCompany().getId(),
-            company.getId())) {
+            getCompanyByAccount(account).getId())) {
             throw new CostumeApprovalBoardException(
                 CostumeApprovalBoardErrorCode.NOT_ABLE_TO_READ_COSTUME_APPROVAL_BOARD);
         }
@@ -111,7 +129,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     @Override
     @Transactional
     public void deleteCostumeApprovalBoardByMember(
-        Member member,
+        final Account account,
         Long costumeApprovalBoardId
     ) {
         CostumeApprovalBoard costumeApprovalBoard = costumeApprovalBoardRepository.findById(
@@ -119,7 +137,8 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             .orElseThrow(() -> new CostumeApprovalBoardException(
                 CostumeApprovalBoardErrorCode.NOT_FOUND_COSTUME_APPROVAL_BOARD)
             );
-        if (!Objects.equals(costumeApprovalBoard.getMember().getId(), member.getId())) {
+        if (!Objects.equals(costumeApprovalBoard.getMember().getId(),
+            getMemberByAccount(account).getId())) {
             throw new CostumeApprovalBoardException(
                 CostumeApprovalBoardErrorCode.NOT_ABLE_TO_DELETE_COSTUME_APPROVAL_BOARD);
         }
@@ -129,7 +148,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     @Override
     @Transactional
     public void deleteCostumeApprovalBoardByCompany(
-        final Company company,
+        final Account account,
         final Long costumeApprovalBoardId
     ) {
         CostumeApprovalBoard costumeApprovalBoard = costumeApprovalBoardRepository.findById(
@@ -138,7 +157,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
                 CostumeApprovalBoardErrorCode.NOT_FOUND_COSTUME_APPROVAL_BOARD)
             );
         if (!Objects.equals(costumeApprovalBoard.getRole().getJobPost().getCompany().getId(),
-            company.getId())) {
+            getCompanyByAccount(account).getId())) {
             throw new CostumeApprovalBoardException(
                 CostumeApprovalBoardErrorCode.NOT_ABLE_TO_DELETE_COSTUME_APPROVAL_BOARD);
         }
@@ -149,10 +168,11 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     @Transactional
     public void createCostumeApprovalBoard(
         Long roleId,
-        Member member,
+        final Account account,
         CostumeApprovalBoardCreateServiceDto costumeApprovalBoardCreateServiceDto,
         MultipartFile multipartFile
-    )throws IOException {
+    ) throws IOException {
+        Member member = getMemberByAccount(account);
         Role role = roleRepository.findById(roleId)
             .orElseThrow(() -> new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
         // 이미 의상 승인 글을 작성한 경우
@@ -176,7 +196,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
         }
         String fileName;
         String fileUrl;
-        String folderName = member.getName()+ UUID.randomUUID();
+        String folderName = member.getName() + UUID.randomUUID();
 
         // 이미지 저장 후 경로 가져오기 (메서드 추출, 추후 작성)
         fileName = s3Provider.originalFileName(multipartFile);
@@ -191,16 +211,17 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             .build();
         costumeApprovalBoardRepository.save(costumeApprovalBoard);
         fileUrl = folderName + SEPARATOR + fileName;
-        s3Provider.saveFile(multipartFile,fileUrl);
+        s3Provider.saveFile(multipartFile, fileUrl);
     }
 
     @Override
     @Transactional
     public void updateCostumeApprovalBoardByMember(
         final Long costumeApprovalBoardId,
-        final Member member,
+        final Account account,
         final CostumeApprovalBoardExplainUpdateServiceRequestDto serviceRequestDto
     ) {
+        Member member = getMemberByAccount(account);
         CostumeApprovalBoard costumeApprovalBoard =
             costumeApprovalBoardRepository.findById(costumeApprovalBoardId)
                 .orElseThrow(() -> new CostumeApprovalBoardException(
@@ -232,10 +253,11 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     @Override
     @Transactional
     public void updateCostumeApprovalBoardByCompany(
-        Company company,
+        final Account account,
         Long costumeApprovalBoardId,
         CostumeApprovalBoardApplyStatusUpdateServiceRequestDto serviceRequestDto
     ) {
+        Company company = getCompanyByAccount(account);
         // costume approval board가 있는지 확인
         CostumeApprovalBoard costumeApprovalBoard = costumeApprovalBoardRepository.findById(
                 costumeApprovalBoardId).

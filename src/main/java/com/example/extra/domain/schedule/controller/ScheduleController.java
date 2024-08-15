@@ -38,7 +38,7 @@ public class ScheduleController {
     ) {
         ScheduleCreateServiceRequestDto serviceRequestDto =
             scheduleDtoMapper.toScheduleCreateServiceDto(controllerRequestDto);
-        scheduleService.createSchedule(jobPostId, userDetails.getCompany(),
+        scheduleService.createSchedule(jobPostId, userDetails.getAccount(),
             serviceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -52,7 +52,7 @@ public class ScheduleController {
     ) {
         ScheduleUpdateServiceRequestDto serviceRequestDto =
             scheduleDtoMapper.toScheduleUpdateServiceDto(controllerRequestDto);
-        scheduleService.updateSchedule(jobPostId, scheduleId, userDetails.getCompany(),
+        scheduleService.updateSchedule(jobPostId, scheduleId, userDetails.getAccount(),
             serviceRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -63,7 +63,7 @@ public class ScheduleController {
         @PathVariable(name = "schedule_id") Long scheduleId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        scheduleService.deleteSchedule(jobPostId, scheduleId, userDetails.getCompany());
+        scheduleService.deleteSchedule(jobPostId, scheduleId, userDetails.getAccount());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

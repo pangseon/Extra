@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 public record JobPostCreateControllerRequestDto(
     String title,
     String gatheringLocation,
-    LocalDateTime gatheringTime,
+    String gatheringTime,
     String imageUrl,
     Boolean status,
     Integer hourPay,

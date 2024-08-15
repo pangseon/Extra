@@ -16,7 +16,9 @@ public enum MemberErrorCode implements ErrorCode {
     UNAUTHORIZED(HttpStatus.FORBIDDEN, "토큰이 없습니다."),
 
     // 404
-    NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다.");
+    NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."),
+    NOT_FOUND_TATTOO(HttpStatus.NOT_FOUND, "tattoo를 찾을 수 없습니다.")
+    ;
 
     private final HttpStatus status;
     private final String message;

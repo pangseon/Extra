@@ -1,21 +1,16 @@
 package com.example.extra.domain.member.controller;
 
-import com.example.extra.domain.member.dto.controller.MemberLoginControllerRequestDto;
 import com.example.extra.domain.member.dto.controller.MemberSignUpControllerRequestDto;
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
-import com.example.extra.domain.member.dto.service.request.MemberLoginServiceRequestDto;
-import com.example.extra.domain.member.dto.service.response.MemberLoginServiceResponseDto;
 import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.member.mapper.dto.MemberDtoMapper;
 import com.example.extra.domain.member.service.MemberService;
 import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import com.example.extra.domain.tattoo.mapper.dto.TattooDtoMapper;
 import com.example.extra.global.security.UserDetailsImpl;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,34 +49,6 @@ public class MemberController {
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(
-        @Valid @RequestBody MemberLoginControllerRequestDto controllerRequestDto
-    ) {
-        MemberLoginServiceRequestDto serviceRequestDto =
-            memberDtoMapper.toMemberLoginServiceRequestDto(controllerRequestDto);
-
-        MemberLoginServiceResponseDto serviceResponseDto =
-            memberService.login(serviceRequestDto);
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .header(
-                AUTHORIZATION_HEADER,
-                serviceResponseDto.token()
-            )
-            .build();
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(
-        @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @NotNull HttpServletRequest request
-    ) throws ServletException, IOException {
-        memberService.logout(userDetails, request);
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("")

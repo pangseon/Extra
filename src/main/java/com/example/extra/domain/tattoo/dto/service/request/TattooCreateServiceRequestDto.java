@@ -8,8 +8,7 @@ public record TattooCreateServiceRequestDto(
     Boolean shoulder,
     Boolean back,
     Boolean hand,
-    Boolean feet,
-    String etc
+    Boolean feet
 ) {
 
 }
