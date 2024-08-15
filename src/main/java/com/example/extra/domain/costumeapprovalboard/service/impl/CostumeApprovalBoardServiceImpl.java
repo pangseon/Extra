@@ -208,6 +208,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             .member(member)
             .role(role)
             .imageExplain(costumeApprovalBoardCreateServiceDto.image_explain())
+            .folderName(folderName)
             .build();
         costumeApprovalBoardRepository.save(costumeApprovalBoard);
         fileUrl = folderName + SEPARATOR + fileName;
@@ -219,35 +220,23 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     public void updateCostumeApprovalBoardByMember(
         final Long costumeApprovalBoardId,
         final Account account,
-        final CostumeApprovalBoardExplainUpdateServiceRequestDto serviceRequestDto
-    ) {
+        final CostumeApprovalBoardExplainUpdateServiceRequestDto serviceRequestDto,
+        final MultipartFile multipartFile
+    ) throws IOException {
         Member member = getMemberByAccount(account);
         CostumeApprovalBoard costumeApprovalBoard =
-            costumeApprovalBoardRepository.findById(costumeApprovalBoardId)
-                .orElseThrow(() -> new CostumeApprovalBoardException(
-                    CostumeApprovalBoardErrorCode.NOT_FOUND_COSTUME_APPROVAL_BOARD));
-
-        // 회원이 작성한 글이 아님 -> throw 주인 아님 예외
-        if (!member.getId().equals(costumeApprovalBoard.getMember().getId())) {
-            throw new CostumeApprovalBoardException(
-                CostumeApprovalBoardErrorCode.NOT_MASTER_COSTUME_APPROVAL_BOARD);
-        }
-
-        // 아무것도 들어오지 않았을 경우
-        if (serviceRequestDto == null) {
-            return;
-        }
-
-        // 설명 수정
-        if (serviceRequestDto.image_explain() != null) {
+            costumeApprovalBoardRepository.findByIdAndMember(costumeApprovalBoardId,member)
+                .orElseThrow(()->new CostumeApprovalBoardException(CostumeApprovalBoardErrorCode.NOT_ABLE_TO_ACCESS_COSTUME_APPROVAL_BOARD));
+        if (!serviceRequestDto.imageChange()){
             costumeApprovalBoard.updateImageExplain(serviceRequestDto.image_explain());
+            costumeApprovalBoard.updateCostumeImageUrl(costumeApprovalBoard.getCostumeImageUrl());
+        }else{
+            String imageName = s3Provider.updateImage(costumeApprovalBoard.getCostumeImageUrl(),
+                costumeApprovalBoard.getFolderName(),multipartFile);
+            costumeApprovalBoard.updateImageExplain(serviceRequestDto.image_explain());
+            costumeApprovalBoard.updateCostumeImageUrl(imageName);
         }
 
-        // 이미지 수정
-        if (serviceRequestDto.multipartFile() != null) {
-            String url = saveImage(serviceRequestDto.multipartFile());
-            costumeApprovalBoard.updateCostumeImageUrl(url);
-        }
     }
 
     @Override

@@ -158,7 +158,7 @@ public class CostumeApprovalBoardController {
         @PathVariable(name = "costume_approval_board_id") Long costumeApprovalBoardId,
         @Nullable @RequestPart(name = "explain") CostumeApprovalBoardExplainUpdateControllerRequestDto controllerRequestDto,
         @Nullable @RequestPart(name = "image") MultipartFile multipartFile
-    ) {
+    )throws IOException {
         CostumeApprovalBoardExplainUpdateServiceRequestDto serviceRequestDto =
             costumeApprovalBoardDtoMapper.toCostumeApprovalBoardExplainUpdateServiceRequestDto(
                 controllerRequestDto,
@@ -168,7 +168,8 @@ public class CostumeApprovalBoardController {
         costumeApprovalBoardService.updateCostumeApprovalBoardByMember(
             costumeApprovalBoardId,
             userDetails.getAccount(),
-            serviceRequestDto
+            serviceRequestDto,
+            multipartFile
         );
 
         return ResponseEntity
