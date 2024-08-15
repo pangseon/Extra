@@ -136,10 +136,7 @@ public class Member extends BaseEntity {
         return this.id.toString() + "M";
     }
 
-    public void update(
-        final MemberUpdateServiceRequestDto serviceRequestDto,
-        final Tattoo tattoo
-    ) {
+    public void update(final MemberUpdateServiceRequestDto serviceRequestDto) {
         this.name = serviceRequestDto.name();
         this.sex = serviceRequestDto.sex();
         this.birthday = serviceRequestDto.birthday();
@@ -152,6 +149,5 @@ public class Member extends BaseEntity {
         this.pros = serviceRequestDto.pros();
         this.bank = serviceRequestDto.bank();
         this.accountNumber = serviceRequestDto.accountNumber();
-        this.tattoo = tattoo;
     }
 }
