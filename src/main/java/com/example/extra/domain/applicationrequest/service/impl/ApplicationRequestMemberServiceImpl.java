@@ -9,13 +9,13 @@ import com.example.extra.domain.applicationrequest.dto.service.ApplicationReques
 import com.example.extra.domain.applicationrequest.entity.ApplicationRequestMember;
 import com.example.extra.domain.applicationrequest.exception.ApplicationRequestErrorCode;
 import com.example.extra.domain.applicationrequest.exception.ApplicationRequestException;
-import com.example.extra.domain.applicationrequest.mapper.entity.ApplicationRequestEntityMapper;
 import com.example.extra.domain.applicationrequest.repository.ApplicationRequestMemberRepository;
 import com.example.extra.domain.applicationrequest.service.ApplicationRequestMemberService;
 import com.example.extra.domain.attendancemanagement.entity.AttendanceManagement;
 import com.example.extra.domain.attendancemanagement.repository.AttendanceManagementRepository;
 import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.company.repository.CompanyRepository;
+import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.role.entity.Role;
@@ -25,6 +25,7 @@ import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.global.enums.ApplyStatus;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -37,7 +38,6 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
 
     private final ApplicationRequestMemberRepository applicationRequestMemberRepository;
     private final RoleRepository roleRepository;
-    private final ApplicationRequestEntityMapper applicationRequestEntityMapper;
     private final AttendanceManagementRepository attendanceManagementRepository;
     private final MemberRepository memberRepository;
     private final CompanyRepository companyRepository;
@@ -74,15 +74,38 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
     @Transactional(readOnly = true)
     public List<ApplicationRequestMemberReadServiceResponseDto> getAppliedRoles(
         final Account account,
+        final Integer year,
+        final Integer month,
         final Pageable pageable
     ) {
-        Slice<ApplicationRequestMember> applicationRequestMemberSlice =
-            applicationRequestMemberRepository.findAllByMember(
-                getMemberByAccount(account),
-                pageable
-            );
-        return applicationRequestEntityMapper.toApplicationRequestMemberReadServiceResponseDtoList(
-            applicationRequestMemberSlice);
+        Slice<ApplicationRequestMember> applicationRequestMemberSlice;
+        if (year != null && month != null) {
+            List<ApplicationRequestMember> userApplicationRequests =
+                applicationRequestMemberRepository.findAllByMember(getMemberByAccount(account));
+
+            return userApplicationRequests.stream()
+                .filter(arm -> {
+                    Role role = arm.getRole();
+                    JobPost jobPost = role.getJobPost();
+                    return jobPost.getScheduleList().stream()
+                        .anyMatch(schedule ->
+                            schedule.getCalender().getYear() == year &&
+                                schedule.getCalender().getMonthValue() == month
+                        );
+                })
+                .map(ApplicationRequestMemberReadServiceResponseDto::from)
+                .collect(Collectors.toList());
+
+        } else {
+            applicationRequestMemberSlice =
+                applicationRequestMemberRepository.findAllByMember(
+                    getMemberByAccount(account),
+                    pageable
+                );
+            return applicationRequestMemberSlice.stream()
+                .map(ApplicationRequestMemberReadServiceResponseDto::from)
+                .collect(Collectors.toList());
+        }
     }
 
     // 출연자가 특정 상태(지원중, 미승인, 승인)에 따라 본인이 지원한 역할들 보려 할 때
@@ -99,8 +122,9 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
                 applyStatus,
                 pageable
             );
-        return applicationRequestEntityMapper.toApplicationRequestMemberReadServiceResponseDtoList(
-            applicationRequestMemberSlice);
+        return applicationRequestMemberSlice.stream()
+            .map(ApplicationRequestMemberReadServiceResponseDto::from)
+            .collect(Collectors.toList());
     }
 
     // 출연자가 지원 요청을 취소할 때
@@ -148,8 +172,9 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
                 role,
                 pageable
             );
-        return applicationRequestEntityMapper.toApplicationRequestCompanyReadServiceResponseDtoList(
-            applicationRequestMemberSlice);
+        return applicationRequestMemberSlice.stream()
+            .map(ApplicationRequestCompanyReadServiceResponseDto::from)
+            .collect(Collectors.toList());
     }
 
     // 업체가 해당 역할에 지원한 출연자들에 대해 승인/거절할 때
