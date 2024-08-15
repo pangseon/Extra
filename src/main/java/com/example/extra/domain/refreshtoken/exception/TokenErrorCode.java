@@ -1,4 +1,4 @@
-package com.example.extra.global.security.exception;
+package com.example.extra.domain.refreshtoken.exception;
 
 import com.example.extra.global.exception.ErrorCode;
 import lombok.Getter;

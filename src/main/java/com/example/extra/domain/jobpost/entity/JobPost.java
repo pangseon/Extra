@@ -15,7 +15,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -52,13 +51,13 @@ public class JobPost extends BaseEntity {
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "company_id",nullable = false)
+    @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
-    @OneToMany(mappedBy = "jobPost",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Schedule> scheduleList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "jobPost",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Role> roleList = new ArrayList<>();
 
     @Builder
@@ -69,7 +68,7 @@ public class JobPost extends BaseEntity {
         final Boolean status,
         final Category category,
         final Company company
-    ){
+    ) {
         this.title = title;
         this.gatheringLocation = gatheringLocation;
         this.gatheringTime = gatheringTime;
@@ -77,13 +76,14 @@ public class JobPost extends BaseEntity {
         this.category = category;
         this.company = company;
     }
+
     public void updateJobPost(
-         String dramaTitle,
-         String gatheringLocation,
+        String dramaTitle,
+        String gatheringLocation,
         String gatheringTime,
-         Boolean status,
-         Category category
-    ){
+        Boolean status,
+        Category category
+    ) {
         this.title = dramaTitle;
         this.gatheringLocation = gatheringLocation;
         this.gatheringTime = gatheringTime;

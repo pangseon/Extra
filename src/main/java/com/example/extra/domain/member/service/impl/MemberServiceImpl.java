@@ -55,8 +55,9 @@ public class MemberServiceImpl implements MemberService {
         }
 
         Member member = memberEntityMapper.toMember(memberCreateServiceRequestDto, account);
-        Tattoo tattoo = tattooRepository.findByTattooCreateServiceRequestDto(tattooCreateServiceRequestDto)
-            .orElseThrow(()-> new MemberException(MemberErrorCode.NOT_FOUND_TATTOO));
+        Tattoo tattoo = tattooRepository.findByTattooCreateServiceRequestDto(
+                tattooCreateServiceRequestDto)
+            .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_TATTOO));
 
         member.updateTattoo(tattoo);
         memberRepository.save(member);

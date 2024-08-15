@@ -1,4 +1,4 @@
-package com.example.extra.global.security.dto;
+package com.example.extra.domain.refreshtoken.dto;
 
 public record RefreshTokenCreateServiceResponseDto(
     String accessToken

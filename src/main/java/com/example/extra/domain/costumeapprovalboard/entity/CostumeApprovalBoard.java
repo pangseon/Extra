@@ -41,6 +41,9 @@ public class CostumeApprovalBoard extends BaseEntity {
     private String costumeImageUrl;
 
     @Column
+    private String folderName;
+
+    @Column
     private String imageExplain;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -56,13 +59,15 @@ public class CostumeApprovalBoard extends BaseEntity {
         final String costumeImageUrl,
         final String imageExplain,
         final Member member,
-        final Role role
+        final Role role,
+        final String folderName
     ) {
         this.costumeApprove = ApplyStatus.APPLIED;
         this.costumeImageUrl = costumeImageUrl;
         this.imageExplain = imageExplain;
         this.member = member;
         this.role = role;
+        this.folderName = folderName;
     }
 
     public void updateImageExplain(String imageExplain) {

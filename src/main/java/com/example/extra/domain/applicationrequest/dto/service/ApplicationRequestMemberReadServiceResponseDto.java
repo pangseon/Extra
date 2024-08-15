@@ -8,7 +8,6 @@ import com.example.extra.domain.schedule.entity.Schedule;
 import com.example.extra.global.enums.ApplyStatus;
 import com.example.extra.global.enums.Category;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 

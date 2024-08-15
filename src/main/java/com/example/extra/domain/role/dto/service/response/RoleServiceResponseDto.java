@@ -1,7 +1,6 @@
 package com.example.extra.domain.role.dto.service.response;
 
 import com.example.extra.global.enums.Season;
-import java.time.LocalDate;
 
 public record RoleServiceResponseDto(
     Long id,
@@ -14,7 +13,6 @@ public record RoleServiceResponseDto(
     Integer currentPersonnel,
     Season season,
     Boolean checkTattoo
-)
-{
+) {
 
 }
