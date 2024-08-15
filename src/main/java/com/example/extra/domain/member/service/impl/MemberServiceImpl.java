@@ -108,23 +108,24 @@ public class MemberServiceImpl implements MemberService {
     ) throws IOException {
         Member member = findByAccout(account);
 
-        // tattoo
-        Tattoo tattoo = getTattoo(tattooCreateServiceRequestDto);
+        // tattoo update
+        if (tattooCreateServiceRequestDto != null) {
+            member.updateTattoo(getTattoo(tattooCreateServiceRequestDto));
+        }
 
-        // member 정보 update
-        member.update(
-            memberUpdateServiceRequestDto,
-            tattoo
-        );
+        // member update
+        if (memberUpdateServiceRequestDto != null) {
+            member.update(memberUpdateServiceRequestDto);
 
-        // 프로필 이미지 수정
-        if (memberUpdateServiceRequestDto.isImageChange()) {
-            String imageUrl = s3Provider.updateImage(
-                account.getImageUrl(),
-                account.getFolderUrl(),
-                multipartFile
-            );
-            account.updateImageUrl(imageUrl);
+            // 프로필 이미지 수정
+            if (memberUpdateServiceRequestDto.isImageChange()) {
+                String imageUrl = s3Provider.updateImage(
+                    account.getImageUrl(),
+                    account.getFolderUrl(),
+                    multipartFile
+                );
+                account.updateImageUrl(imageUrl);
+            }
         }
     }
 
