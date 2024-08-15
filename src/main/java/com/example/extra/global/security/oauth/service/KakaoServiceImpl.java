@@ -93,11 +93,8 @@ public class KakaoServiceImpl {
     }
 
     // 중복 확인
-    private void validate(final String email) {
-        accountRepository.findByEmail(email)
-            .ifPresent(m -> {
-                throw new AccountException(AccountErrorCode.DUPLICATION_ACCOUNT);
-            });
+    private boolean checkSignup(final String email) {
+        return accountRepository.findByEmail(email).isPresent();
     }
 
     public KakaoInfo getKakaoInfo(String accessToken)
