@@ -183,4 +183,32 @@ public class KakaoServiceImpl {
 
         return new KakaoLoginServiceResponseDto(accessToken);
     }
+
+    @Transactional
+    public KakaoLoginServiceResponseDto login(
+        final KakaoLoginServiceRequestDto serviceRequestDto
+    ) {
+        Account account = accountRepository.findByEmail(serviceRequestDto.email())
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
+
+        // jwt 토큰 생성
+        String accessToken = jwtUtil.createToken(
+            account.getEmail(),
+            account.getUserRole()
+        );
+        String refreshToken = jwtUtil.createRefreshToken();
+        log.info("access token: " + accessToken);
+        log.info("refresh token: " + refreshToken);
+
+        account.updateRefreshToken(jwtUtil.substringToken(refreshToken));
+
+        refreshTokenRepository.save(
+            new RefreshToken(
+                account.getId().toString(),
+                jwtUtil.substringToken(refreshToken)
+            )
+        );
+
+        return new KakaoLoginServiceResponseDto(accessToken);
+    }
 }
