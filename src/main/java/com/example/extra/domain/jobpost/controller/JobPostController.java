@@ -9,7 +9,9 @@ import com.example.extra.domain.jobpost.mapper.dto.JobPostDtoMapper;
 import com.example.extra.domain.jobpost.service.JobPostService;
 import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,5 +82,23 @@ public class JobPostController {
     ) {
         return jobPostService.readAllJobPosts(page);
     }
-
+    @GetMapping("/calender")
+    public List<JobPostServiceResponseDto> readAllByCalenderJobPosts(
+        @RequestParam String year,
+        @RequestParam String month,
+        @RequestParam int page
+    ){
+        int calender_year =Integer.parseInt(year);
+        int calender_month = Integer.parseInt(month);
+        return jobPostService.readAllByCalenderJobPosts(page,calender_year,calender_month);
+    }
+    @GetMapping("/calenders")
+    public Map<LocalDate, List<Long>> readJobPostIdsByMonth(
+        @RequestParam String year,
+        @RequestParam String month
+    ){
+        int calender_year =Integer.parseInt(year);
+        int calender_month = Integer.parseInt(month);
+        return jobPostService.readJobPostIdsByMonth(calender_year,calender_month);
+    }
 }

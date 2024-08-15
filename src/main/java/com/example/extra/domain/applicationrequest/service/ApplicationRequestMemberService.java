@@ -17,6 +17,8 @@ public interface ApplicationRequestMemberService {
 
     List<ApplicationRequestMemberReadServiceResponseDto> getAppliedRoles(
         final Account account,
+        final Integer year,
+        final Integer month,
         final Pageable pageable
     );
 
