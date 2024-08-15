@@ -1,6 +1,6 @@
-package com.example.extra.global.security.controller;
+package com.example.extra.domain.refreshtoken.controller;
 
-import com.example.extra.global.security.service.RefreshTokenService;
+import com.example.extra.domain.refreshtoken.service.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

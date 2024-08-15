@@ -1,9 +1,9 @@
 package com.example.extra.global.filter;
 
+import com.example.extra.domain.refreshtoken.exception.TokenErrorCode;
 import com.example.extra.global.exception.ErrorCode;
 import com.example.extra.global.exception.dto.CustomExceptionResponseDto;
 import com.example.extra.global.security.JwtUtil;
-import com.example.extra.global.security.exception.TokenErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -77,7 +77,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             url.equals("/api/v1/members/signup") ||         // 회원 - 회원 가입
             url.equals("/api/v1/companies/signup") ||       // 회사 - 회원 가입
             url.equals("/swagger-ui/**") ||
-            url.equals("/v3/api-docs/**");
+            url.equals("/v3/api-docs/**") ||
+            url.equals("/api/v1/oauth/**")
+            ;
     }
 
     public void setAuthentication(String username) {
