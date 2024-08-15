@@ -8,6 +8,7 @@ import com.example.extra.domain.refreshtoken.repository.RefreshTokenRepository;
 import com.example.extra.domain.refreshtoken.token.RefreshToken;
 import com.example.extra.global.security.JwtUtil;
 import com.example.extra.global.security.oauth.dto.service.request.KakaoLoginServiceRequestDto;
+import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginCheckServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoTokenInfoServiceResponseDto;
 import com.example.extra.global.security.oauth.entity.KakaoInfo;
@@ -22,6 +23,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -35,7 +37,9 @@ public class KakaoServiceImpl {
 
     private final AccountRepository accountRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${kakao.client.id}")
     String clientId;
@@ -93,14 +97,11 @@ public class KakaoServiceImpl {
     }
 
     // 중복 확인
-    private void validate(final String email) {
-        accountRepository.findByEmail(email)
-            .ifPresent(m -> {
-                throw new AccountException(AccountErrorCode.DUPLICATION_ACCOUNT);
-            });
+    private boolean checkSignup(final String email) {
+        return accountRepository.findByEmail(email).isPresent();
     }
 
-    public KakaoInfo getKakaoInfo(String accessToken)
+    public KakaoLoginCheckServiceResponseDto getKakaoInfo(String accessToken)
         throws JsonProcessingException {
         // HTTP Header
         HttpHeaders headers = new HttpHeaders();
@@ -142,25 +143,26 @@ public class KakaoServiceImpl {
 //            .asText();
 
         KakaoInfo kakaoInfo = new KakaoInfo(id, email);
-        validate(kakaoInfo.getId().toString());
+        boolean isSignup = checkSignup(kakaoInfo.getId().toString());
 
-        return kakaoInfo;
+        return new KakaoLoginCheckServiceResponseDto(
+            kakaoInfo,
+            isSignup
+        );
     }
 
     @Transactional
     public KakaoLoginServiceResponseDto signup(
         final KakaoLoginServiceRequestDto serviceRequestDto
     ) {
-        String email = serviceRequestDto.email();
-        validate(email);
-
-        String uuid = UUID.randomUUID()
-            .toString()
-            .replace("-", "");
+        String password = passwordEncoder.encode(
+            UUID.randomUUID()
+                .toString()
+                .replace("-", ""));
 
         Account account = Account.builder()
             .email(serviceRequestDto.email())
-            .password(uuid)
+            .password(password)
             .userRole(serviceRequestDto.userRole())
             .build();
 
@@ -176,6 +178,34 @@ public class KakaoServiceImpl {
         account.updateRefreshToken(jwtUtil.substringToken(refreshToken));
 
         accountRepository.save(account);
+        refreshTokenRepository.save(
+            new RefreshToken(
+                account.getId().toString(),
+                jwtUtil.substringToken(refreshToken)
+            )
+        );
+
+        return new KakaoLoginServiceResponseDto(accessToken);
+    }
+
+    @Transactional
+    public KakaoLoginServiceResponseDto login(
+        final KakaoLoginServiceRequestDto serviceRequestDto
+    ) {
+        Account account = accountRepository.findByEmail(serviceRequestDto.email())
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
+
+        // jwt 토큰 생성
+        String accessToken = jwtUtil.createToken(
+            account.getEmail(),
+            account.getUserRole()
+        );
+        String refreshToken = jwtUtil.createRefreshToken();
+        log.info("access token: " + accessToken);
+        log.info("refresh token: " + refreshToken);
+
+        account.updateRefreshToken(jwtUtil.substringToken(refreshToken));
+
         refreshTokenRepository.save(
             new RefreshToken(
                 account.getId().toString(),
