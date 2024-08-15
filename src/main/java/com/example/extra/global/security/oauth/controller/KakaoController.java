@@ -2,6 +2,7 @@ package com.example.extra.global.security.oauth.controller;
 
 import com.example.extra.global.security.oauth.dto.controller.KakaoLoginControllerRequestDto;
 import com.example.extra.global.security.oauth.dto.service.request.KakaoLoginServiceRequestDto;
+import com.example.extra.global.security.oauth.dto.service.response.KakaoAuthServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginCheckServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoTokenInfoServiceResponseDto;
 import com.example.extra.global.security.oauth.entity.KakaoInfo;
@@ -28,9 +29,11 @@ public class KakaoController {
 
     // 인가 코드 받기
     @GetMapping("/authorize")
-    public String authorize(
+    public ResponseEntity<KakaoAuthServiceResponseDto> authorize(
     ) {
-        return oauthKakaoService.authorize();
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(oauthKakaoService.authorize());
     }
 
     // access token & refresh token 발급, kakao email 발급
