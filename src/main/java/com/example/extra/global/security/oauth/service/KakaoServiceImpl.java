@@ -8,6 +8,7 @@ import com.example.extra.domain.refreshtoken.repository.RefreshTokenRepository;
 import com.example.extra.domain.refreshtoken.token.RefreshToken;
 import com.example.extra.global.security.JwtUtil;
 import com.example.extra.global.security.oauth.dto.service.request.KakaoLoginServiceRequestDto;
+import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginCheckServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoTokenInfoServiceResponseDto;
 import com.example.extra.global.security.oauth.entity.KakaoInfo;
@@ -97,7 +98,7 @@ public class KakaoServiceImpl {
         return accountRepository.findByEmail(email).isPresent();
     }
 
-    public KakaoInfo getKakaoInfo(String accessToken)
+    public KakaoLoginCheckServiceResponseDto getKakaoInfo(String accessToken)
         throws JsonProcessingException {
         // HTTP Header
         HttpHeaders headers = new HttpHeaders();
@@ -139,18 +140,18 @@ public class KakaoServiceImpl {
 //            .asText();
 
         KakaoInfo kakaoInfo = new KakaoInfo(id, email);
-        validate(kakaoInfo.getId().toString());
+        boolean isSignup = checkSignup(kakaoInfo.getId().toString());
 
-        return kakaoInfo;
+        return new KakaoLoginCheckServiceResponseDto(
+            kakaoInfo,
+            isSignup
+        );
     }
 
     @Transactional
     public KakaoLoginServiceResponseDto signup(
         final KakaoLoginServiceRequestDto serviceRequestDto
     ) {
-        String email = serviceRequestDto.email();
-        validate(email);
-
         String uuid = UUID.randomUUID()
             .toString()
             .replace("-", "");
