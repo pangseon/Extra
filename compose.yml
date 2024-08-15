@@ -6,7 +6,7 @@ services:
     depends_on:
       my-cache-server:
         condition: service_healthy
-  redis:
+  my-cache-server:
     image: redis
     ports:
       - 6379:6379
