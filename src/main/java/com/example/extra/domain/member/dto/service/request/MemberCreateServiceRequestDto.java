@@ -3,8 +3,7 @@ package com.example.extra.domain.member.dto.service.request;
 import java.time.LocalDate;
 
 public record MemberCreateServiceRequestDto(
-    String email,
-    String password,
+    Long accountId,
     String phone,
     String name,
     LocalDate birthday,
@@ -13,14 +12,10 @@ public record MemberCreateServiceRequestDto(
     Float height,
     Float weight,
     String bank,
-    String accountNumber,
-    Boolean isAdmin,
-    String adminToken
-
+    String accountNumber
     /**
      * 약관 동의 내용 필요
      */
-
 ) {
 
 }

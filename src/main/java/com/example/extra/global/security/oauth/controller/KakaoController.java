@@ -1,5 +1,6 @@
 package com.example.extra.global.security.oauth.controller;
 
+import com.example.extra.global.security.oauth.dto.controller.KakaoLoginControllerRequestDto;
 import com.example.extra.global.security.oauth.dto.service.request.KakaoLoginServiceRequestDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoLoginServiceResponseDto;
 import com.example.extra.global.security.oauth.dto.service.response.KakaoTokenInfoServiceResponseDto;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,9 +35,11 @@ public class KakaoController {
 
     // access token & refresh token 발급, kakao email 발급
     @PostMapping("/kakao")
-    public ResponseEntity<?> kakaoLogin(@RequestParam String code)
+    public ResponseEntity<?> kakaoLogin(
+        @RequestParam String code,
+        @RequestBody KakaoLoginControllerRequestDto controllerRequestDto
+    )
         throws JsonProcessingException {
-
         KakaoTokenInfoServiceResponseDto tokenInfoServiceResponseDto;
         try {
             // [0] accessToken, [1] refreshToken
@@ -57,7 +61,10 @@ public class KakaoController {
         // 고유 회원번호로 email 대체
         String email = kakaoInfo.getId().toString();
         KakaoLoginServiceRequestDto loginServiceRequestDto
-            = new KakaoLoginServiceRequestDto(email);
+            = KakaoLoginServiceRequestDto.builder()
+            .email(email)
+            .userRole(controllerRequestDto.userRole())
+            .build();
 
         KakaoLoginServiceResponseDto loginServiceResponseDto =
             oauthKakaoService.signup(loginServiceRequestDto);

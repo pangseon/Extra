@@ -15,7 +15,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -42,59 +41,53 @@ public class JobPost extends BaseEntity {
     private String gatheringLocation;
 
     @Column
-    private LocalDateTime gatheringTime;
+    private String gatheringTime;
 
     @Column
     private Boolean status;
-
-    @Column
-    private Integer hourPay;
 
     @Column
     private Category category;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "company_id",nullable = false)
+    @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
-    @OneToMany(mappedBy = "jobPost",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Schedule> scheduleList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "jobPost",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Role> roleList = new ArrayList<>();
 
     @Builder
     public JobPost(
         final String title,
         final String gatheringLocation,
-        final LocalDateTime gatheringTime,
+        final String gatheringTime,
         final Boolean status,
-        final Integer hourPay,
         final Category category,
         final Company company
-    ){
+    ) {
         this.title = title;
         this.gatheringLocation = gatheringLocation;
         this.gatheringTime = gatheringTime;
         this.status = status;
-        this.hourPay = hourPay;
         this.category = category;
         this.company = company;
     }
+
     public void updateJobPost(
-         String dramaTitle,
-         String gatheringLocation,
-         LocalDateTime gatheringTime,
-         Boolean status,
-         Integer hourPay,
-         Category category
-    ){
+        String dramaTitle,
+        String gatheringLocation,
+        String gatheringTime,
+        Boolean status,
+        Category category
+    ) {
         this.title = dramaTitle;
         this.gatheringLocation = gatheringLocation;
         this.gatheringTime = gatheringTime;
         this.status = status;
-        this.hourPay = hourPay;
         this.category = category;
     }
 

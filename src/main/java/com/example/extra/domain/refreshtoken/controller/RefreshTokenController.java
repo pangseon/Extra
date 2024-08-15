@@ -16,24 +16,12 @@ public class RefreshTokenController {
 
     private final RefreshTokenService refreshTokenService;
 
-    @GetMapping("/member/token")
-    public ResponseEntity<?> getMemberRefreshToken(
+    @GetMapping("/token")
+    public ResponseEntity<?> getNewAccessToken(
         HttpServletRequest httpServletRequest,
         HttpServletResponse httpServletResponse
     ) {
-        refreshTokenService.getMemberNewAccessToken(
-            httpServletRequest,
-            httpServletResponse
-        );
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/company/token")
-    public ResponseEntity<?> getCompanyRefreshToken(
-        HttpServletRequest httpServletRequest,
-        HttpServletResponse httpServletResponse
-    ) {
-        refreshTokenService.getCompanyNewAccessToken(
+        refreshTokenService.getNewAccessToken(
             httpServletRequest,
             httpServletResponse
         );

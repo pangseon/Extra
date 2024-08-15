@@ -1,6 +1,10 @@
 package com.example.extra.domain.jobpost.service.impl;
 
+import com.example.extra.domain.account.entity.Account;
+import com.example.extra.domain.account.exception.AccountErrorCode;
+import com.example.extra.domain.account.exception.AccountException;
 import com.example.extra.domain.company.entity.Company;
+import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostCreateServiceRequestDto;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostUpdateServiceRequestDto;
 import com.example.extra.domain.jobpost.dto.service.response.JobPostServiceResponseDto;
@@ -10,6 +14,8 @@ import com.example.extra.domain.jobpost.exception.NotFoundJobPostException;
 import com.example.extra.domain.jobpost.mapper.service.JobPostEntityMapper;
 import com.example.extra.domain.jobpost.repository.JobPostRepository;
 import com.example.extra.domain.jobpost.service.JobPostService;
+import com.example.extra.domain.member.entity.Member;
+import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.role.entity.Role;
 import com.example.extra.domain.role.exception.NotFoundRoleException;
 import com.example.extra.domain.role.exception.RoleErrorCode;
@@ -18,8 +24,11 @@ import com.example.extra.domain.schedule.entity.Schedule;
 import com.example.extra.domain.schedule.exception.NotFoundScheduleException;
 import com.example.extra.domain.schedule.exception.ScheduleErrorCode;
 import com.example.extra.domain.schedule.repository.ScheduleRepository;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,38 +40,52 @@ public class JobPostServiceImpl implements JobPostService {
     private final JobPostEntityMapper jobPostEntityMapper;
     private final ScheduleRepository scheduleRepository;
     private final RoleRepository roleRepository;
+    private final MemberRepository memberRepository;
+    private final CompanyRepository companyRepository;
+
+    private Member getMemberByAccount(final Account account) {
+        return memberRepository.findByAccount(account)
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
+    }
+
+    private Company getCompanyByAccount(final Account account) {
+        return companyRepository.findByAccount(account)
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
+    }
 
     public void createJobPost(
-        Company company,
+        final Account account,
         final JobPostCreateServiceRequestDto jobPostCreateServiceRequestDto
     ) {
-        JobPost jobPost = jobPostEntityMapper.toJobPost(jobPostCreateServiceRequestDto, company);
+        JobPost jobPost = jobPostEntityMapper.toJobPost(jobPostCreateServiceRequestDto,
+            getCompanyByAccount(account));
         jobPostRepository.save(jobPost);
     }
 
     @Transactional
     public void updateJobPost(
         Long jobPost_id,
-        final JobPostUpdateServiceRequestDto jobPostUpdateServiceRequestDto
-        , Company company
+        final JobPostUpdateServiceRequestDto jobPostUpdateServiceRequestDto,
+        final Account account
     ) {
-        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id, company)
+        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id,
+                getCompanyByAccount(account))
             .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
         jobPost.updateJobPost(
             jobPostUpdateServiceRequestDto.title(),
             jobPostUpdateServiceRequestDto.gatheringLocation(),
             jobPostUpdateServiceRequestDto.gatheringTime(),
             jobPostUpdateServiceRequestDto.status(),
-            jobPostUpdateServiceRequestDto.hourPay(),
             jobPostUpdateServiceRequestDto.category());
         jobPostRepository.save(jobPost);
     }
 
     public void deleteJobPost(
-        Long jobPost_id
-        , Company company
+        Long jobPost_id,
+        final Account account
     ) {
-        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id, company)
+        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id,
+                getCompanyByAccount(account))
             .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
         jobPostRepository.delete(jobPost);
     }
@@ -74,9 +97,13 @@ public class JobPostServiceImpl implements JobPostService {
     }
 
     @Transactional(readOnly = true)
-    public List<JobPostServiceResponseDto> readAllJobPosts() {
-        return jobPostRepository.findAll()
-            .stream()
+    public List<JobPostServiceResponseDto> readAllJobPosts(int page) {
+        Pageable pageable = PageRequest.of(page,5);
+            return scheduleRepository.findAll(pageable)
+                .stream()
+                .sorted(Comparator.comparing(Schedule::getCalender).reversed()) // LocalDate를 기준으로 최신 날짜 순으로 정렬
+                .map(Schedule::getJobPost)
+                .distinct()
             .map(this::readDto)
             .toList();
     }
@@ -88,7 +115,6 @@ public class JobPostServiceImpl implements JobPostService {
             .gatheringLocation(jobPost.getGatheringLocation())
             .gatheringTime(jobPost.getGatheringTime())
             .status(jobPost.getStatus())
-            .hourPay(jobPost.getHourPay())
             .category(jobPost.getCategory())
             .companyName(jobPost.getCompany().getName())
             .calenderList(scheduleList(jobPost.getId())

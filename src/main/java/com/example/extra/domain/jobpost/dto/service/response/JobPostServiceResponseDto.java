@@ -3,7 +3,6 @@ package com.example.extra.domain.jobpost.dto.service.response;
 import com.example.extra.global.enums.Category;
 import com.example.extra.global.enums.Season;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 
@@ -12,7 +11,7 @@ public record JobPostServiceResponseDto(
     Long id,
     String title,
     String gatheringLocation,
-    LocalDateTime gatheringTime,
+    String gatheringTime,
     String imageUrl,
     Boolean status,
     Integer hourPay,

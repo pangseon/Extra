@@ -71,12 +71,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private boolean checkUrl(String url) {
-        return url.equals("/api/v1/member/token") ||        // 회원 - 토큰 재발급
+        return url.equals("/api/v1/token") ||               // 토큰 재발급
+            url.equals("/api/v1/account/signup") ||        // 회원가입
+            url.equals("/api/v1/account/login") ||          // 로그인
             url.equals("/api/v1/members/signup") ||         // 회원 - 회원 가입
-            url.equals("/api/v1/members/login") ||          // 회원 - 로그인
-            url.equals("/api/v1/company/token") ||          // 회사 - 토큰 재발급
             url.equals("/api/v1/companies/signup") ||       // 회사 - 회원 가입
-            url.equals("/api/v1/companies/login") ||        // 회사 - 로그인
             url.equals("/swagger-ui/**") ||
             url.equals("/v3/api-docs/**") ||
             url.equals("/api/v1/oauth/**")

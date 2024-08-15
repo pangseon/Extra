@@ -1,12 +1,9 @@
 package com.example.extra.global.security.oauth.service;
 
-import com.example.extra.domain.company.exception.CompanyErrorCode;
-import com.example.extra.domain.company.exception.CompanyException;
-import com.example.extra.domain.company.repository.CompanyRepository;
-import com.example.extra.domain.member.entity.Member;
-import com.example.extra.domain.member.exception.MemberErrorCode;
-import com.example.extra.domain.member.exception.MemberException;
-import com.example.extra.domain.member.repository.MemberRepository;
+import com.example.extra.domain.account.entity.Account;
+import com.example.extra.domain.account.exception.AccountErrorCode;
+import com.example.extra.domain.account.exception.AccountException;
+import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.domain.refreshtoken.repository.RefreshTokenRepository;
 import com.example.extra.domain.refreshtoken.token.RefreshToken;
 import com.example.extra.global.security.JwtUtil;
@@ -36,8 +33,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class KakaoServiceImpl {
 
-    private final MemberRepository memberRepository;
-    private final CompanyRepository companyRepository;
+    private final AccountRepository accountRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtUtil jwtUtil;
 
@@ -48,7 +44,7 @@ public class KakaoServiceImpl {
 
     public String authorize() {
         String url = "https://kauth.kakao.com/oauth/authorize" +
-            "&response_type=code" +
+            "?response_type=code" +
             "&client_id=" + clientId +
             "&redirect_uri=" + redirectUri;
 
@@ -98,13 +94,9 @@ public class KakaoServiceImpl {
 
     // 중복 확인
     private void validate(final String email) {
-        memberRepository.findByEmail(email)
+        accountRepository.findByEmail(email)
             .ifPresent(m -> {
-                throw new MemberException(MemberErrorCode.ALREADY_EXIST_MEMBER);
-            });
-        companyRepository.findByEmail(email)
-            .ifPresent(m -> {
-                throw new CompanyException(CompanyErrorCode.ALREADY_EXIST_EMAIL);
+                throw new AccountException(AccountErrorCode.DUPLICATION_ACCOUNT);
             });
     }
 
@@ -141,10 +133,13 @@ public class KakaoServiceImpl {
         Long id = jsonNode
             .get("id")
             .asLong();
-        String email = jsonNode
-            .get("kakao_account")
-            .get("email")
-            .asText();
+
+        // email 못 받아옴 -> email 지정
+        String email = "email";
+//        String email = jsonNode
+//            .get("kakao_account")
+//            .get("email")
+//            .asText();
 
         KakaoInfo kakaoInfo = new KakaoInfo(id, email);
         validate(kakaoInfo.getId().toString());
@@ -163,25 +158,27 @@ public class KakaoServiceImpl {
             .toString()
             .replace("-", "");
 
-        Member member = Member.builder()
-            .email(email)
+        Account account = Account.builder()
+            .email(serviceRequestDto.email())
             .password(uuid)
+            .userRole(serviceRequestDto.userRole())
             .build();
 
         // jwt 토큰 생성
         String accessToken = jwtUtil.createToken(
-            member.getEmail(),
-            member.getUserRole()
+            account.getEmail(),
+            account.getUserRole()
         );
         String refreshToken = jwtUtil.createRefreshToken();
         log.info("access token: " + accessToken);
         log.info("refresh token: " + refreshToken);
 
-        member.updateRefreshToken(jwtUtil.substringToken(refreshToken));
+        account.updateRefreshToken(jwtUtil.substringToken(refreshToken));
 
+        accountRepository.save(account);
         refreshTokenRepository.save(
             new RefreshToken(
-                member.tokenId(),
+                account.getId().toString(),
                 jwtUtil.substringToken(refreshToken)
             )
         );

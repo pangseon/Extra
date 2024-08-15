@@ -1,14 +1,10 @@
 package com.example.extra.domain.tattoo.entity;
 
-import com.example.extra.domain.member.entity.Member;
-import com.example.extra.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -21,7 +17,7 @@ import lombok.ToString;
 @Table(name = "TB_TATTOO")
 @Entity
 @ToString
-public class Tattoo extends BaseEntity {
+public class Tattoo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,12 +47,6 @@ public class Tattoo extends BaseEntity {
     @Column(columnDefinition = "boolean default false")
     private Boolean feet;
 
-    private String etc;
-
-    @OneToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
-
     @Builder
     public Tattoo(
         Boolean face,
@@ -66,9 +56,7 @@ public class Tattoo extends BaseEntity {
         Boolean shoulder,
         Boolean back,
         Boolean hand,
-        Boolean feet,
-        String etc,
-        Member member
+        Boolean feet
     ) {
         this.face = face;
         this.chest = chest;
@@ -78,7 +66,5 @@ public class Tattoo extends BaseEntity {
         this.back = back;
         this.hand = hand;
         this.feet = feet;
-        this.etc = etc;
-        this.member = member;
     }
 }

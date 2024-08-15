@@ -1,16 +1,15 @@
 package com.example.extra.domain.member.entity;
 
+import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.global.entity.BaseEntity;
-import com.example.extra.global.enums.UserRole;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
@@ -31,15 +30,6 @@ public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(
-        nullable = false,
-        unique = true
-    )
-    private String email;
-
-    @Column(nullable = false)
-    private String password;
 
     @Column(nullable = false)
     @Size(min = 1, max = 10)
@@ -81,22 +71,16 @@ public class Member extends BaseEntity {
     @Size(max = 30)
     private String accountNumber;
 
-    @Column
-    private String refreshToken;
-
-    // 계정 권한 설정
-    // 공고글의 Role과 이름이 겹칠 것 같아 다른 네이밍 생각 필요 ex) authority | auth
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private UserRole userRole;
-
-    @OneToOne(
-        mappedBy = "member",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "tattoo_id")
     @ToString.Exclude
     private Tattoo tattoo;
+
+    @OneToOne(
+        optional = false,
+        fetch = FetchType.LAZY
+    )
+    private Account account;
 
 //    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
 //    private final List<ApplicationRequestCompany> applicationRequestCompanyList = new ArrayList<>();
@@ -115,24 +99,18 @@ public class Member extends BaseEntity {
 
     @Builder
     public Member(
-        String email,
-        String password,
-        String name,
-        Boolean sex,
-        LocalDate birthday,
-        String home,
-        Float height,
-        Float weight,
-        String phone,
-        String introduction,
-        String license,
-        String pros,
-        Tattoo tattoo,
-        String bank,
-        String accountNumber
+        final String name,
+        final Boolean sex,
+        final LocalDate birthday,
+        final String home,
+        final Float height,
+        final Float weight,
+        final String phone,
+        final String bank,
+        final String accountNumber,
+        final Tattoo tattoo,
+        final Account account
     ) {
-        this.email = email;
-        this.password = password;
         this.name = name;
         this.sex = sex;
         this.birthday = birthday;
@@ -140,37 +118,20 @@ public class Member extends BaseEntity {
         this.height = height;
         this.weight = weight;
         this.phone = phone;
-        this.introduction = "";
-        this.license = "";
-        this.pros = "";
-        this.tattoo = tattoo;
+        this.introduction = null;
+        this.license = null;
+        this.pros = null;
         this.bank = bank;
         this.accountNumber = accountNumber;
-        this.userRole = UserRole.USER;
+        this.tattoo = tattoo;
+        this.account = account;
     }
 
     public void updateTattoo(Tattoo tattoo) {
         this.tattoo = tattoo;
     }
 
-    public void updateRole() {
-        this.userRole = UserRole.ADMIN;
-    }
-
-    public void encodePassword(String password) {
-        this.password = password;
-    }
-
-    public void updateRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
-    public void deleteRefreshToken() {
-        this.refreshToken = null;
-    }
-
     public String tokenId() {
         return this.id.toString() + "M";
     }
-
 }
