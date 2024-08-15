@@ -23,6 +23,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -36,7 +37,9 @@ public class KakaoServiceImpl {
 
     private final AccountRepository accountRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${kakao.client.id}")
     String clientId;
@@ -152,13 +155,14 @@ public class KakaoServiceImpl {
     public KakaoLoginServiceResponseDto signup(
         final KakaoLoginServiceRequestDto serviceRequestDto
     ) {
-        String uuid = UUID.randomUUID()
-            .toString()
-            .replace("-", "");
+        String password = passwordEncoder.encode(
+            UUID.randomUUID()
+                .toString()
+                .replace("-", ""));
 
         Account account = Account.builder()
             .email(serviceRequestDto.email())
-            .password(uuid)
+            .password(password)
             .userRole(serviceRequestDto.userRole())
             .build();
 
