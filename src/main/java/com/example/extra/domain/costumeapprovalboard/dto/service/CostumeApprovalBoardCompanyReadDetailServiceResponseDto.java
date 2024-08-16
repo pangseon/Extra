@@ -7,13 +7,13 @@ import lombok.Builder;
 @Builder
 public record CostumeApprovalBoardCompanyReadDetailServiceResponseDto(
     Long id,
-    String member_name,
-    String role_name,
+    String memberName,
+    String roleName,
     Boolean sex,
     String costume,
-    String image_explain,
-    String image_url,
-    ApplyStatus costume_approve
+    String imageExplain,
+    String imageUrl,
+    ApplyStatus costumeApprove
 ) {
 
     public static CostumeApprovalBoardCompanyReadDetailServiceResponseDto from(
@@ -21,12 +21,12 @@ public record CostumeApprovalBoardCompanyReadDetailServiceResponseDto(
         return CostumeApprovalBoardCompanyReadDetailServiceResponseDto
             .builder()
             .id(costumeApprovalBoard.getId())
-            .member_name(costumeApprovalBoard.getMember().getName())
-            .role_name(costumeApprovalBoard.getRole().getRoleName())
+            .memberName(costumeApprovalBoard.getMember().getName())
+            .roleName(costumeApprovalBoard.getRole().getRoleName())
             .sex(costumeApprovalBoard.getRole().getSex())
             .costume(costumeApprovalBoard.getRole().getCostume())
-            .image_explain(costumeApprovalBoard.getImageExplain())
-            .costume_approve(costumeApprovalBoard.getCostumeApprove())
+            .imageExplain(costumeApprovalBoard.getImageExplain())
+            .costumeApprove(costumeApprovalBoard.getCostumeApprove())
             .build();
     }
 }

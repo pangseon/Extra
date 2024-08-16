@@ -7,9 +7,9 @@ import lombok.Builder;
 @Builder
 public record CostumeApprovalBoardCompanyReadServiceResponseDto(
     Long id,
-    String member_name,
+    String memberName,
     String imageUrl,
-    ApplyStatus costume_approve
+    ApplyStatus costumeApprove
 ) {
 
     public static CostumeApprovalBoardCompanyReadServiceResponseDto from(
@@ -17,9 +17,9 @@ public record CostumeApprovalBoardCompanyReadServiceResponseDto(
         return CostumeApprovalBoardCompanyReadServiceResponseDto
             .builder()
                 .id(costumeApprovalBoard.getId())
-                .member_name(costumeApprovalBoard.getMember().getName())
+                .memberName(costumeApprovalBoard.getMember().getName())
                 .imageUrl(costumeApprovalBoard.getMember().getAccount().getImageUrl())
-                .costume_approve(costumeApprovalBoard.getCostumeApprove())
+                .costumeApprove(costumeApprovalBoard.getCostumeApprove())
             .build();
     }
 }

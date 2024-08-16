@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Builder
 public record CostumeApprovalBoardCreateServiceDto(
-    String image_explain,
+    String imageExplain,
     MultipartFile multipartFile
 ) {
 

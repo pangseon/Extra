@@ -211,7 +211,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             .costumeImageUrl(fileUrl)
             .member(member)
             .role(role)
-            .imageExplain(costumeApprovalBoardCreateServiceDto.image_explain())
+            .imageExplain(costumeApprovalBoardCreateServiceDto.imageExplain())
             .folderName(folderName)
             .build();
         costumeApprovalBoardRepository.save(costumeApprovalBoard);
@@ -232,12 +232,12 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             costumeApprovalBoardRepository.findByIdAndMember(costumeApprovalBoardId,member)
                 .orElseThrow(()->new CostumeApprovalBoardException(CostumeApprovalBoardErrorCode.NOT_ABLE_TO_ACCESS_COSTUME_APPROVAL_BOARD));
         if (!serviceRequestDto.imageChange()){
-            costumeApprovalBoard.updateImageExplain(serviceRequestDto.image_explain());
+            costumeApprovalBoard.updateImageExplain(serviceRequestDto.imageExplain());
             costumeApprovalBoard.updateCostumeImageUrl(costumeApprovalBoard.getCostumeImageUrl());
         }else{
             String imageName = s3Provider.updateImage(costumeApprovalBoard.getCostumeImageUrl(),
                 costumeApprovalBoard.getFolderName(),multipartFile);
-            costumeApprovalBoard.updateImageExplain(serviceRequestDto.image_explain());
+            costumeApprovalBoard.updateImageExplain(serviceRequestDto.imageExplain());
             costumeApprovalBoard.updateCostumeImageUrl(imageName);
         }
 
