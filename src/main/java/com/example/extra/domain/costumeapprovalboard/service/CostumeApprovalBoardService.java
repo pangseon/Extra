@@ -9,13 +9,16 @@ import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApproval
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
 import java.io.IOException;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface CostumeApprovalBoardService {
 
     List<CostumeApprovalBoardCompanyReadServiceResponseDto> getCostumeApprovalBoardForCompany(
         final Account account,
-        final Long jobPostId
+        final Long roleId,
+        final String name,
+        final Pageable pageable
     );
 
     CostumeApprovalBoardCompanyReadDetailServiceResponseDto getCostumeApprovalBoardDetailForCompany(

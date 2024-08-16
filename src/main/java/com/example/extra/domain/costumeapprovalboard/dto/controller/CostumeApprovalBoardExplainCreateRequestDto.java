@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record CostumeApprovalBoardExplainCreateRequestDto(
-    String image_explain
+    String imageExplain
 ) {
 
 }

@@ -13,12 +13,16 @@ import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApproval
 import com.example.extra.domain.costumeapprovalboard.mapper.dto.CostumeApprovalBoardDtoMapper;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
 import com.example.extra.global.security.UserDetailsImpl;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,6 +33,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,15 +48,19 @@ public class CostumeApprovalBoardController {
 
 
     // 업체가 의상 승인 게시글 목록 조회
-    @GetMapping("/jobposts/{jobPostId}")
+    @GetMapping("/roles/{roleId}")
     public ResponseEntity<?> readCostumeApprovalBoardFromCompany(
-        @PathVariable Long jobPostId,
-        @AuthenticationPrincipal UserDetailsImpl userDetails
+        @PathVariable Long roleId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @RequestParam(required = false) String name,
+        @PageableDefault(size = 5, sort = "createdAt", direction = Direction.DESC) @Parameter(hidden = true) Pageable pageable
     ) {
         List<CostumeApprovalBoardCompanyReadServiceResponseDto> serviceResponseDtoList =
             costumeApprovalBoardService.getCostumeApprovalBoardForCompany(
                 userDetails.getAccount(),
-                jobPostId
+                roleId,
+                name,
+                pageable
             );
         return ResponseEntity.status(HttpStatus.OK)
             .body(serviceResponseDtoList);
