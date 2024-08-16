@@ -4,7 +4,8 @@ import com.example.extra.domain.jobpost.dto.controller.JobPostCreateControllerRe
 import com.example.extra.domain.jobpost.dto.controller.JobPostUpdateControllerRequestDto;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostCreateServiceRequestDto;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostUpdateServiceRequestDto;
-import com.example.extra.domain.jobpost.dto.service.response.JobPostServiceResponseDto;
+import com.example.extra.domain.jobpost.dto.service.response.JobPostCreateServiceResponseDto;
+import com.example.extra.domain.jobpost.dto.service.response.JobPostReadServiceResponseDto;
 import com.example.extra.domain.jobpost.mapper.dto.JobPostDtoMapper;
 import com.example.extra.domain.jobpost.service.JobPostService;
 import com.example.extra.global.security.UserDetailsImpl;
@@ -41,10 +42,12 @@ public class JobPostController {
     ) {
         JobPostCreateServiceRequestDto serviceRequestDto =
             jobPostDtoMapper.toJobPostCreateServiceDto(controllerRequestDto);
-        jobPostService.createJobPost(userDetails.getAccount(), serviceRequestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        JobPostCreateServiceResponseDto serviceResponseDto = jobPostService.createJobPost(
+            userDetails.getAccount(),
+            serviceRequestDto
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(serviceResponseDto);
     }
-
     @PutMapping("/{jobpost_id}")
     public ResponseEntity<?> updateJobPost(
         @PathVariable(name = "jobpost_id") Long jobpostId,
@@ -70,20 +73,20 @@ public class JobPostController {
     }
 
     @GetMapping("/{jobpost_id}")
-    public JobPostServiceResponseDto readOnceJobPost(
+    public JobPostReadServiceResponseDto readOnceJobPost(
         @PathVariable(name = "jobpost_id") Long jobpostId
     ) {
         return jobPostService.readOnceJobPost(jobpostId);
     }
 
     @GetMapping("")
-    public List<JobPostServiceResponseDto> readAllJobPosts(
+    public List<JobPostReadServiceResponseDto> readAllJobPosts(
         @RequestParam int page
     ) {
         return jobPostService.readAllJobPosts(page);
     }
     @GetMapping("/calender")
-    public List<JobPostServiceResponseDto> readAllByCalenderJobPosts(
+    public List<JobPostReadServiceResponseDto> readAllByCalenderJobPosts(
         @RequestParam String year,
         @RequestParam String month,
         @RequestParam int page
