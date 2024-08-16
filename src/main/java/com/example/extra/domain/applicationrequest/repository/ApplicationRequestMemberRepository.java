@@ -39,6 +39,12 @@ public interface ApplicationRequestMemberRepository extends
         ApplyStatus applyStatus
     );
 
+    List<ApplicationRequestMember> findAllByRoleAndApplyStatusAndMember_NameContaining(
+        Role role,
+        ApplyStatus applyStatus,
+        String name
+    );
+
     Optional<ApplicationRequestMember> findByMemberAndRole(
         Member member,
         Role role

@@ -59,7 +59,8 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
     public List<AttendanceManagementReadServiceResponseDto> getApprovedMemberInfo(
         final Account account,
         final Long jobPostId,
-        Pageable pageable
+        final String memberName,
+        final Pageable pageable
     ) {
         Company company = getCompanyByAccount(account);
         JobPost jobPost = getJobPostById(jobPostId);
@@ -68,7 +69,7 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
                 AttendanceManagementErrorCode.FORBIDDEN_ACCESS_ATTENDANCE_MANAGEMENT);
         }
         List<AttendanceManagementReadServiceResponseDto> attendanceManagementReadServiceResponseDtoList =
-            getAttendanceManagementReadServiceResponseDtoList(jobPost);
+            getAttendanceManagementReadServiceResponseDtoList(jobPost, memberName);
 
         sortAttendanceManagementReadServiceResponseDtoList(
             attendanceManagementReadServiceResponseDtoList, pageable);
@@ -208,13 +209,23 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
     }
 
     private List<AttendanceManagementReadServiceResponseDto> getAttendanceManagementReadServiceResponseDtoList(
-        final JobPost jobPost) {
+        final JobPost jobPost,
+        final String memberName
+    ) {
         List<AttendanceManagementReadServiceResponseDto> attendanceManagementReadServiceResponseDtoList = new ArrayList<>();
         List<Role> roleList = roleRepository.findAllByJobPost(jobPost);
         for (Role role : roleList) {
             List<ApplicationRequestMember> applicationRequestMemberList =
-                applicationRequestMemberRepository.findAllByRoleAndApplyStatus(role,
-                    ApplyStatus.APPROVED);
+                (memberName != null && !memberName.isEmpty()) ?
+                    applicationRequestMemberRepository.findAllByRoleAndApplyStatusAndMember_NameContaining(
+                        role,
+                        ApplyStatus.APPROVED,
+                        memberName
+                    ) :
+                    applicationRequestMemberRepository.findAllByRoleAndApplyStatus(
+                        role,
+                        ApplyStatus.APPROVED
+                    );
             for (ApplicationRequestMember applicationRequestMember : applicationRequestMemberList) {
                 // 출석 여부 정보 확인
                 AttendanceManagement attendanceManagement = attendanceManagementRepository.findByMemberAndJobPost(
