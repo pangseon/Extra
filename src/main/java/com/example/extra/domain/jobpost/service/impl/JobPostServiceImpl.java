@@ -7,7 +7,8 @@ import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostCreateServiceRequestDto;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostUpdateServiceRequestDto;
-import com.example.extra.domain.jobpost.dto.service.response.JobPostServiceResponseDto;
+import com.example.extra.domain.jobpost.dto.service.response.JobPostCreateServiceResponseDto;
+import com.example.extra.domain.jobpost.dto.service.response.JobPostReadServiceResponseDto;
 import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.domain.jobpost.exception.JobPostErrorCode;
 import com.example.extra.domain.jobpost.exception.NotFoundJobPostException;
@@ -56,13 +57,14 @@ public class JobPostServiceImpl implements JobPostService {
             .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
     }
 
-    public void createJobPost(
+    public JobPostCreateServiceResponseDto createJobPost(
         final Account account,
         final JobPostCreateServiceRequestDto jobPostCreateServiceRequestDto
     ) {
         JobPost jobPost = jobPostEntityMapper.toJobPost(jobPostCreateServiceRequestDto,
             getCompanyByAccount(account));
-        jobPostRepository.save(jobPost);
+        jobPost = jobPostRepository.save(jobPost);
+        return JobPostCreateServiceResponseDto.from(jobPost);
     }
 
     @Transactional
@@ -94,13 +96,13 @@ public class JobPostServiceImpl implements JobPostService {
     }
 
     @Transactional(readOnly = true)
-    public JobPostServiceResponseDto readOnceJobPost(Long jobPost_id) {
+    public JobPostReadServiceResponseDto readOnceJobPost(Long jobPost_id) {
         return readDto(jobPostRepository.findById(jobPost_id)
             .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST)));
     }
 
     @Transactional(readOnly = true)
-    public List<JobPostServiceResponseDto> readAllJobPosts(int page) {
+    public List<JobPostReadServiceResponseDto> readAllJobPosts(int page) {
         Pageable pageable = PageRequest.of(page,5);
             return scheduleRepository.findAll(pageable)
                 .stream()
@@ -111,7 +113,7 @@ public class JobPostServiceImpl implements JobPostService {
             .toList();
     }
     @Transactional(readOnly = true)
-    public List<JobPostServiceResponseDto> readAllByCalenderJobPosts(int page, int year, int month) {
+    public List<JobPostReadServiceResponseDto> readAllByCalenderJobPosts(int page, int year, int month) {
         Pageable pageable = PageRequest.of(page, 5);
         // 특정 연도와 월에 해당하는 Schedule들을 필터링
         List<Schedule> filteredSchedules = scheduleRepository.findAll(pageable)
@@ -147,8 +149,8 @@ public class JobPostServiceImpl implements JobPostService {
             ));
     }
 
-    private JobPostServiceResponseDto readDto(JobPost jobPost) {
-        return JobPostServiceResponseDto.builder()
+    private JobPostReadServiceResponseDto readDto(JobPost jobPost) {
+        return JobPostReadServiceResponseDto.builder()
             .id(jobPost.getId())
             .title(jobPost.getTitle())
             .gatheringLocation(jobPost.getGatheringLocation())
