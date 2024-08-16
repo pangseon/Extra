@@ -1,6 +1,7 @@
 package com.example.extra.domain.member.entity;
 
 import com.example.extra.domain.account.entity.Account;
+import com.example.extra.domain.member.dto.service.request.MemberUpdateServiceRequestDto;
 import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.global.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -134,5 +135,20 @@ public class Member extends BaseEntity {
 
     public String tokenId() {
         return this.id.toString() + "M";
+    }
+
+    public void update(final MemberUpdateServiceRequestDto serviceRequestDto) {
+        this.name = serviceRequestDto.name();
+        this.sex = serviceRequestDto.sex();
+        this.birthday = serviceRequestDto.birthday();
+        this.home = serviceRequestDto.home();
+        this.height = serviceRequestDto.height();
+        this.weight = serviceRequestDto.weight();
+        this.phone = serviceRequestDto.phone();
+        this.introduction = serviceRequestDto.introduction();
+        this.license = serviceRequestDto.license();
+        this.pros = serviceRequestDto.pros();
+        this.bank = serviceRequestDto.bank();
+        this.accountNumber = serviceRequestDto.accountNumber();
     }
 }

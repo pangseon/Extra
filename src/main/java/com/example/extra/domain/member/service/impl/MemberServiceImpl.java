@@ -5,6 +5,7 @@ import com.example.extra.domain.account.exception.AccountErrorCode;
 import com.example.extra.domain.account.exception.AccountException;
 import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
+import com.example.extra.domain.member.dto.service.request.MemberUpdateServiceRequestDto;
 import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.exception.MemberErrorCode;
@@ -15,12 +16,15 @@ import com.example.extra.domain.member.service.MemberService;
 import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
+import com.example.extra.global.s3.S3Provider;
 import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -33,6 +37,8 @@ public class MemberServiceImpl implements MemberService {
 
     // mapper
     private final MemberEntityMapper memberEntityMapper;
+
+    private final S3Provider s3Provider;
 
     @Override
     @Transactional
@@ -90,6 +96,47 @@ public class MemberServiceImpl implements MemberService {
             .hand(tattoo.getHand())
             .feet(tattoo.getFeet())
             .build();
+    }
+
+    @Override
+    @Transactional
+    public void update(
+        final Account account,
+        final MemberUpdateServiceRequestDto memberUpdateServiceRequestDto,
+        final TattooCreateServiceRequestDto tattooCreateServiceRequestDto,
+        final MultipartFile multipartFile
+    ) throws IOException {
+        Member member = findByAccout(account);
+
+        // tattoo update
+        if (tattooCreateServiceRequestDto != null) {
+            member.updateTattoo(getTattoo(tattooCreateServiceRequestDto));
+        }
+
+        // member update
+        if (memberUpdateServiceRequestDto != null) {
+            member.update(memberUpdateServiceRequestDto);
+
+            // 프로필 이미지 수정
+            if (memberUpdateServiceRequestDto.isImageChange()) {
+                String imageUrl = s3Provider.updateImage(
+                    account.getImageUrl(),
+                    account.getFolderUrl(),
+                    multipartFile
+                );
+                account.updateImageUrl(imageUrl);
+            }
+        }
+    }
+
+    private Tattoo getTattoo(final TattooCreateServiceRequestDto tattooCreateServiceRequestDto) {
+        return tattooRepository.findByTattooCreateServiceRequestDto(tattooCreateServiceRequestDto)
+            .orElseThrow(() -> new IllegalArgumentException("타투 없음"));
+    }
+
+    private Member findByAccout(final Account account) {
+        return memberRepository.findByAccount(account)
+            .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
     }
 
     @Override

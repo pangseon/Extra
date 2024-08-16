@@ -43,6 +43,7 @@ public class AccountServiceImpl implements AccountService {
             .email(serviceRequestDto.email())
             .password(passwordEncoder.encode(serviceRequestDto.password()))
             .userRole(serviceRequestDto.userRole())
+            .folderUrl(serviceRequestDto.email())
             .build();
 
         return new AccountCreateServiceResponseDto(accountRepository.save(account).getId());
