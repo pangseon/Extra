@@ -4,6 +4,7 @@ import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,7 +31,7 @@ public class Schedule extends BaseEntity {
     @Column(nullable = false)
     private LocalDate calender;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "jobpost_id",nullable = false)
     private JobPost jobPost;
