@@ -9,6 +9,7 @@ import com.example.extra.domain.attendancemanagement.mapper.dto.AttendanceManage
 import com.example.extra.domain.attendancemanagement.service.AttendanceManagementService;
 import com.example.extra.domain.attendancemanagement.util.ExcelFile;
 import com.example.extra.global.security.UserDetailsImpl;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -42,12 +44,14 @@ public class AttendanceManagementController {
     public ResponseEntity<?> readAllAttendanceManagementByJobPost(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "jobPostId") Long jobPostId,
-        @PageableDefault(size = 10, sort = "roleName", direction = Direction.ASC) Pageable pageable
+        @RequestParam(required = false) String name,
+        @PageableDefault(size = 5, sort = "roleName", direction = Direction.ASC) @Parameter(hidden = true) Pageable pageable
     ) {
         List<AttendanceManagementReadServiceResponseDto> serviceResponseDtoList =
             attendanceManagementService.getApprovedMemberInfo(
                 userDetails.getAccount(),
                 jobPostId,
+                name,
                 pageable
             );
         return ResponseEntity.status(HttpStatus.OK)

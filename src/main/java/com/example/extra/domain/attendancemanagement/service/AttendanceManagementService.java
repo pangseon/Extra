@@ -12,7 +12,8 @@ public interface AttendanceManagementService {
     List<AttendanceManagementReadServiceResponseDto> getApprovedMemberInfo(
         final Account account,
         final Long jobPostId,
-        Pageable pageable
+        final String memberName,
+        final Pageable pageable
     );
 
     void updateClockInTime(
