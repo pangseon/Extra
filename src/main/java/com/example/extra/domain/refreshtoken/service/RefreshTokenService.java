@@ -4,6 +4,7 @@ import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.account.exception.AccountErrorCode;
 import com.example.extra.domain.account.exception.AccountException;
 import com.example.extra.domain.account.repository.AccountRepository;
+import com.example.extra.domain.refreshtoken.dto.RefreshTokenCreateServiceResponseDto;
 import com.example.extra.domain.refreshtoken.exception.TokenErrorCode;
 import com.example.extra.domain.refreshtoken.exception.TokenException;
 import com.example.extra.domain.refreshtoken.repository.RefreshTokenRepository;
@@ -26,7 +27,7 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final AccountRepository accountRepository;
 
-    public void getNewAccessToken(
+    public RefreshTokenCreateServiceResponseDto getNewAccessToken(
         final HttpServletRequest httpServletRequest,
         final HttpServletResponse httpServletResponse
     ) {
@@ -53,6 +54,8 @@ public class RefreshTokenService {
 
             account.updateRefreshToken(jwtUtil.substringToken(newRefreshToken));
             jwtUtil.addTokenHeader(newAccessToken, httpServletResponse);
+
+            return new RefreshTokenCreateServiceResponseDto(newRefreshToken);
         } else {
             throw new TokenException(TokenErrorCode.INVALID_TOKEN);
         }
