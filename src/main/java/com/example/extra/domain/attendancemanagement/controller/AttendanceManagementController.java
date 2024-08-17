@@ -60,7 +60,7 @@ public class AttendanceManagementController {
     }
 
     // 해당 공고 출연자 세부 정보 조회
-    @GetMapping("/jobposts/attendance-management/{attendance_management_id}")
+    @GetMapping("/attendance-management/{attendance_management_id}")
     public ResponseEntity<MemberReadServiceResponseDto> readMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "attendance_management_id") Long attendanceManagementId
