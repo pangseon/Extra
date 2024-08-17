@@ -3,6 +3,7 @@ package com.example.extra.domain.member.controller;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
+import com.example.extra.domain.member.dto.controller.MemberCreateControllerRequestDto;
 import com.example.extra.domain.member.dto.controller.MemberSignUpControllerRequestDto;
 import com.example.extra.domain.member.dto.controller.MemberUpdateControllerRequestDto;
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
@@ -10,9 +11,6 @@ import com.example.extra.domain.member.dto.service.request.MemberUpdateServiceRe
 import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.member.mapper.dto.MemberDtoMapper;
 import com.example.extra.domain.member.service.MemberService;
-import com.example.extra.domain.tattoo.dto.controller.TattooCreateControllerRequestDto;
-import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
-import com.example.extra.domain.tattoo.mapper.dto.TattooDtoMapper;
 import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,25 +37,14 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MemberDtoMapper memberDtoMapper;
-    private final TattooDtoMapper tattooDtoMapper;
-    public static final String AUTHORIZATION_HEADER = "Authorization";
 
     @PostMapping("/signup")
     public ResponseEntity<Void> signup(
-        @Valid @RequestBody MemberSignUpControllerRequestDto requestDto
+        @Valid @RequestBody MemberCreateControllerRequestDto controllerRequestDto
     ) {
-        MemberCreateServiceRequestDto memberCreateServiceRequestDto =
-            memberDtoMapper.toMemberCreateServiceRequestDto(
-                requestDto.memberCreate());
-        TattooCreateServiceRequestDto tattooCreateServiceRequestDto =
-            tattooDtoMapper.toTattooCreateServiceRequestDto(
-                requestDto.tattooCreate());
-
-        memberService.signup(
-            memberCreateServiceRequestDto,
-            tattooCreateServiceRequestDto
-        );
-
+        MemberCreateServiceRequestDto serviceRequestDto =
+            memberDtoMapper.toMemberCreateServiceRequestDto(controllerRequestDto);
+        memberService.signup(serviceRequestDto);
         return ResponseEntity
             .status(CREATED)
             .build();
@@ -82,24 +69,15 @@ public class MemberController {
     @PutMapping("")
     public ResponseEntity<Void> update(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @Nullable @RequestPart(name = "member") MemberUpdateControllerRequestDto memberUpdateControllerRequestDto,
-        @Nullable @RequestPart(name = "tattoo") TattooCreateControllerRequestDto tattooCreateControllerRequestDto,
+        @Nullable @RequestPart(name = "member") MemberUpdateControllerRequestDto controllerRequestDto,
         @Nullable @RequestPart(name = "image") MultipartFile multipartFile
     ) throws IOException {
-        MemberUpdateServiceRequestDto memberServiceRequestDto =
-            memberUpdateControllerRequestDto == null ?
-                null :
-                memberDtoMapper.toMemberUpdateServiceRequestDto(memberUpdateControllerRequestDto);
-
-        TattooCreateServiceRequestDto tattooServiceRequestDto =
-            tattooCreateControllerRequestDto == null ?
-                null :
-                tattooDtoMapper.toTattooCreateServiceRequestDto(tattooCreateControllerRequestDto);
+        MemberUpdateServiceRequestDto serviceRequestDto =
+            memberDtoMapper.toMemberUpdateServiceRequestDto(controllerRequestDto);
 
         memberService.update(
             userDetails.getAccount(),
-            memberServiceRequestDto,
-            tattooServiceRequestDto,
+            serviceRequestDto,
             multipartFile
         );
 

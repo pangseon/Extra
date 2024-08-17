@@ -11,17 +11,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TattooRepository extends JpaRepository<Tattoo, Long> {
-    // TODO - member 부분 dto 구조 수정 시 삭제
-    @Query("SELECT t FROM Tattoo t WHERE " +
-        "t.face = :#{#dto.face} AND " +
-        "t.chest = :#{#dto.chest} AND " +
-        "t.arm = :#{#dto.arm} AND " +
-        "t.leg = :#{#dto.leg} AND " +
-        "t.shoulder = :#{#dto.shoulder} AND " +
-        "t.back = :#{#dto.back} AND " +
-        "t.hand = :#{#dto.hand} AND " +
-        "t.feet = :#{#dto.feet}")
-    Optional<Tattoo> findByTattooCreateServiceRequestDto(@Param("dto") TattooCreateServiceRequestDto dto);
     @Query("SELECT t FROM Tattoo t WHERE " +
         "t.face = :#{#dto.face} AND " +
         "t.chest = :#{#dto.chest} AND " +
