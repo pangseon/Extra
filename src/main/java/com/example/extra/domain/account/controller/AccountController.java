@@ -7,6 +7,7 @@ import com.example.extra.domain.account.dto.service.request.AccountLoginServiceR
 import com.example.extra.domain.account.dto.service.response.AccountLoginServiceResponseDto;
 import com.example.extra.domain.account.mapper.dto.AccountDtoMapper;
 import com.example.extra.domain.account.service.AccountService;
+import com.example.extra.domain.refreshtoken.dto.RefreshTokenCreateServiceResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -57,6 +58,6 @@ public class AccountController {
                 AUTHORIZATION_HEADER,
                 serviceResponseDto.accessToken()
             )
-            .body(serviceResponseDto.refreshToken());
+            .body(new RefreshTokenCreateServiceResponseDto(serviceResponseDto.refreshToken()));
     }
 }
