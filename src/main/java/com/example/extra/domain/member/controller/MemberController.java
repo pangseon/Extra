@@ -108,7 +108,7 @@ public class MemberController {
             .build();
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping("")
     public ResponseEntity<Void> delete(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         memberService.delete(userDetails.getAccount());
 
