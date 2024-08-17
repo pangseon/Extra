@@ -8,6 +8,7 @@ import com.example.extra.domain.attendancemanagement.dto.service.AttendanceManag
 import com.example.extra.domain.attendancemanagement.mapper.dto.AttendanceManagementDtoMapper;
 import com.example.extra.domain.attendancemanagement.service.AttendanceManagementService;
 import com.example.extra.domain.attendancemanagement.util.ExcelFile;
+import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
@@ -58,6 +59,25 @@ public class AttendanceManagementController {
             .body(serviceResponseDtoList);
     }
 
+    // 해당 공고 출연자 세부 정보 조회
+    @GetMapping("/jobposts/{jobPost_id}/members/{member_id}")
+    public ResponseEntity<MemberReadServiceResponseDto> readMember(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PathVariable(name = "jobPost_id") Long jobPostId,
+        @PathVariable(name = "member_id") Long memberId
+    ) {
+        MemberReadServiceResponseDto serviceResponseDto =
+            attendanceManagementService.readMember(
+                userDetails.getAccount(),
+                jobPostId,
+                memberId
+            );
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(serviceResponseDto);
+    }
+
     // QR 출근 체크
     @PutMapping("/jobposts/{jobPostId}/clock-in")
     public ResponseEntity<?> updateAttendanceManagementClockInTime(
@@ -65,6 +85,7 @@ public class AttendanceManagementController {
         @PathVariable(name = "jobPostId") Long jobPostId,
         @Valid @RequestBody AttendanceManagementUpdateControllerRequestDto controllerRequestDto
     ) {
+
         AttendanceManagementUpdateServiceRequestDto serviceRequestDto =
             attendanceManagementDtoMapper.toAttendanceManagementUpdateServiceRequestDto(
                 controllerRequestDto
