@@ -11,10 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface MemberService {
 
-    void signup(
-        final MemberCreateServiceRequestDto memberCreateServiceRequestDto,
-        final TattooCreateServiceRequestDto tattooCreateServiceRequestDto
-    );
+    void signup(final MemberCreateServiceRequestDto memberCreateServiceRequestDto);
 
     MemberReadServiceResponseDto readOnce(
         final Account account,
@@ -24,9 +21,8 @@ public interface MemberService {
     void delete(final Account account);
 
     void update(
-        Account account,
-        MemberUpdateServiceRequestDto memberUpdateServiceRequestDto,
-        TattooCreateServiceRequestDto tattooCreateServiceRequestDto,
-        MultipartFile multipartFile
+        final Account account,
+        final MemberUpdateServiceRequestDto memberUpdateServiceRequestDto,
+        final MultipartFile multipartFile
     ) throws IOException;
 }

@@ -13,6 +13,7 @@ import com.example.extra.domain.member.exception.MemberException;
 import com.example.extra.domain.member.mapper.entity.MemberEntityMapper;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.member.service.MemberService;
+import com.example.extra.domain.tattoo.dto.controller.TattooCreateControllerRequestDto;
 import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
@@ -41,10 +42,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void signup(
-        final MemberCreateServiceRequestDto memberCreateServiceRequestDto,
-        final TattooCreateServiceRequestDto tattooCreateServiceRequestDto
-    ) {
+    public void signup(final MemberCreateServiceRequestDto memberCreateServiceRequestDto) {
         Account account = accountRepository.findById(memberCreateServiceRequestDto.accountId())
             .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
 
@@ -60,8 +58,8 @@ public class MemberServiceImpl implements MemberService {
         }
 
         Member member = memberEntityMapper.toMember(memberCreateServiceRequestDto, account);
-        Tattoo tattoo = tattooRepository.findByTattooCreateServiceRequestDto(
-                tattooCreateServiceRequestDto)
+        Tattoo tattoo = tattooRepository.findByTattooCreateControllerRequestDto(
+                memberCreateServiceRequestDto.tattoo())
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_TATTOO));
 
         member.updateTattoo(tattoo);
@@ -75,27 +73,7 @@ public class MemberServiceImpl implements MemberService {
         final HttpServletRequest request
     ) {
         Member member = findByAccount(account);
-        Tattoo tattoo = member.getTattoo();
-        return MemberReadServiceResponseDto.builder()
-            .name(member.getName())
-            .sex(member.getSex())
-            .birthday(member.getBirthday())
-            .home(member.getHome())
-            .height(member.getHeight())
-            .weight(member.getWeight())
-            .introduction(member.getIntroduction())
-            .license(member.getLicense())
-            .pros(member.getPros())
-            .imageUrl(account.getImageUrl())
-            .face(tattoo.getFace())
-            .chest(tattoo.getChest())
-            .arm(tattoo.getArm())
-            .leg(tattoo.getLeg())
-            .shoulder(tattoo.getShoulder())
-            .back(tattoo.getBack())
-            .hand(tattoo.getHand())
-            .feet(tattoo.getFeet())
-            .build();
+        return MemberReadServiceResponseDto.from(member);
     }
 
     @Override
@@ -103,19 +81,17 @@ public class MemberServiceImpl implements MemberService {
     public void update(
         final Account account,
         final MemberUpdateServiceRequestDto memberUpdateServiceRequestDto,
-        final TattooCreateServiceRequestDto tattooCreateServiceRequestDto,
         final MultipartFile multipartFile
     ) throws IOException {
         Member member = findByAccount(account);
-
-        // tattoo update
-        if (tattooCreateServiceRequestDto != null) {
-            member.updateTattoo(getTattoo(tattooCreateServiceRequestDto));
-        }
-
         // member update
         if (memberUpdateServiceRequestDto != null) {
             member.update(memberUpdateServiceRequestDto);
+
+            // tattoo update
+            if (memberUpdateServiceRequestDto.tattoo() != null){
+                member.updateTattoo(getTattoo(memberUpdateServiceRequestDto.tattoo()));
+            }
 
             // 프로필 이미지 수정
             if (memberUpdateServiceRequestDto.isImageChange()) {
@@ -129,9 +105,9 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
-    private Tattoo getTattoo(final TattooCreateServiceRequestDto tattooCreateServiceRequestDto) {
-        return tattooRepository.findByTattooCreateServiceRequestDto(tattooCreateServiceRequestDto)
-            .orElseThrow(() -> new IllegalArgumentException("타투 없음"));
+    private Tattoo getTattoo(final TattooCreateControllerRequestDto tattooCreateControllerRequestDto) {
+        return tattooRepository.findByTattooCreateControllerRequestDto(tattooCreateControllerRequestDto)
+            .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_TATTOO));
     }
 
     private Member findByAccount(final Account account) {
@@ -144,10 +120,5 @@ public class MemberServiceImpl implements MemberService {
     public void delete(final Account account) {
         Member member = findByAccount(account);
         memberRepository.delete(member);
-    }
-
-    private Member findById(Long id) {
-        return memberRepository.findById(id)
-            .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
     }
 }
