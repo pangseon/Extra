@@ -5,7 +5,6 @@ import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRe
 import com.example.extra.domain.member.dto.service.request.MemberUpdateServiceRequestDto;
 import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
-import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,10 +21,7 @@ public interface MemberService {
         final HttpServletRequest request
     );
 
-    void delete(
-        final UserDetailsImpl userDetails,
-        final HttpServletRequest request
-    );
+    void delete(final Account account);
 
     void update(
         Account account,

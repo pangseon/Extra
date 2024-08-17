@@ -17,7 +17,6 @@ import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRe
 import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
 import com.example.extra.global.s3.S3Provider;
-import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -75,7 +74,7 @@ public class MemberServiceImpl implements MemberService {
         final Account account,
         final HttpServletRequest request
     ) {
-        Member member = findById(account.getId());
+        Member member = findByAccout(account);
         Tattoo tattoo = member.getTattoo();
         return MemberReadServiceResponseDto.builder()
             .name(member.getName())
@@ -142,11 +141,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void delete(
-        final UserDetailsImpl userDetails,
-        final HttpServletRequest request
-    ) {
-        Member member = findById(userDetails.getAccount().getId());
+    public void delete(final Account account) {
+        Member member = findByAccout(account);
         memberRepository.delete(member);
     }
 

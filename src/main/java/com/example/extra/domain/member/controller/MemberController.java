@@ -14,7 +14,6 @@ import com.example.extra.domain.member.service.MemberService;
 import com.example.extra.domain.tattoo.dto.controller.TattooCreateControllerRequestDto;
 import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import com.example.extra.domain.tattoo.mapper.dto.TattooDtoMapper;
-import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -82,7 +81,7 @@ public class MemberController {
 
     @PutMapping("")
     public ResponseEntity<Void> update(
-        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @AuthenticationPrincipal Account account,
         @Nullable @RequestPart(name = "member") MemberUpdateControllerRequestDto memberUpdateControllerRequestDto,
         @Nullable @RequestPart(name = "tattoo") TattooCreateControllerRequestDto tattooCreateControllerRequestDto,
         @Nullable @RequestPart(name = "image") MultipartFile multipartFile
@@ -98,7 +97,7 @@ public class MemberController {
                 tattooDtoMapper.toTattooCreateServiceRequestDto(tattooCreateControllerRequestDto);
 
         memberService.update(
-            userDetails.getAccount(),
+            account,
             memberServiceRequestDto,
             tattooServiceRequestDto,
             multipartFile
@@ -109,15 +108,9 @@ public class MemberController {
             .build();
     }
 
-    @DeleteMapping("/{member_id}")
-    public ResponseEntity<Void> delete(
-        @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @NotNull HttpServletRequest request
-    ) {
-        memberService.delete(
-            userDetails,
-            request
-        );
+    @DeleteMapping("/")
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal Account account) {
+        memberService.delete(account);
 
         return ResponseEntity
             .status(OK)
