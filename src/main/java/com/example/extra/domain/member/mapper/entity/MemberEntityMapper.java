@@ -8,17 +8,13 @@ import com.example.extra.domain.member.dto.service.response.MemberReadServiceRes
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.tattoo.entity.Tattoo;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = SPRING)
+@Mapper(componentModel = SPRING, unmappedTargetPolicy = ReportingPolicy.IGNORE, unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface MemberEntityMapper {
 
     Member toMember(
         MemberCreateServiceRequestDto memberCreateServiceRequestDto,
         Account account
-    );
-
-    MemberReadServiceResponseDto toMemberReadServiceResponseDto(
-        Member member,
-        Tattoo tattoo
     );
 }
