@@ -3,7 +3,6 @@ package com.example.extra.domain.costumeapprovalboard.service.impl;
 import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.account.exception.AccountErrorCode;
 import com.example.extra.domain.account.exception.AccountException;
-import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.domain.applicationrequest.entity.ApplicationRequestCompany;
 import com.example.extra.domain.applicationrequest.entity.ApplicationRequestMember;
 import com.example.extra.domain.applicationrequest.exception.ApplicationRequestErrorCode;
@@ -23,14 +22,12 @@ import com.example.extra.domain.costumeapprovalboard.exception.CostumeApprovalBo
 import com.example.extra.domain.costumeapprovalboard.exception.CostumeApprovalBoardException;
 import com.example.extra.domain.costumeapprovalboard.repository.CostumeApprovalBoardRepository;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
-import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.domain.jobpost.exception.JobPostErrorCode;
 import com.example.extra.domain.jobpost.exception.NotFoundJobPostException;
-import com.example.extra.domain.jobpost.repository.JobPostRepository;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.role.entity.Role;
-import com.example.extra.domain.role.exception.NotFoundRoleException;
+import com.example.extra.domain.role.exception.RoleException;
 import com.example.extra.domain.role.exception.RoleErrorCode;
 import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.global.enums.ApplyStatus;
@@ -40,7 +37,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -178,7 +174,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     ) throws IOException {
         Member member = getMemberByAccount(account);
         Role role = roleRepository.findById(roleId)
-            .orElseThrow(() -> new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
+            .orElseThrow(() -> new RoleException(RoleErrorCode.NOT_FOUND_ROLE));
         // 이미 의상 승인 글을 작성한 경우
         costumeApprovalBoardRepository.findByMemberAndRole(
                 member,

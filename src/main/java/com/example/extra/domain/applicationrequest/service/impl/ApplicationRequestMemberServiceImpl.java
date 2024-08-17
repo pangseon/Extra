@@ -19,7 +19,7 @@ import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.role.entity.Role;
-import com.example.extra.domain.role.exception.NotFoundRoleException;
+import com.example.extra.domain.role.exception.RoleException;
 import com.example.extra.domain.role.exception.RoleErrorCode;
 import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.global.enums.ApplyStatus;
@@ -221,7 +221,7 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
 
     private Role getRoleById(final Long roleId) {
         return roleRepository.findById(roleId).orElseThrow(
-            () -> new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE)
+            () -> new RoleException(RoleErrorCode.NOT_FOUND_ROLE)
         );
     }
 

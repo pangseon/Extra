@@ -21,6 +21,7 @@ import com.example.extra.domain.schedule.service.ScheduleService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -35,7 +36,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         return companyRepository.findByAccount(account)
             .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
     }
-
+    @Override
+    @Transactional
     public void createSchedule(
         Long jobPost_id,
         final Account account,
@@ -50,7 +52,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         scheduleRepository.save(schedule);
 
     }
-
+    @Override
+    @Transactional
     public void updateSchedule(
         Long jobPost_id,
         Long schedule_id,
@@ -65,7 +68,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         schedule.updateSchedule(scheduleUpdateServiceRequestDto.calender());
         scheduleRepository.save(schedule);
     }
-
+    @Override
+    @Transactional
     public void deleteSchedule(
         Long jobPost_id,
         Long schedule_id,
@@ -78,7 +82,8 @@ public class ScheduleServiceImpl implements ScheduleService {
             .orElseThrow(() -> new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
         scheduleRepository.delete(schedule);
     }
-
+    @Override
+    @Transactional(readOnly = true)
     public ScheduleServiceResponseDto readSchedule(
         Long jobPost_id,
         Long schedule_id) {
@@ -88,7 +93,8 @@ public class ScheduleServiceImpl implements ScheduleService {
             .orElseThrow(() -> new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
         return scheduleEntityMapper.toScheduleServiceResponseDto(schedule);
     }
-
+    @Override
+    @Transactional(readOnly = true)
     public List<ScheduleServiceResponseDto> readAllSchedule(Long jobPost_id) {
         JobPost jobPost = jobPostRepository.findById(jobPost_id)
             .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));

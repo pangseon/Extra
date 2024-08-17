@@ -1,5 +1,6 @@
 package com.example.extra.domain.jobpost.dto.service.response;
 
+import com.example.extra.domain.tattoo.dto.service.response.TattooReadServiceResponseDto;
 import com.example.extra.global.enums.Category;
 import com.example.extra.global.enums.Season;
 import java.time.LocalDate;
@@ -27,7 +28,7 @@ public record JobPostReadServiceResponseDto(
     List<Integer> limitPersonnelList,
     List<Integer> currentPersonnelList,
     List<Season> seasonList,
-    List<Boolean> checkTattooList
+    List<TattooReadServiceResponseDto> tattooList
 ) {
 
 }

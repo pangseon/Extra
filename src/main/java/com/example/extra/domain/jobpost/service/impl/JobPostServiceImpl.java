@@ -18,13 +18,14 @@ import com.example.extra.domain.jobpost.service.JobPostService;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.role.entity.Role;
-import com.example.extra.domain.role.exception.NotFoundRoleException;
+import com.example.extra.domain.role.exception.RoleException;
 import com.example.extra.domain.role.exception.RoleErrorCode;
 import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.domain.schedule.entity.Schedule;
 import com.example.extra.domain.schedule.exception.NotFoundScheduleException;
 import com.example.extra.domain.schedule.exception.ScheduleErrorCode;
 import com.example.extra.domain.schedule.repository.ScheduleRepository;
+import com.example.extra.domain.tattoo.dto.service.response.TattooReadServiceResponseDto;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -44,19 +45,9 @@ public class JobPostServiceImpl implements JobPostService {
     private final JobPostEntityMapper jobPostEntityMapper;
     private final ScheduleRepository scheduleRepository;
     private final RoleRepository roleRepository;
-    private final MemberRepository memberRepository;
     private final CompanyRepository companyRepository;
-
-    private Member getMemberByAccount(final Account account) {
-        return memberRepository.findByAccount(account)
-            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
-    }
-
-    private Company getCompanyByAccount(final Account account) {
-        return companyRepository.findByAccount(account)
-            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
-    }
-
+    @Override
+    @Transactional
     public JobPostCreateServiceResponseDto createJobPost(
         final Account account,
         final JobPostCreateServiceRequestDto jobPostCreateServiceRequestDto
@@ -66,7 +57,7 @@ public class JobPostServiceImpl implements JobPostService {
         jobPost = jobPostRepository.save(jobPost);
         return JobPostCreateServiceResponseDto.from(jobPost);
     }
-
+    @Override
     @Transactional
     public void updateJobPost(
         Long jobPost_id,
@@ -84,7 +75,8 @@ public class JobPostServiceImpl implements JobPostService {
             jobPostUpdateServiceRequestDto.category());
         jobPostRepository.save(jobPost);
     }
-
+    @Override
+    @Transactional
     public void deleteJobPost(
         Long jobPost_id,
         final Account account
@@ -94,13 +86,13 @@ public class JobPostServiceImpl implements JobPostService {
             .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
         jobPostRepository.delete(jobPost);
     }
-
+    @Override
     @Transactional(readOnly = true)
     public JobPostReadServiceResponseDto readOnceJobPost(Long jobPost_id) {
         return readDto(jobPostRepository.findById(jobPost_id)
             .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST)));
     }
-
+    @Override
     @Transactional(readOnly = true)
     public List<JobPostReadServiceResponseDto> readAllJobPosts(int page) {
         Pageable pageable = PageRequest.of(page,5);
@@ -112,6 +104,7 @@ public class JobPostServiceImpl implements JobPostService {
             .map(this::readDto)
             .toList();
     }
+    @Override
     @Transactional(readOnly = true)
     public List<JobPostReadServiceResponseDto> readAllByCalenderJobPosts(int page, int year, int month) {
         Pageable pageable = PageRequest.of(page, 5);
@@ -130,6 +123,7 @@ public class JobPostServiceImpl implements JobPostService {
             .map(this::readDto) // DTO로 변환
             .toList();
     }
+    @Override
     @Transactional(readOnly = true)
     public Map<LocalDate, List<Long>> readJobPostIdsByMonth(int year, int month) {
         // 해당 연도와 월에 해당하는 LocalDate 범위를 생성
@@ -182,9 +176,10 @@ public class JobPostServiceImpl implements JobPostService {
                 .stream()
                 .map(Role::getSex)
                 .toList())
-            .checkTattooList(roleList(jobPost.getId())
+            .tattooList(roleList(jobPost.getId())
                 .stream()
-                .map(Role::getCheckTattoo)
+                .map(Role::getTattoo)
+                .map(TattooReadServiceResponseDto::from)
                 .toList())
             .currentPersonnelList(roleList(jobPost.getId())
                 .stream()
@@ -200,10 +195,14 @@ public class JobPostServiceImpl implements JobPostService {
                 .toList())
             .build();
     }
+    private Company getCompanyByAccount(final Account account) {
+        return companyRepository.findByAccount(account)
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
+    }
 
     private List<Role> roleList(Long jobPost_id) {
         return roleRepository.findByJobPostId(jobPost_id)
-            .orElseThrow(() -> new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
+            .orElseThrow(() -> new RoleException(RoleErrorCode.NOT_FOUND_ROLE));
     }
 
     private List<Schedule> scheduleList(Long jobPost_id) {

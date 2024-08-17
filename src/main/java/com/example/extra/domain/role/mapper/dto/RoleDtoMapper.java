@@ -15,8 +15,7 @@ public interface RoleDtoMapper {
     RoleCreateServiceRequestDto toRoleCreateServiceDto(
       RoleCreateControllerRequestDto roleCreateControllerRequestDto
     );
-    List<RoleCreateServiceRequestDto> toRoleCreateServiceRequestDtoList(
-    List<RoleCreateControllerRequestDto> roleCreateControllerRequestDtoList);
     RoleUpdateServiceRequestDto toRoleUpdateServiceDto(
-        RoleUpdateControllerRequestDto roleUpdateControllerRequestDto);
+        RoleUpdateControllerRequestDto roleUpdateControllerRequestDto
+    );
 }

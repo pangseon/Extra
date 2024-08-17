@@ -1,6 +1,7 @@
 package com.example.extra.domain.role.entity;
 
 import com.example.extra.domain.jobpost.entity.JobPost;
+import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.global.entity.BaseEntity;
 import com.example.extra.global.enums.Season;
 import jakarta.persistence.Column;
@@ -17,6 +18,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -54,8 +56,10 @@ public class Role extends BaseEntity {
     @Column
     private Season season;
 
-    @Column
-    private Boolean checkTattoo;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "tattoo_id")
+    @ToString.Exclude
+    private Tattoo tattoo;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -72,7 +76,7 @@ public class Role extends BaseEntity {
         final Integer limitPersonnel,
         final Integer currentPersonnel,
         final Season season,
-        final Boolean checkTattoo,
+        final Tattoo tattoo,
         final JobPost jobPost
     ) {
         this.roleName = roleName;
@@ -83,7 +87,7 @@ public class Role extends BaseEntity {
         this.limitPersonnel = limitPersonnel;
         this.currentPersonnel = currentPersonnel;
         this.season = season;
-        this.checkTattoo = checkTattoo;
+        this.tattoo = tattoo;
         this.jobPost = jobPost;
     }
 
@@ -96,7 +100,7 @@ public class Role extends BaseEntity {
         Integer limitPersonnel,
         Integer currentPersonnel,
         Season season,
-        Boolean checkTattoo
+        Tattoo tattoo
     ) {
         this.roleName = roleName;
         this.costume = costume;
@@ -106,9 +110,11 @@ public class Role extends BaseEntity {
         this.limitPersonnel = limitPersonnel;
         this.currentPersonnel = currentPersonnel;
         this.season = season;
-        this.checkTattoo = checkTattoo;
+        this.tattoo = tattoo;
     }
-
+    public void updateTattoo(Tattoo tattoo) {
+        this.tattoo = tattoo;
+    }
     public void addOneToCurrentPersonnel() {
         this.currentPersonnel += 1;
     }

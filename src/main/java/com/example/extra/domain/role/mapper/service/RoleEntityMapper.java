@@ -7,11 +7,10 @@ import com.example.extra.domain.role.dto.service.request.RoleCreateServiceReques
 import com.example.extra.domain.role.dto.service.response.RoleServiceResponseDto;
 import com.example.extra.domain.role.entity.Role;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = SPRING)
+@Mapper(componentModel = SPRING, unmappedTargetPolicy = ReportingPolicy.IGNORE, unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface RoleEntityMapper {
 
     Role toRole(RoleCreateServiceRequestDto roleCreateServiceRequestDto, JobPost jobPost);
-
-    RoleServiceResponseDto toRoleServiceResponseDto(Role role, Integer min_Age, Integer max_Age);
 }
