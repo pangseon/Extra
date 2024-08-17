@@ -7,7 +7,7 @@ import java.util.List;
 import lombok.Builder;
 
 @Builder
-public record JobPostServiceResponseDto(
+public record JobPostReadServiceResponseDto(
     Long id,
     String title,
     String gatheringLocation,
