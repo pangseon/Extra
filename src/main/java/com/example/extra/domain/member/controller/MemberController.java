@@ -4,6 +4,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.example.extra.domain.member.dto.controller.MemberCreateControllerRequestDto;
+import com.example.extra.domain.member.dto.controller.MemberSignUpControllerRequestDto;
 import com.example.extra.domain.member.dto.controller.MemberUpdateControllerRequestDto;
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
 import com.example.extra.domain.member.dto.service.request.MemberUpdateServiceRequestDto;
