@@ -62,12 +62,8 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
         final String memberName,
         final Pageable pageable
     ) {
-        Company company = getCompanyByAccount(account);
-        JobPost jobPost = getJobPostById(jobPostId);
-        if (!Objects.equals(jobPost.getCompany().getId(), company.getId())) {
-            throw new AttendanceManagementException(
-                AttendanceManagementErrorCode.FORBIDDEN_ACCESS_ATTENDANCE_MANAGEMENT);
-        }
+        JobPost jobPost = validateCompanyOwnJobPost(account,
+            jobPostId);
         List<AttendanceManagementReadServiceResponseDto> attendanceManagementReadServiceResponseDtoList =
             getAttendanceManagementReadServiceResponseDtoList(jobPost, memberName);
 
@@ -87,12 +83,10 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
         final Long jobPostId,
         final AttendanceManagementUpdateServiceRequestDto attendanceManagementUpdateServiceRequestDto
     ) {
-        Company company = getCompanyByAccount(account);
-        JobPost jobPost = getJobPostById(jobPostId);
-        if (!Objects.equals(jobPost.getCompany().getId(), company.getId())) {
-            throw new AttendanceManagementException(
-                AttendanceManagementErrorCode.FORBIDDEN_ACCESS_ATTENDANCE_MANAGEMENT);
-        }
+        JobPost jobPost = validateCompanyOwnJobPost(
+            account,
+            jobPostId
+        );
         AttendanceManagement attendanceManagement = getAttendanceManagementByJobPostAndRequestDto(
             jobPost,
             attendanceManagementUpdateServiceRequestDto
@@ -112,12 +106,10 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
         final Long jobPostId,
         final AttendanceManagementUpdateServiceRequestDto attendanceManagementUpdateServiceRequestDto
     ) {
-        Company company = getCompanyByAccount(account);
-        JobPost jobPost = getJobPostById(jobPostId);
-        if (!Objects.equals(jobPost.getCompany().getId(), company.getId())) {
-            throw new AttendanceManagementException(
-                AttendanceManagementErrorCode.FORBIDDEN_ACCESS_ATTENDANCE_MANAGEMENT);
-        }
+        JobPost jobPost = validateCompanyOwnJobPost(
+            account,
+            jobPostId
+        );
         AttendanceManagement attendanceManagement = getAttendanceManagementByJobPostAndRequestDto(
             jobPost,
             attendanceManagementUpdateServiceRequestDto
@@ -137,12 +129,10 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
         final Long jobPostId,
         final AttendanceManagementUpdateServiceRequestDto attendanceManagementUpdateServiceRequestDto
     ) {
-        Company company = getCompanyByAccount(account);
-        JobPost jobPost = getJobPostById(jobPostId);
-        if (!Objects.equals(jobPost.getCompany().getId(), company.getId())) {
-            throw new AttendanceManagementException(
-                AttendanceManagementErrorCode.FORBIDDEN_ACCESS_ATTENDANCE_MANAGEMENT);
-        }
+        JobPost jobPost = validateCompanyOwnJobPost(
+            account,
+            jobPostId
+        );
         AttendanceManagement attendanceManagement = getAttendanceManagementByJobPostAndRequestDto(
             jobPost,
             attendanceManagementUpdateServiceRequestDto
@@ -156,12 +146,10 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
         final Account account,
         final Long jobPostId
     ) {
-        Company company = getCompanyByAccount(account);
-        JobPost jobPost = getJobPostById(jobPostId);
-        if (!Objects.equals(jobPost.getCompany().getId(), company.getId())) {
-            throw new AttendanceManagementException(
-                AttendanceManagementErrorCode.FORBIDDEN_ACCESS_ATTENDANCE_MANAGEMENT);
-        }
+        JobPost jobPost = validateCompanyOwnJobPost(
+            account,
+            jobPostId
+        );
         List<AttendanceManagement> attendanceManagementList = attendanceManagementRepository.findAllByJobPost(
             jobPost);
         return attendanceManagementEntityMapper.toAttendanceManagementCreateExcelServiceResponseDtoList(
@@ -279,5 +267,20 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
     private Company getCompanyByAccount(final Account account) {
         return companyRepository.findByAccount(account)
             .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
+    }
+
+    private JobPost validateCompanyOwnJobPost(
+        final Account account,
+        final Long jobPostId
+    ) {
+        Company company = getCompanyByAccount(account);
+        JobPost jobPost = getJobPostById(jobPostId);
+
+        if (!Objects.equals(jobPost.getCompany().getId(), company.getId())) {
+            throw new AttendanceManagementException(
+                AttendanceManagementErrorCode.FORBIDDEN_ACCESS_ATTENDANCE_MANAGEMENT);
+        }
+
+        return jobPost;
     }
 }
