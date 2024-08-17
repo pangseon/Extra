@@ -3,7 +3,6 @@ package com.example.extra.domain.member.controller;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
-import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.member.dto.controller.MemberSignUpControllerRequestDto;
 import com.example.extra.domain.member.dto.controller.MemberUpdateControllerRequestDto;
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
@@ -14,6 +13,7 @@ import com.example.extra.domain.member.service.MemberService;
 import com.example.extra.domain.tattoo.dto.controller.TattooCreateControllerRequestDto;
 import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import com.example.extra.domain.tattoo.mapper.dto.TattooDtoMapper;
+import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -65,12 +65,12 @@ public class MemberController {
 
     @GetMapping("")
     public ResponseEntity<MemberReadServiceResponseDto> readOnce(
-        @AuthenticationPrincipal Account account,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @NotNull HttpServletRequest request
     ) {
         MemberReadServiceResponseDto serviceResponseDto =
             memberService.readOnce(
-                account,
+                userDetails.getAccount(),
                 request
             );
 
@@ -81,7 +81,7 @@ public class MemberController {
 
     @PutMapping("")
     public ResponseEntity<Void> update(
-        @AuthenticationPrincipal Account account,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @Nullable @RequestPart(name = "member") MemberUpdateControllerRequestDto memberUpdateControllerRequestDto,
         @Nullable @RequestPart(name = "tattoo") TattooCreateControllerRequestDto tattooCreateControllerRequestDto,
         @Nullable @RequestPart(name = "image") MultipartFile multipartFile
@@ -97,7 +97,7 @@ public class MemberController {
                 tattooDtoMapper.toTattooCreateServiceRequestDto(tattooCreateControllerRequestDto);
 
         memberService.update(
-            account,
+            userDetails.getAccount(),
             memberServiceRequestDto,
             tattooServiceRequestDto,
             multipartFile
@@ -109,8 +109,8 @@ public class MemberController {
     }
 
     @DeleteMapping("/")
-    public ResponseEntity<Void> delete(@AuthenticationPrincipal Account account) {
-        memberService.delete(account);
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        memberService.delete(userDetails.getAccount());
 
         return ResponseEntity
             .status(OK)
