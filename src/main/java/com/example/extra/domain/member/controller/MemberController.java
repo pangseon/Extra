@@ -1,5 +1,8 @@
 package com.example.extra.domain.member.controller;
 
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+
 import com.example.extra.domain.member.dto.controller.MemberSignUpControllerRequestDto;
 import com.example.extra.domain.member.dto.controller.MemberUpdateControllerRequestDto;
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
@@ -17,7 +20,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,7 +43,7 @@ public class MemberController {
     public static final String AUTHORIZATION_HEADER = "Authorization";
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(
+    public ResponseEntity<Void> signup(
         @Valid @RequestBody MemberSignUpControllerRequestDto requestDto
     ) {
         MemberCreateServiceRequestDto memberCreateServiceRequestDto =
@@ -56,24 +58,29 @@ public class MemberController {
             tattooCreateServiceRequestDto
         );
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity
+            .status(CREATED)
+            .build();
     }
 
     @GetMapping("")
-    public ResponseEntity<MemberReadServiceResponseDto> readUser(
+    public ResponseEntity<MemberReadServiceResponseDto> readOnce(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @NotNull HttpServletRequest request
     ) {
         MemberReadServiceResponseDto serviceResponseDto =
-            memberService.readUser(
-                userDetails,
+            memberService.readOnce(
+                userDetails.getAccount(),
                 request
             );
-        return ResponseEntity.status(HttpStatus.OK).body(serviceResponseDto);
+
+        return ResponseEntity
+            .status(OK)
+            .body(serviceResponseDto);
     }
 
     @PutMapping("")
-    public ResponseEntity<?> update(
+    public ResponseEntity<Void> update(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @Nullable @RequestPart(name = "member") MemberUpdateControllerRequestDto memberUpdateControllerRequestDto,
         @Nullable @RequestPart(name = "tattoo") TattooCreateControllerRequestDto tattooCreateControllerRequestDto,
@@ -97,19 +104,16 @@ public class MemberController {
         );
 
         return ResponseEntity
-            .status(HttpStatus.OK)
+            .status(OK)
             .build();
     }
 
-    @DeleteMapping("/{member_id}")
-    public ResponseEntity<?> deleteUser(
-        @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @NotNull HttpServletRequest request
-    ) {
-        memberService.deleteUser(
-            userDetails,
-            request
-        );
-        return ResponseEntity.status(HttpStatus.OK).build();
+    @DeleteMapping("")
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        memberService.delete(userDetails.getAccount());
+
+        return ResponseEntity
+            .status(OK)
+            .build();
     }
 }

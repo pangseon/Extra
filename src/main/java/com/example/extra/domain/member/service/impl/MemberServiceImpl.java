@@ -17,7 +17,6 @@ import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRe
 import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
 import com.example.extra.global.s3.S3Provider;
-import com.example.extra.global.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -71,11 +70,11 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(readOnly = true)
-    public MemberReadServiceResponseDto readUser(
-        final UserDetailsImpl userDetails,
+    public MemberReadServiceResponseDto readOnce(
+        final Account account,
         final HttpServletRequest request
     ) {
-        Member member = findById(userDetails.getAccount().getId());
+        Member member = findByAccount(account);
         Tattoo tattoo = member.getTattoo();
         return MemberReadServiceResponseDto.builder()
             .name(member.getName())
@@ -87,6 +86,7 @@ public class MemberServiceImpl implements MemberService {
             .introduction(member.getIntroduction())
             .license(member.getLicense())
             .pros(member.getPros())
+            .imageUrl(account.getImageUrl())
             .face(tattoo.getFace())
             .chest(tattoo.getChest())
             .arm(tattoo.getArm())
@@ -106,7 +106,7 @@ public class MemberServiceImpl implements MemberService {
         final TattooCreateServiceRequestDto tattooCreateServiceRequestDto,
         final MultipartFile multipartFile
     ) throws IOException {
-        Member member = findByAccout(account);
+        Member member = findByAccount(account);
 
         // tattoo update
         if (tattooCreateServiceRequestDto != null) {
@@ -134,29 +134,20 @@ public class MemberServiceImpl implements MemberService {
             .orElseThrow(() -> new IllegalArgumentException("타투 없음"));
     }
 
-    private Member findByAccout(final Account account) {
+    private Member findByAccount(final Account account) {
         return memberRepository.findByAccount(account)
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
     }
 
     @Override
     @Transactional
-    public void deleteUser(
-        final UserDetailsImpl userDetails,
-        final HttpServletRequest request
-    ) {
-        Member member = findById(userDetails.getAccount().getId());
+    public void delete(final Account account) {
+        Member member = findByAccount(account);
         memberRepository.delete(member);
     }
 
     private Member findById(Long id) {
         return memberRepository.findById(id)
-            .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
-    }
-
-    // 테스트용 유저 받아오기
-    private Member getMemberForTest() {
-        return memberRepository.findById(1L)
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
     }
 }
