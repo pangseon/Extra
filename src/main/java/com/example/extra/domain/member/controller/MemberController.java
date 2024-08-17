@@ -110,11 +110,11 @@ public class MemberController {
     }
 
     @DeleteMapping("/{member_id}")
-    public ResponseEntity<Void> deleteUser(
+    public ResponseEntity<Void> delete(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @NotNull HttpServletRequest request
     ) {
-        memberService.deleteUser(
+        memberService.delete(
             userDetails,
             request
         );

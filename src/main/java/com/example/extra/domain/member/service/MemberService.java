@@ -22,7 +22,7 @@ public interface MemberService {
         final HttpServletRequest request
     );
 
-    void deleteUser(
+    void delete(
         final UserDetailsImpl userDetails,
         final HttpServletRequest request
     );

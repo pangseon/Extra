@@ -142,7 +142,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void deleteUser(
+    public void delete(
         final UserDetailsImpl userDetails,
         final HttpServletRequest request
     ) {
