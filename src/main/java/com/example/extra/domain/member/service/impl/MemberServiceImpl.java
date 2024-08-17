@@ -74,7 +74,7 @@ public class MemberServiceImpl implements MemberService {
         final Account account,
         final HttpServletRequest request
     ) {
-        Member member = findByAccout(account);
+        Member member = findByAccount(account);
         Tattoo tattoo = member.getTattoo();
         return MemberReadServiceResponseDto.builder()
             .name(member.getName())
@@ -106,7 +106,7 @@ public class MemberServiceImpl implements MemberService {
         final TattooCreateServiceRequestDto tattooCreateServiceRequestDto,
         final MultipartFile multipartFile
     ) throws IOException {
-        Member member = findByAccout(account);
+        Member member = findByAccount(account);
 
         // tattoo update
         if (tattooCreateServiceRequestDto != null) {
@@ -134,7 +134,7 @@ public class MemberServiceImpl implements MemberService {
             .orElseThrow(() -> new IllegalArgumentException("타투 없음"));
     }
 
-    private Member findByAccout(final Account account) {
+    private Member findByAccount(final Account account) {
         return memberRepository.findByAccount(account)
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
     }
@@ -142,7 +142,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public void delete(final Account account) {
-        Member member = findByAccout(account);
+        Member member = findByAccount(account);
         memberRepository.delete(member);
     }
 
