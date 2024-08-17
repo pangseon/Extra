@@ -60,17 +60,15 @@ public class AttendanceManagementController {
     }
 
     // 해당 공고 출연자 세부 정보 조회
-    @GetMapping("/jobposts/{jobPost_id}/members/{member_id}")
+    @GetMapping("/jobposts/attendance-management/{attendance_management_id}")
     public ResponseEntity<MemberReadServiceResponseDto> readMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @PathVariable(name = "jobPost_id") Long jobPostId,
-        @PathVariable(name = "member_id") Long memberId
+        @PathVariable(name = "attendance_management_id") Long attendanceManagementId
     ) {
         MemberReadServiceResponseDto serviceResponseDto =
             attendanceManagementService.readMember(
                 userDetails.getAccount(),
-                jobPostId,
-                memberId
+                attendanceManagementId
             );
 
         return ResponseEntity
