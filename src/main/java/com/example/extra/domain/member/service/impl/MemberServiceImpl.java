@@ -154,10 +154,4 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.findById(id)
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
     }
-
-    // 테스트용 유저 받아오기
-    private Member getMemberForTest() {
-        return memberRepository.findById(1L)
-            .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_MEMBER));
-    }
 }
