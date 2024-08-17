@@ -130,17 +130,15 @@ public class ApplicationRequestMemberController {
     }
 
     // 해당 역할에 지원한 출연자들 개별 조회
-    @GetMapping("/company/roles/{role_id}/members/{member_id}")
+    @GetMapping("/company/application-requests/{applicationRequest_id}")
     public ResponseEntity<MemberReadServiceResponseDto> readOnceApplicationRequestMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @PathVariable(name = "role_id") Long roleId,
-        @PathVariable(name = "member_id") Long memberId
+        @PathVariable(name = "applicationRequest_id") Long applicationRequestId
     ) {
         MemberReadServiceResponseDto serviceResponseDto =
             applicationRequestMemberService.readOnceApplicationRequestMember(
                 userDetails.getAccount(),
-                roleId,
-                memberId
+                applicationRequestId
             );
 
         return ResponseEntity
