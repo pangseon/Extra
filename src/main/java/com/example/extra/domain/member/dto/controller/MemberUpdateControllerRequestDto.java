@@ -1,5 +1,6 @@
 package com.example.extra.domain.member.dto.controller;
 
+import com.example.extra.domain.tattoo.dto.controller.TattooCreateControllerRequestDto;
 import java.time.LocalDate;
 
 public record MemberUpdateControllerRequestDto(
@@ -15,6 +16,7 @@ public record MemberUpdateControllerRequestDto(
     String pros,
     String bank,
     String accountNumber,
+    TattooCreateControllerRequestDto tattoo,
     boolean isImageChange
 ) {
 
