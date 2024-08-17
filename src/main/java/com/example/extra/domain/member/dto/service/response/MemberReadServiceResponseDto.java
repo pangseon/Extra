@@ -14,6 +14,7 @@ public record MemberReadServiceResponseDto(
     String introduction,
     String license,
     String pros,
+    String imageUrl,
     Boolean face,
     Boolean chest,
     Boolean arm,
