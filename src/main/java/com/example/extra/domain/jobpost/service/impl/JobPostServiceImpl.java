@@ -18,7 +18,7 @@ import com.example.extra.domain.jobpost.service.JobPostService;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.role.entity.Role;
-import com.example.extra.domain.role.exception.NotFoundRoleException;
+import com.example.extra.domain.role.exception.RoleException;
 import com.example.extra.domain.role.exception.RoleErrorCode;
 import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.domain.schedule.entity.Schedule;
@@ -203,7 +203,7 @@ public class JobPostServiceImpl implements JobPostService {
 
     private List<Role> roleList(Long jobPost_id) {
         return roleRepository.findByJobPostId(jobPost_id)
-            .orElseThrow(() -> new NotFoundRoleException(RoleErrorCode.NOT_FOUND_ROLE));
+            .orElseThrow(() -> new RoleException(RoleErrorCode.NOT_FOUND_ROLE));
     }
 
     private List<Schedule> scheduleList(Long jobPost_id) {
