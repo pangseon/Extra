@@ -71,11 +71,11 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(readOnly = true)
-    public MemberReadServiceResponseDto readUser(
-        final UserDetailsImpl userDetails,
+    public MemberReadServiceResponseDto readOnce(
+        final Account account,
         final HttpServletRequest request
     ) {
-        Member member = findById(userDetails.getAccount().getId());
+        Member member = findById(account.getId());
         Tattoo tattoo = member.getTattoo();
         return MemberReadServiceResponseDto.builder()
             .name(member.getName())
@@ -87,6 +87,7 @@ public class MemberServiceImpl implements MemberService {
             .introduction(member.getIntroduction())
             .license(member.getLicense())
             .pros(member.getPros())
+            .imageUrl(account.getImageUrl())
             .face(tattoo.getFace())
             .chest(tattoo.getChest())
             .arm(tattoo.getArm())

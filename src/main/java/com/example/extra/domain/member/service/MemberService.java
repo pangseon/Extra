@@ -17,8 +17,8 @@ public interface MemberService {
         final TattooCreateServiceRequestDto tattooCreateServiceRequestDto
     );
 
-    MemberReadServiceResponseDto readUser(
-        final UserDetailsImpl userDetails,
+    MemberReadServiceResponseDto readOnce(
+        final Account account,
         final HttpServletRequest request
     );
 

@@ -3,6 +3,7 @@ package com.example.extra.domain.member.controller;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
+import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.member.dto.controller.MemberSignUpControllerRequestDto;
 import com.example.extra.domain.member.dto.controller.MemberUpdateControllerRequestDto;
 import com.example.extra.domain.member.dto.service.request.MemberCreateServiceRequestDto;
@@ -64,13 +65,13 @@ public class MemberController {
     }
 
     @GetMapping("")
-    public ResponseEntity<MemberReadServiceResponseDto> readUser(
-        @AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<MemberReadServiceResponseDto> readOnce(
+        @AuthenticationPrincipal Account account,
         @NotNull HttpServletRequest request
     ) {
         MemberReadServiceResponseDto serviceResponseDto =
-            memberService.readUser(
-                userDetails,
+            memberService.readOnce(
+                account,
                 request
             );
 
