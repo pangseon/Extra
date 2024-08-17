@@ -22,6 +22,7 @@ import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.domain.jobpost.exception.JobPostErrorCode;
 import com.example.extra.domain.jobpost.exception.NotFoundJobPostException;
 import com.example.extra.domain.jobpost.repository.JobPostRepository;
+import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.exception.MemberErrorCode;
 import com.example.extra.domain.member.exception.MemberException;
@@ -74,6 +75,25 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
         int end = Math.min((start + pageable.getPageSize()),
             attendanceManagementReadServiceResponseDtoList.size());
         return attendanceManagementReadServiceResponseDtoList.subList(start, end);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberReadServiceResponseDto readMember(
+        final Account account,
+        final Long attendanceManagementId
+    ) {
+        // 출연 목록 존재 검증
+        AttendanceManagement attendanceManagement = attendanceManagementRepository.findById(
+                attendanceManagementId)
+            .orElseThrow(() -> new AttendanceManagementException(
+                AttendanceManagementErrorCode.NOT_FOUND_ATTENDANCE_MANAGEMENT
+            ));
+
+        // 해당 회사의 공고 검증
+        validateCompanyOwnJobPost(account, attendanceManagement.getJobPost().getId());
+
+        return MemberReadServiceResponseDto.from(attendanceManagement.getMember());
     }
 
     @Override
