@@ -1,6 +1,5 @@
 package com.example.extra.domain.role.repository;
 
-import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.domain.role.entity.Role;
 import java.util.List;

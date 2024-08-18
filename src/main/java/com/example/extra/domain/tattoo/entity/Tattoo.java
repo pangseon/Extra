@@ -10,13 +10,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "TB_TATTOO")
 @Entity
-@ToString
 public class Tattoo {
 
     @Id

@@ -27,9 +27,6 @@ public class CompanyController {
     private final CompanyService companyService;
     private final CompanyDtoMapper companyDtoMapper;
 
-    public static final String AUTHORIZATION_HEADER = "Authorization";
-
-
     @PostMapping("/signup")
     public ResponseEntity<?> signup(
         @Valid @RequestBody CompanyCreateControllerRequestDto controllerRequestDto
