@@ -10,16 +10,20 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,24 +35,17 @@ public class Company extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @Column(nullable = false)
+    @Size(max = 30)
     private String name;
 
-    @Column
-    private String companyUrl;
+    @Column // varchar(255)
+    private String companyUrl; // nullable(아직 프론트에서 안받음)
 
-    @OneToOne(
-        optional = false,
-        fetch = FetchType.LAZY
-    )
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "account_id", nullable = false)
     private Account account;
-
-    // TODO - 회사-공고글 양방향 매핑할 지 확인 받기 + cascade 정책 확인 받기
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
-    private List<JobPost> jobPostList = new ArrayList<>();
-
-    // TODO - 코드 컨벤션(엔티티에 수정 로직 작성x) 지키면서 어떻게 양방향 처리 할 수 있을지 확인하기.
-    // public void addJobPost(JobPost jobPost) {}
 
     @Builder
     public Company(
@@ -60,9 +57,4 @@ public class Company extends BaseEntity {
         this.companyUrl = companyUrl;
         this.account = account;
     }
-
-    public String tokenId() {
-        return this.id.toString() + "C";
-    }
-
 }

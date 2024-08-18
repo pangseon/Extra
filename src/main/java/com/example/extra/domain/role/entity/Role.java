@@ -13,12 +13,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -32,33 +32,35 @@ public class Role extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
+    @Size(max = 10)
     private String roleName;
 
-    @Column
+    @Column(nullable = false)
+    @Size(max = 50)
     private String costume;
 
-    @Column
+    @Column(nullable = false)
     private Boolean sex;
 
-    @Column
+    @Column(nullable = false)
     private LocalDate minAge;
 
-    @Column
+    @Column(nullable = false)
     private LocalDate maxAge;
 
-    @Column
+    @Column(columnDefinition = "SMALLINT UNSIGNED not null")
     private Integer limitPersonnel;
 
-    @Column
+    @Column(columnDefinition = "SMALLINT UNSIGNED not null")
     private Integer currentPersonnel;
 
-    @Column
+    @Column(nullable = false)
     private Season season;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "tattoo_id")
-    @ToString.Exclude
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "tattoo_id", nullable = false)
     private Tattoo tattoo;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
