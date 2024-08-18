@@ -16,6 +16,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,11 +32,13 @@ public class MemberTerms extends BaseEntity {
     private Boolean agree;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "member_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "term_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "term_id", nullable = false)
     private Terms term;
 
     @Builder

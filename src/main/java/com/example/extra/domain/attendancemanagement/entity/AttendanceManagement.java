@@ -17,7 +17,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -28,19 +29,23 @@ public class AttendanceManagement extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime clockInTime;
+    @Column(columnDefinition = "TIMESTAMP")
+    private LocalDateTime clockInTime; // nullable
 
-    private LocalDateTime clockOutTime;
+    @Column(columnDefinition = "TIMESTAMP")
+    private LocalDateTime clockOutTime; // nullable
 
-    @ColumnDefault("0")
+    @Column(columnDefinition = "SMALLINT UNSIGNED not null")
     private Integer mealCount;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "job_post_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "job_post_id", nullable = false)
     private JobPost jobPost;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "member_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @Builder

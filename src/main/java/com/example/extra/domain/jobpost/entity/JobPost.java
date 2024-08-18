@@ -16,6 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -35,19 +36,21 @@ public class JobPost extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
+    @Size(max = 30)
     private String title;
 
-    @Column
-    private String gatheringLocation;
+    @Column(nullable = false)
+    private String gatheringLocation; // varchar(255)
 
-    @Column
+    @Column(nullable = false)
+    @Size(max = 30)
     private String gatheringTime;
 
-    @Column
+    @Column(nullable = false)
     private Boolean status;
 
-    @Column
+    @Column(nullable = false)
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

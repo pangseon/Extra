@@ -20,13 +20,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "TB_MEMBER")
 @Entity
-@ToString
 public class Member extends BaseEntity {
 
     @Id
@@ -34,7 +34,7 @@ public class Member extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    @Size(min = 1, max = 10)
+    @Size(max = 10)
     private String name;
 
     @Column(nullable = false)
@@ -56,32 +56,31 @@ public class Member extends BaseEntity {
     @Size(max = 15)
     private String phone;
 
-    @Column
-    private String introduction;
+    @Column(columnDefinition = "TEXT")
+    private String introduction; // nullable
 
-    @Column
-    private String license;
+    @Column(columnDefinition = "TEXT")
+    private String license; // nullable
 
-    @Column
-    private String pros;
+    @Column(columnDefinition = "TEXT")
+    private String pros; // nullable
 
-    @Column
+    @Column(nullable = false)
     @Size(max = 10)
     private String bank;
 
-    @Column
+    @Column(nullable = false)
     @Size(max = 30)
     private String accountNumber;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "tattoo_id")
-    @ToString.Exclude
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "tattoo_id", nullable = false)
     private Tattoo tattoo;
 
-    @OneToOne(
-        optional = false,
-        fetch = FetchType.LAZY
-    )
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
 //    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
@@ -131,10 +130,6 @@ public class Member extends BaseEntity {
 
     public void updateTattoo(Tattoo tattoo) {
         this.tattoo = tattoo;
-    }
-
-    public String tokenId() {
-        return this.id.toString() + "M";
     }
 
     public void update(final MemberUpdateServiceRequestDto serviceRequestDto) {
