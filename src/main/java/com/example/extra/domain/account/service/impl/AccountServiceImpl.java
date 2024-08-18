@@ -89,6 +89,6 @@ public class AccountServiceImpl implements AccountService {
             )
         );
 
-        return new AccountLoginServiceResponseDto(accessToken);
+        return new AccountLoginServiceResponseDto(accessToken, refreshToken);
     }
 }

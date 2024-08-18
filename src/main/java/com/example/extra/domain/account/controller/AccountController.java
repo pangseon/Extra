@@ -4,8 +4,10 @@ import com.example.extra.domain.account.dto.controller.AccountCreateControllerRe
 import com.example.extra.domain.account.dto.controller.AccountLoginControllerRequestDto;
 import com.example.extra.domain.account.dto.service.request.AccountCreateServiceRequestDto;
 import com.example.extra.domain.account.dto.service.request.AccountLoginServiceRequestDto;
+import com.example.extra.domain.account.dto.service.response.AccountLoginServiceResponseDto;
 import com.example.extra.domain.account.mapper.dto.AccountDtoMapper;
 import com.example.extra.domain.account.service.AccountService;
+import com.example.extra.domain.refreshtoken.dto.RefreshTokenCreateServiceResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -47,11 +49,15 @@ public class AccountController {
         AccountLoginServiceRequestDto serviceRequestDto =
             accountDtoMapper.toAccountLoginServiceRequestDto(controllerRequestDto);
 
+        AccountLoginServiceResponseDto serviceResponseDto =
+            accountService.login(serviceRequestDto);
+
         return ResponseEntity
             .status(HttpStatus.OK)
             .header(
                 AUTHORIZATION_HEADER,
-                accountService.login(serviceRequestDto).accessToken())
-            .build();
+                serviceResponseDto.accessToken()
+            )
+            .body(new RefreshTokenCreateServiceResponseDto(serviceResponseDto.refreshToken()));
     }
 }
