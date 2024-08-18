@@ -4,6 +4,7 @@ import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestCompanyReadServiceResponseDto;
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestMemberReadServiceResponseDto;
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestMemberUpdateServiceRequestDto;
+import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.global.enums.ApplyStatus;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -50,4 +51,8 @@ public interface ApplicationRequestMemberService {
         final ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
     );
 
+    MemberReadServiceResponseDto readOnceApplicationRequestMember(
+        Account account,
+        Long applicationRequestId
+    );
 }

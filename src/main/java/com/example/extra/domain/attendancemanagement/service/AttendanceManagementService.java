@@ -4,6 +4,7 @@ import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.attendancemanagement.dto.service.AttendanceManagementCreateExcelServiceResponseDto;
 import com.example.extra.domain.attendancemanagement.dto.service.AttendanceManagementReadServiceResponseDto;
 import com.example.extra.domain.attendancemanagement.dto.service.AttendanceManagementUpdateServiceRequestDto;
+import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 
@@ -40,4 +41,9 @@ public interface AttendanceManagementService {
     );
 
     String getJobPostTitle(final Long jobPostId);
+
+    MemberReadServiceResponseDto readMember(
+        Account account,
+        Long attendanceManagementId
+    );
 }

@@ -6,6 +6,7 @@ import com.example.extra.domain.applicationrequest.dto.service.ApplicationReques
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestMemberUpdateServiceRequestDto;
 import com.example.extra.domain.applicationrequest.mapper.dto.ApplicationRequestDtoMapper;
 import com.example.extra.domain.applicationrequest.service.ApplicationRequestMemberService;
+import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.global.enums.ApplyStatus;
 import com.example.extra.global.exception.dto.CustomExceptionResponseDto;
 import com.example.extra.global.security.UserDetailsImpl;
@@ -126,6 +127,23 @@ public class ApplicationRequestMemberController {
             );
         return ResponseEntity.status(HttpStatus.OK)
             .body(serviceResponseDtoList);
+    }
+
+    // 해당 역할에 지원한 출연자들 개별 조회
+    @GetMapping("/company/application-requests/{applicationRequest_id}")
+    public ResponseEntity<MemberReadServiceResponseDto> readOnceApplicationRequestMember(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PathVariable(name = "applicationRequest_id") Long applicationRequestId
+    ) {
+        MemberReadServiceResponseDto serviceResponseDto =
+            applicationRequestMemberService.readOnceApplicationRequestMember(
+                userDetails.getAccount(),
+                applicationRequestId
+            );
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(serviceResponseDto);
     }
 
     // 요청 승인 및 거절(지원현황 화면)

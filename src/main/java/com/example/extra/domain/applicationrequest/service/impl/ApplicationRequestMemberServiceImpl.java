@@ -16,11 +16,12 @@ import com.example.extra.domain.attendancemanagement.repository.AttendanceManage
 import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.jobpost.entity.JobPost;
+import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.role.entity.Role;
-import com.example.extra.domain.role.exception.RoleException;
 import com.example.extra.domain.role.exception.RoleErrorCode;
+import com.example.extra.domain.role.exception.RoleException;
 import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.global.enums.ApplyStatus;
 import java.util.List;
@@ -217,6 +218,27 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
                 .mealCount(0)
                 .build()
         );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberReadServiceResponseDto readOnceApplicationRequestMember(
+        final Account account,
+        final Long applicationRequestId
+    ) {
+        // 해당 회사가 작성한 역할인지 확인
+        // 아닌 경우 -> throw 접근 권한 없음
+        Company company = getCompanyByAccount(account);
+        ApplicationRequestMember applicationRequestMember =
+            getApplicationRequestMemberById(applicationRequestId);
+
+        if (!company.equals(applicationRequestMember.getRole().getJobPost().getCompany())) {
+            throw new ApplicationRequestException(
+                ApplicationRequestErrorCode.NOT_ABLE_TO_ACCESS_APPLICATION_REQUEST_MEMBER
+            );
+        }
+
+        return MemberReadServiceResponseDto.from(applicationRequestMember.getMember());
     }
 
     private Role getRoleById(final Long roleId) {
