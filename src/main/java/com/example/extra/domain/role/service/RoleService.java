@@ -3,12 +3,13 @@ package com.example.extra.domain.role.service;
 import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.role.dto.service.request.RoleCreateServiceRequestDto;
 import com.example.extra.domain.role.dto.service.request.RoleUpdateServiceRequestDto;
+import com.example.extra.domain.role.dto.service.response.RoleCreateServiceResponseDto;
 import com.example.extra.domain.role.dto.service.response.RoleServiceResponseDto;
 import java.util.List;
 
 public interface RoleService {
 
-    void createRole(
+    RoleCreateServiceResponseDto createRole(
         Long jobPost_id,
         Account account,
         RoleCreateServiceRequestDto roleCreateServiceRequestDto);

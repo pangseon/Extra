@@ -4,6 +4,8 @@ import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.account.exception.AccountErrorCode;
 import com.example.extra.domain.account.exception.AccountException;
 import com.example.extra.domain.company.entity.Company;
+import com.example.extra.domain.company.exception.CompanyErrorCode;
+import com.example.extra.domain.company.exception.CompanyException;
 import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostCreateServiceRequestDto;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostUpdateServiceRequestDto;
@@ -55,7 +57,7 @@ public class JobPostServiceImpl implements JobPostService {
         JobPost jobPost = jobPostEntityMapper.toJobPost(jobPostCreateServiceRequestDto,
             getCompanyByAccount(account));
         jobPost = jobPostRepository.save(jobPost);
-        return JobPostCreateServiceResponseDto.from(jobPost);
+        return new JobPostCreateServiceResponseDto(jobPost.getId());
     }
     @Override
     @Transactional

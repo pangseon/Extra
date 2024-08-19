@@ -11,6 +11,7 @@ import com.example.extra.domain.jobpost.exception.NotFoundJobPostException;
 import com.example.extra.domain.jobpost.repository.JobPostRepository;
 import com.example.extra.domain.schedule.dto.service.request.ScheduleCreateServiceRequestDto;
 import com.example.extra.domain.schedule.dto.service.request.ScheduleUpdateServiceRequestDto;
+import com.example.extra.domain.schedule.dto.service.response.ScheduleCreateServiceResponseDto;
 import com.example.extra.domain.schedule.dto.service.response.ScheduleServiceResponseDto;
 import com.example.extra.domain.schedule.entity.Schedule;
 import com.example.extra.domain.schedule.exception.NotFoundScheduleException;
@@ -38,7 +39,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
     @Override
     @Transactional
-    public void createSchedule(
+    public ScheduleCreateServiceResponseDto createSchedule(
         Long jobPost_id,
         final Account account,
         ScheduleCreateServiceRequestDto scheduleCreateServiceRequestDto
@@ -49,8 +50,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         ).orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
         Schedule schedule = scheduleEntityMapper.toSchedule(scheduleCreateServiceRequestDto,
             jobPost);
-        scheduleRepository.save(schedule);
-
+        schedule = scheduleRepository.save(schedule);
+        return new ScheduleCreateServiceResponseDto(schedule.getId());
     }
     @Override
     @Transactional
