@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum AttendanceManagementErrorCode implements ErrorCode {
     ALREADY_CLOCKED_IN(HttpStatus.BAD_REQUEST, "이미 출근 처리가 완료되었습니다."),
     ALREADY_CLOCKED_OUT(HttpStatus.BAD_REQUEST, "이미 퇴근 처리가 완료되었습니다."),
+    ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 해당 공고에 지원 승인 되었습니다."),
 
     FORBIDDEN_ACCESS_ATTENDANCE_MANAGEMENT(HttpStatus.FORBIDDEN, "해당 촬영에 접근 권한이 없습니다. 해당 촬영의 공고를 작성한 계정으로 다시 시도하세요."),
 
