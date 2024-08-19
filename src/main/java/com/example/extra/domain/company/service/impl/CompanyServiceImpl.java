@@ -5,7 +5,7 @@ import com.example.extra.domain.account.exception.AccountErrorCode;
 import com.example.extra.domain.account.exception.AccountException;
 import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.domain.company.dto.service.request.CompanyCreateServiceRequestDto;
-import com.example.extra.domain.company.dto.service.response.CompanyReadOnceServiceResponseDto;
+import com.example.extra.domain.company.dto.service.response.CompanyReadServiceResponseDto;
 import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.company.mapper.entity.CompanyEntityMapper;
 import com.example.extra.domain.company.repository.CompanyRepository;
@@ -65,7 +65,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     @Transactional(readOnly = true)
-    public CompanyReadOnceServiceResponseDto readOnceCompany(
+    public CompanyReadServiceResponseDto readOnce(
         UserDetailsImpl userDetails
     ) {
         Company company = companyRepository.findByAccount(userDetails.getAccount())

@@ -42,11 +42,12 @@ public class CompanyController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> readOnceCompany(
+    public ResponseEntity<?> readOnce(
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        CompanyReadOnceServiceResponseDto serviceResponseDto =
-            companyService.readOnceCompany(userDetails);
+        CompanyReadServiceResponseDto serviceResponseDto =
+            companyService.readOnce(userDetails);
+        
         return ResponseEntity
             .status(OK)
             .body(serviceResponseDto);

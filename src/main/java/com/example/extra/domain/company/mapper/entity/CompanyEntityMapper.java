@@ -4,7 +4,7 @@ import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
 import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.company.dto.service.request.CompanyCreateServiceRequestDto;
-import com.example.extra.domain.company.dto.service.response.CompanyReadOnceServiceResponseDto;
+import com.example.extra.domain.company.dto.service.response.CompanyReadServiceResponseDto;
 import com.example.extra.domain.company.entity.Company;
 import org.mapstruct.Mapper;
 
@@ -16,7 +16,7 @@ public interface CompanyEntityMapper {
         Account account
     );
 
-    CompanyReadOnceServiceResponseDto toCompanyReadOnceServiceResponseDto(
+    CompanyReadServiceResponseDto toCompanyReadOnceServiceResponseDto(
         Company company
     );
 }
