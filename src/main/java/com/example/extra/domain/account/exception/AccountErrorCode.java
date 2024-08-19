@@ -15,6 +15,7 @@ public enum AccountErrorCode implements ErrorCode {
     DUPLICATION_ACCOUNT(HttpStatus.BAD_REQUEST, "이미 가입한 계정"),
     INVALID_EMAIL(HttpStatus.BAD_REQUEST, "잘못된 이메일 입력"),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "잘못된 비밀번호 입력"),
+    NOT_FINISHED_SIGN_UP(HttpStatus.BAD_REQUEST, "회원 가입을 먼저 완수해주세요"),
 
     // 404
     NOT_FOUND_ACCOUNT(HttpStatus.NOT_FOUND, "존재하지 않은 게정입니다"),
