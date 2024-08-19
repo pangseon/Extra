@@ -15,7 +15,7 @@ public record MemberCreateControllerRequestDto(
     @NotNull(message = "전화번호는 필수 입력 정보입니다")
     @Pattern(
         regexp = "^\\d{10,11}$",
-        message = "전화번호 형식을 지켜주세요. \'-\' 입력 없이 최소 10, 최대 11글자의 숫자만 입력해주세요"
+        message = "전화번호 형식을 지켜주세요. '-' 입력 없이 최소 10, 최대 11글자의 숫자만 입력해주세요"
     )
     String phone,
     @Schema(description = "이름", example = "홍길동")

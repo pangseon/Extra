@@ -15,6 +15,7 @@ public class TattooServiceImpl implements TattooService {
 
     private final TattooRepository tattooRepository;
     private final TattooEntityMapper tattooEntityMapper;
+
     @Override
     public void create(final TattooCreateServiceRequestDto requestDto) {
         Tattoo tattoo = tattooEntityMapper.toTattoo(requestDto);
