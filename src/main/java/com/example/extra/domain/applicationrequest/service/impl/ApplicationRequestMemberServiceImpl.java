@@ -26,6 +26,7 @@ import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.global.enums.ApplyStatus;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -51,14 +52,20 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
         final Long roleId
     ) {
         Member member = getMemberByAccount(account);
-
         Role role = getRoleById(roleId);
+        // 이미 지원한 경우 지원 불가
+        Optional<ApplicationRequestMember> applicationRequestMemberOptional =
+            applicationRequestMemberRepository.findByMemberAndRole(
+                member,
+                role
+            );
+        if (applicationRequestMemberOptional.isPresent()) {
+            throw new ApplicationRequestException(ApplicationRequestErrorCode.ALREADY_EXIST);
+        }
         Boolean isStillRecruiting = role.getJobPost().getStatus();
         // 모집이 마감된 경우 지원 불가
         if (!isStillRecruiting) {
-            throw new ApplicationRequestException(
-                ApplicationRequestErrorCode.NOT_ABLE_TO_APPLY_TO_JOB_POST
-            );
+            throw new ApplicationRequestException(ApplicationRequestErrorCode.NOT_ABLE_TO_APPLY_TO_JOB_POST);
         }
         applicationRequestMemberRepository.save(
             ApplicationRequestMember.builder()
