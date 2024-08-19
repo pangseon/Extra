@@ -1,6 +1,5 @@
 package com.example.extra.domain.jobpost.dto.controller;
 
-import com.example.extra.global.enums.Category;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -24,7 +23,7 @@ public record JobPostCreateControllerRequestDto(
         regexp = "\\b(?:DRAMA|MOVIE|ADVERTISEMENT|MUSIC_VIDEO|ETC)\\b",
         message = "DRAMA, MOVIE, ADVERTISEMENT, MUSIC_VIDEO, ETC 중 하나를 입력해주세요"
     )
-    Category category
+    String category
 ) {
 
 }
