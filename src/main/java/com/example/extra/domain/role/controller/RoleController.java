@@ -34,7 +34,7 @@ public class RoleController {
 
     @PostMapping("/{jobPostId}/roles")
     public ResponseEntity<RoleCreateServiceResponseDto> createRole(
-        @PathVariable(name = "jobPostId") Long jobPostId,
+        @PathVariable Long jobPostId,
         @Valid @RequestBody RoleCreateControllerRequestDto controllerRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
@@ -46,8 +46,8 @@ public class RoleController {
 
     @PutMapping("/{jobPostId}/roles/{roleId}")
     public ResponseEntity<?> updateRole(
-        @PathVariable(name = "jobPostId") Long jobPostId,
-        @PathVariable(name = "roleId") Long roleId,
+        @PathVariable Long jobPostId,
+        @PathVariable Long roleId,
         @Valid @RequestBody RoleUpdateControllerRequestDto controllerRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
@@ -60,8 +60,8 @@ public class RoleController {
 
     @DeleteMapping("/{jobPostId}/roles/{roleId}")
     public ResponseEntity<?> deleteRole(
-        @PathVariable(name = "jobPostId") Long jobPostId,
-        @PathVariable(name = "roleId") Long roleId,
+        @PathVariable Long jobPostId,
+        @PathVariable Long roleId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         roleService.deleteRole(jobPostId, roleId, userDetails.getAccount());
@@ -70,15 +70,15 @@ public class RoleController {
 
     @GetMapping("/{jobPostId}/roles/{roleId}")
     public RoleServiceResponseDto readOnceRole(
-        @PathVariable(name = "jobPostId") Long jobPostId,
-        @PathVariable(name = "roleId") Long roleId
+        @PathVariable Long jobPostId,
+        @PathVariable Long roleId
     ) {
         return roleService.readRole(jobPostId, roleId);
     }
 
     @GetMapping("/{jobPostId}/roles")
     public List<RoleServiceResponseDto> readAllRole(
-        @PathVariable(name = "jobPostId") Long jobPostId) {
+        @PathVariable Long jobPostId) {
         return roleService.readAllRole(jobPostId);
     }
 
