@@ -85,7 +85,7 @@ public class ApplicationRequestMemberController {
         if (applyStatus == null) {
             throw new CustomValidationException(FieldErrorResponseDto.builder()
                     .name("applyStatus")
-                    .message("유효한 applyStatus 값을 입력해주세요. 가능한 값: 'APPLIED', 'REJECTED', 'APPROVED'")
+                    .message("APPLIED, REJECTED, APPROVED 중 하나를 입력해주세요")
                 .build());
         }
         List<ApplicationRequestMemberReadServiceResponseDto> serviceResponseDtoList =
