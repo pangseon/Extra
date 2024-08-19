@@ -4,6 +4,7 @@ import com.example.extra.domain.schedule.dto.controller.ScheduleCreateController
 import com.example.extra.domain.schedule.dto.controller.ScheduleUpdateControllerRequestDto;
 import com.example.extra.domain.schedule.dto.service.request.ScheduleCreateServiceRequestDto;
 import com.example.extra.domain.schedule.dto.service.request.ScheduleUpdateServiceRequestDto;
+import com.example.extra.domain.schedule.dto.service.response.ScheduleCreateServiceResponseDto;
 import com.example.extra.domain.schedule.dto.service.response.ScheduleServiceResponseDto;
 import com.example.extra.domain.schedule.mapper.dto.ScheduleDtoMapper;
 import com.example.extra.domain.schedule.service.ScheduleService;
@@ -31,7 +32,7 @@ public class ScheduleController {
     private final ScheduleDtoMapper scheduleDtoMapper;
 
     @PostMapping("/{jobPost_id}/schedules")
-    public ResponseEntity<?> createSchedule(
+    public ResponseEntity<ScheduleCreateServiceResponseDto> createSchedule(
         @PathVariable(name = "jobPost_id") Long jobPostId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody ScheduleCreateControllerRequestDto controllerRequestDto

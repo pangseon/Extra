@@ -11,6 +11,7 @@ import com.example.extra.domain.jobpost.exception.NotFoundJobPostException;
 import com.example.extra.domain.jobpost.repository.JobPostRepository;
 import com.example.extra.domain.role.dto.service.request.RoleCreateServiceRequestDto;
 import com.example.extra.domain.role.dto.service.request.RoleUpdateServiceRequestDto;
+import com.example.extra.domain.role.dto.service.response.RoleCreateServiceResponseDto;
 import com.example.extra.domain.role.dto.service.response.RoleServiceResponseDto;
 import com.example.extra.domain.role.entity.Role;
 import com.example.extra.domain.role.exception.RoleException;
@@ -41,7 +42,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional
-    public void createRole(
+    public RoleCreateServiceResponseDto createRole(
         Long jobPostId,
         final Account account,
         final RoleCreateServiceRequestDto roleCreateServiceRequestDto
@@ -54,7 +55,8 @@ public class RoleServiceImpl implements RoleService {
                 roleCreateServiceRequestDto.tattoo())
             .orElseThrow(() -> new TattooException(TattooErrorCode.NOT_FOUND_TATTOO));
         role.updateTattoo(tattoo);
-        roleRepository.save(role);
+        role = roleRepository.save(role);
+        return new RoleCreateServiceResponseDto(role.getId());
     }
     @Override
     @Transactional

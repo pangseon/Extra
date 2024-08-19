@@ -4,6 +4,7 @@ import com.example.extra.domain.role.dto.controller.RoleCreateControllerRequestD
 import com.example.extra.domain.role.dto.controller.RoleUpdateControllerRequestDto;
 import com.example.extra.domain.role.dto.service.request.RoleCreateServiceRequestDto;
 import com.example.extra.domain.role.dto.service.request.RoleUpdateServiceRequestDto;
+import com.example.extra.domain.role.dto.service.response.RoleCreateServiceResponseDto;
 import com.example.extra.domain.role.dto.service.response.RoleServiceResponseDto;
 import com.example.extra.domain.role.mapper.dto.RoleDtoMapper;
 import com.example.extra.domain.role.service.RoleService;
@@ -31,7 +32,7 @@ public class RoleController {
     private final RoleService roleService;
 
     @PostMapping("/{jobPost_id}/roles")
-    public ResponseEntity<?> createRole(
+    public ResponseEntity<RoleCreateServiceResponseDto> createRole(
         @PathVariable(name = "jobPost_id") Long jobPostId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody RoleCreateControllerRequestDto controllerRequestDto
