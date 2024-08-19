@@ -12,6 +12,8 @@ import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApproval
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.mapper.dto.CostumeApprovalBoardDtoMapper;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
+import com.example.extra.global.exception.CustomValidationException;
+import com.example.extra.global.exception.dto.FieldErrorResponseDto;
 import com.example.extra.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.annotation.Nullable;
@@ -46,6 +48,9 @@ public class CostumeApprovalBoardController {
     private final CostumeApprovalBoardService costumeApprovalBoardService;
     private final CostumeApprovalBoardDtoMapper costumeApprovalBoardDtoMapper;
 
+    private static final long MAX_FILE_SIZE = 30 * 1024 * 1024; // 30 MB (최신 삼성폰 이미지 크기 30MB. 아이폰 15MB)
+    private static final String IMAGE_CONTENT_TYPE_PREFIX = "image/";
+
 
     // 업체가 의상 승인 게시글 목록 조회
     @GetMapping("/roles/{roleId}")
@@ -55,6 +60,13 @@ public class CostumeApprovalBoardController {
         @RequestParam(required = false) String name,
         @PageableDefault(size = 5, sort = "createdAt", direction = Direction.DESC) @Parameter(hidden = true) Pageable pageable
     ) {
+        // 한글(\uAC00-\uD7AF), 알파벳([a-zA-Z])만 가능. 1자에서 10자까지 허용됨
+        if (name != null && !name.matches("^[\\uAC00-\\uD7AFa-zA-Z]{1,10}$\n")) {
+            throw new CustomValidationException(FieldErrorResponseDto.builder()
+                    .name("name")
+                    .message("name은 한글 또는 영어 알파벳으로만 구성되어야 하며, 길이는 10자 이하이어야 합니다.")
+                .build());
+        }
         List<CostumeApprovalBoardCompanyReadServiceResponseDto> serviceResponseDtoList =
             costumeApprovalBoardService.getCostumeApprovalBoardForCompany(
                 userDetails.getAccount(),
@@ -133,6 +145,16 @@ public class CostumeApprovalBoardController {
         @RequestPart(name = "explain") CostumeApprovalBoardExplainCreateRequestDto controllerRequestDto,
         @RequestPart(name = "image") MultipartFile multipartFile
     ) throws IOException {
+        // 이미지 필수
+        if (multipartFile == null || multipartFile.isEmpty()) {
+            throw new CustomValidationException(FieldErrorResponseDto.builder()
+                    .name("image")
+                    .message("이미지 파일은 필수 입력 사항입니다.")
+                .build());
+        }
+        // 이미지 검증
+        validateImageFileIfExists(multipartFile);
+
         Account account = userDetails.getAccount();
         CostumeApprovalBoardCreateServiceDto serviceRequestDto =
             costumeApprovalBoardDtoMapper.toCostumeApprovalBoardCreateServiceDto(
@@ -168,6 +190,9 @@ public class CostumeApprovalBoardController {
         @Nullable @RequestPart(name = "explain") CostumeApprovalBoardExplainUpdateControllerRequestDto controllerRequestDto,
         @Nullable @RequestPart(name = "image") MultipartFile multipartFile
     )throws IOException {
+        if ((multipartFile != null && !multipartFile.isEmpty())) {
+            validateImageFileIfExists(multipartFile);
+        }
         CostumeApprovalBoardExplainUpdateServiceRequestDto serviceRequestDto =
             costumeApprovalBoardDtoMapper.toCostumeApprovalBoardExplainUpdateServiceRequestDto(
                 controllerRequestDto,
@@ -214,5 +239,26 @@ public class CostumeApprovalBoardController {
             .status(HttpStatus.OK)
             .build();
 
+    }
+    private void validateImageFileIfExists(MultipartFile multipartFile) {
+        String contentType = multipartFile.getContentType();
+        // 파일 타입 검증
+        if (contentType == null || !contentType.startsWith(IMAGE_CONTENT_TYPE_PREFIX)) {
+            throw new CustomValidationException(FieldErrorResponseDto.builder()
+                    .name("image")
+                    .message("이미지 파일만 허용됩니다.")
+                .build());
+        }
+        // 이미지 파일 크기 검증
+        if (multipartFile.getSize() > MAX_FILE_SIZE) {
+            String errorMessage = String.format(
+                "이미지 파일 크기는 %dMB를 넘어서는 안됩니다.",
+                MAX_FILE_SIZE / (1024 * 1024)
+            );
+            throw new CustomValidationException(FieldErrorResponseDto.builder()
+                    .name("image")
+                    .message(errorMessage)
+                .build());
+        }
     }
 }
