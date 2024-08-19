@@ -2,10 +2,8 @@ package com.example.extra.domain.costumeapprovalboard.mapper.dto;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
-import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardApplyStatusUpdateControllerRequestDto;
 import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardExplainCreateRequestDto;
 import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardExplainUpdateControllerRequestDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardApplyStatusUpdateServiceRequestDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCreateServiceDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardExplainUpdateServiceRequestDto;
 import org.mapstruct.Mapper;
@@ -22,10 +20,6 @@ public interface CostumeApprovalBoardDtoMapper {
     CostumeApprovalBoardExplainUpdateServiceRequestDto toCostumeApprovalBoardExplainUpdateServiceRequestDto(
         CostumeApprovalBoardExplainUpdateControllerRequestDto costumeApprovalBoardExplainUpdateControllerRequestDto,
         MultipartFile multipartFile
-    );
-
-    CostumeApprovalBoardApplyStatusUpdateServiceRequestDto toCostumeApprovalBoardApplyStatusUpdateServiceRequestDto(
-        CostumeApprovalBoardApplyStatusUpdateControllerRequestDto costumeApprovalBoardApplyStatusUpdateControllerRequestDto
     );
 }
 

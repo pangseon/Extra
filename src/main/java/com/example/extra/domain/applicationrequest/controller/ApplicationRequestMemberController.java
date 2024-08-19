@@ -4,7 +4,6 @@ import com.example.extra.domain.applicationrequest.dto.controller.ApplicationReq
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestCompanyReadServiceResponseDto;
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestMemberReadServiceResponseDto;
 import com.example.extra.domain.applicationrequest.dto.service.ApplicationRequestMemberUpdateServiceRequestDto;
-import com.example.extra.domain.applicationrequest.mapper.dto.ApplicationRequestDtoMapper;
 import com.example.extra.domain.applicationrequest.service.ApplicationRequestMemberService;
 import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.global.enums.ApplyStatus;
@@ -38,7 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApplicationRequestMemberController {
 
     private final ApplicationRequestMemberService applicationRequestMemberService;
-    private final ApplicationRequestDtoMapper applicationRequestDtoMapper;
 
     // 사용자가 지원한 역할들과 지원 상태 확인
     @GetMapping("/member/roles")
@@ -167,9 +165,9 @@ public class ApplicationRequestMemberController {
         @Valid @RequestBody ApplicationRequestMemberUpdateControllerRequestDto controllerRequestDto
     ) {
         ApplicationRequestMemberUpdateServiceRequestDto serviceRequestDto =
-            applicationRequestDtoMapper.toApplicationRequestMemberUpdateServiceRequestDto(
-                controllerRequestDto
-            );
+            ApplicationRequestMemberUpdateServiceRequestDto.builder()
+                    .applyStatus(ApplyStatus.fromString(controllerRequestDto.applyStatus()))
+                .build();
         applicationRequestMemberService.updateStatus(
             userDetails.getAccount(),
             applicationRequestMemberId,

@@ -51,7 +51,7 @@ public class AttendanceManagementController {
         @PageableDefault(size = 5, sort = "roleName", direction = Direction.ASC) @Parameter(hidden = true) Pageable pageable
     ) {
         // 한글(\uAC00-\uD7AF), 알파벳([a-zA-Z])만 가능. 1자에서 10자까지 허용됨
-        if (name != null && !name.matches("^[\\uAC00-\\uD7AFa-zA-Z]{1,10}$\n")) {
+        if (name != null && !name.matches("^[\\uAC00-\\uD7AFa-zA-Z]{1,10}$")) {
             throw new CustomValidationException(FieldErrorResponseDto.builder()
                 .name("name")
                 .message("name은 한글 또는 영어 알파벳으로만 구성되어야 하며, 길이는 10자 이하이어야 합니다.")

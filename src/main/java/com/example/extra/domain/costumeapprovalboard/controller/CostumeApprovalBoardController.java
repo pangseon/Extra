@@ -12,6 +12,7 @@ import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApproval
 import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.mapper.dto.CostumeApprovalBoardDtoMapper;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
+import com.example.extra.global.enums.ApplyStatus;
 import com.example.extra.global.exception.CustomValidationException;
 import com.example.extra.global.exception.dto.FieldErrorResponseDto;
 import com.example.extra.global.security.UserDetailsImpl;
@@ -28,6 +29,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,7 +63,7 @@ public class CostumeApprovalBoardController {
         @PageableDefault(size = 5, sort = "createdAt", direction = Direction.DESC) @Parameter(hidden = true) Pageable pageable
     ) {
         // 한글(\uAC00-\uD7AF), 알파벳([a-zA-Z])만 가능. 1자에서 10자까지 허용됨
-        if (name != null && !name.matches("^[\\uAC00-\\uD7AFa-zA-Z]{1,10}$\n")) {
+        if (name != null && !name.matches("^[\\uAC00-\\uD7AFa-zA-Z]{1,10}$")) {
             throw new CustomValidationException(FieldErrorResponseDto.builder()
                     .name("name")
                     .message("name은 한글 또는 영어 알파벳으로만 구성되어야 하며, 길이는 10자 이하이어야 합니다.")
@@ -146,7 +148,7 @@ public class CostumeApprovalBoardController {
         @RequestPart(name = "image") MultipartFile multipartFile
     ) throws IOException {
         // 이미지 필수
-        if (multipartFile == null || multipartFile.isEmpty()) {
+        if (ObjectUtils.isEmpty(multipartFile)) {
             throw new CustomValidationException(FieldErrorResponseDto.builder()
                     .name("image")
                     .message("이미지 파일은 필수 입력 사항입니다.")
@@ -190,7 +192,7 @@ public class CostumeApprovalBoardController {
         @Nullable @RequestPart(name = "explain") CostumeApprovalBoardExplainUpdateControllerRequestDto controllerRequestDto,
         @Nullable @RequestPart(name = "image") MultipartFile multipartFile
     )throws IOException {
-        if ((multipartFile != null && !multipartFile.isEmpty())) {
+        if (!ObjectUtils.isEmpty(multipartFile)) {
             validateImageFileIfExists(multipartFile);
         }
         CostumeApprovalBoardExplainUpdateServiceRequestDto serviceRequestDto =
@@ -218,16 +220,17 @@ public class CostumeApprovalBoardController {
      * @param costumeApprovalBoardId
      * @return
      */
-    @PutMapping("/{costume_approval_board_id}/companies")
+    @PutMapping("/{costumeApprovalBoardId}/companies")
     public ResponseEntity<?> updateCostumeApprovalBoardByCompany(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @PathVariable(name = "costume_approval_board_id") Long costumeApprovalBoardId,
+        @PathVariable Long costumeApprovalBoardId,
         @Valid @RequestBody CostumeApprovalBoardApplyStatusUpdateControllerRequestDto controllerRequestDto
     ) {
 
         CostumeApprovalBoardApplyStatusUpdateServiceRequestDto serviceRequestDto =
-            costumeApprovalBoardDtoMapper.toCostumeApprovalBoardApplyStatusUpdateServiceRequestDto(
-                controllerRequestDto);
+            CostumeApprovalBoardApplyStatusUpdateServiceRequestDto.builder()
+                    .costumeApprove(ApplyStatus.fromString(controllerRequestDto.costumeApprove()))
+                .build();
 
         costumeApprovalBoardService.updateCostumeApprovalBoardByCompany(
             userDetails.getAccount(),

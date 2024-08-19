@@ -6,11 +6,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Component
@@ -53,7 +53,7 @@ public class S3Provider {
         return metadata;
     }
     public String saveFile(MultipartFile multipartFile, String imageName) throws IOException {
-        if (multipartFile.isEmpty()) {
+        if (ObjectUtils.isEmpty(multipartFile)) {
             return null;
         }
         ObjectMetadata metadata = setObjectMetadata(multipartFile);
@@ -69,11 +69,11 @@ public class S3Provider {
     public String updateImage(String imageName, String folderName, MultipartFile multipartFile)
         throws IOException {
         // S3에 대한 데이터 저장이나 변경이 없을 경우
-        if (imageName == null && multipartFile.isEmpty()) {
+        if (imageName == null && ObjectUtils.isEmpty(multipartFile)) {
             return null;
         } else {
             // S3에 대한 정보가 DB에 저장되었지만 해당 내용을 삭제하고 싶을 때
-            if (multipartFile.isEmpty()) {
+            if (ObjectUtils.isEmpty(multipartFile)) {
                 imageName = imageName.replace(url, "");
                 imageName = imageName.substring(imageName.lastIndexOf("/"));
                 delete(folderName + imageName);
