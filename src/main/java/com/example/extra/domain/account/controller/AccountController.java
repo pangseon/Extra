@@ -1,16 +1,19 @@
 package com.example.extra.domain.account.controller;
 
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+
 import com.example.extra.domain.account.dto.controller.AccountCreateControllerRequestDto;
 import com.example.extra.domain.account.dto.controller.AccountLoginControllerRequestDto;
 import com.example.extra.domain.account.dto.service.request.AccountCreateServiceRequestDto;
 import com.example.extra.domain.account.dto.service.request.AccountLoginServiceRequestDto;
+import com.example.extra.domain.account.dto.service.response.AccountCreateServiceResponseDto;
 import com.example.extra.domain.account.dto.service.response.AccountLoginServiceResponseDto;
 import com.example.extra.domain.account.mapper.dto.AccountDtoMapper;
 import com.example.extra.domain.account.service.AccountService;
 import com.example.extra.domain.refreshtoken.dto.RefreshTokenCreateServiceResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,7 +33,7 @@ public class AccountController {
     public static final String AUTHORIZATION_HEADER = "Authorization";
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(
+    public ResponseEntity<AccountCreateServiceResponseDto> signup(
         //test
         @Valid @RequestBody AccountCreateControllerRequestDto controllerRequestDto
     ) {
@@ -38,12 +41,12 @@ public class AccountController {
             accountDtoMapper.toAccountCreateServiceRequestDto(controllerRequestDto);
 
         return ResponseEntity
-            .status(HttpStatus.CREATED)
+            .status(CREATED)
             .body(accountService.signup(serviceRequestDto));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(
+    public ResponseEntity<RefreshTokenCreateServiceResponseDto> login(
         @Valid @RequestBody AccountLoginControllerRequestDto controllerRequestDto
     ) {
         AccountLoginServiceRequestDto serviceRequestDto =
@@ -53,7 +56,7 @@ public class AccountController {
             accountService.login(serviceRequestDto);
 
         return ResponseEntity
-            .status(HttpStatus.OK)
+            .status(OK)
             .header(
                 AUTHORIZATION_HEADER,
                 serviceResponseDto.accessToken()
