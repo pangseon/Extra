@@ -6,7 +6,6 @@ import com.example.extra.domain.role.dto.controller.RoleCreateControllerRequestD
 import com.example.extra.domain.role.dto.controller.RoleUpdateControllerRequestDto;
 import com.example.extra.domain.role.dto.service.request.RoleCreateServiceRequestDto;
 import com.example.extra.domain.role.dto.service.request.RoleUpdateServiceRequestDto;
-import java.util.List;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = SPRING)
