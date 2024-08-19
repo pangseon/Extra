@@ -28,6 +28,7 @@ import com.example.extra.domain.schedule.exception.NotFoundScheduleException;
 import com.example.extra.domain.schedule.exception.ScheduleErrorCode;
 import com.example.extra.domain.schedule.repository.ScheduleRepository;
 import com.example.extra.domain.tattoo.dto.service.response.TattooReadServiceResponseDto;
+import com.example.extra.global.enums.Category;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -54,8 +55,11 @@ public class JobPostServiceImpl implements JobPostService {
         final Account account,
         final JobPostCreateServiceRequestDto jobPostCreateServiceRequestDto
     ) {
-        JobPost jobPost = jobPostEntityMapper.toJobPost(jobPostCreateServiceRequestDto,
-            getCompanyByAccount(account));
+        JobPost jobPost = jobPostEntityMapper.toJobPost(
+            jobPostCreateServiceRequestDto,
+            Category.fromString(jobPostCreateServiceRequestDto.category()),
+            getCompanyByAccount(account)
+        );
         jobPost = jobPostRepository.save(jobPost);
         return new JobPostCreateServiceResponseDto(jobPost.getId());
     }
