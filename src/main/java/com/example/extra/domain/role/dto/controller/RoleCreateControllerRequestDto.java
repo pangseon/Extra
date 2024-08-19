@@ -34,7 +34,11 @@ public record RoleCreateControllerRequestDto(
     @DecimalMin(value = "0", message = "0 이상의 값이어야 합니다.")
     @DecimalMax(value = "65535", message = "65535 이하의 값이어야 합니다.")
     Integer currentPersonnel, // small int unsigned
-    @NotNull(message = "유효한 season을 입력해주세요.")
+    @NotNull(message = "season은 필수 정보입니다")
+    @Pattern(
+        regexp = "^(SPRING|SUMMER|AUTUMN|WINTER)$\n",
+        message = "SPRING, SUMMER, AUTUMN, WINTER 중 하나를 입력해주세요"
+    )
     Season season,
     @NotNull(message = "tattoo는 필수 정보 입니다.")
     TattooCreateControllerRequestDto tattoo
