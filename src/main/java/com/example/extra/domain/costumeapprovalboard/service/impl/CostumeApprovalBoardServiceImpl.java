@@ -91,7 +91,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     ) {
         // 해당 업체가 올린 공고가 아니면 예외 처리
         Role role = roleRepository.findById(roleId)
-            .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+            .orElseThrow(() -> new RoleException(RoleErrorCode.NOT_FOUND_ROLE));
         if (!Objects.equals(role.getJobPost().getCompany().getId(), getCompanyByAccount(account).getId())) {
             throw new CostumeApprovalBoardException(
                 CostumeApprovalBoardErrorCode.NOT_ABLE_TO_ACCESS_COSTUME_APPROVAL_BOARD);
