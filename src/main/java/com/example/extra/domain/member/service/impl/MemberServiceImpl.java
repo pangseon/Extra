@@ -114,24 +114,21 @@ public class MemberServiceImpl implements MemberService {
         final MultipartFile multipartFile
     ) throws IOException {
         Member member = findByAccount(account);
-        // member update
-        if (memberUpdateServiceRequestDto != null) {
-            member.update(memberUpdateServiceRequestDto);
 
-            // tattoo update
-            if (memberUpdateServiceRequestDto.tattoo() != null) {
-                member.updateTattoo(getTattoo(memberUpdateServiceRequestDto.tattoo()));
-            }
+        // service dto 내부가 전부 존재 - 유효성 검증
+        member.update(memberUpdateServiceRequestDto);
+        member.updateTattoo(
+            checkTattooDto(memberUpdateServiceRequestDto.tattoo())
+        );
 
-            // 프로필 이미지 수정
-            if (memberUpdateServiceRequestDto.isImageChange()) {
-                String imageUrl = s3Provider.updateImage(
-                    account.getImageUrl(),
-                    account.getFolderUrl(),
-                    multipartFile
-                );
-                account.updateImageUrl(imageUrl);
-            }
+        // 프로필 이미지 수정
+        if (memberUpdateServiceRequestDto.isImageChange()) {
+            String imageUrl = s3Provider.updateImage(
+                account.getImageUrl(),
+                account.getFolderUrl(),
+                multipartFile
+            );
+            account.updateImageUrl(imageUrl);
         }
     }
 
