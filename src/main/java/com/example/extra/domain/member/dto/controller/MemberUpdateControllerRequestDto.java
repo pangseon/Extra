@@ -40,7 +40,9 @@ public record MemberUpdateControllerRequestDto(
     String license,
     @Schema(description = "장점", example = "외국어를 할 수 있습니다.")
     String pros,
+    @Schema(description = "은행", example = "하나")
     String bank,
+    @Schema(description = "계좌 번호", example = "123-456-78901234")
     String accountNumber,
     @Schema(description = "타투", defaultValue = "타투 없음")
     TattooCreateControllerRequestDto tattoo,
