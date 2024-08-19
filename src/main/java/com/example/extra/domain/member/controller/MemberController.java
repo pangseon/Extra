@@ -17,9 +17,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -67,14 +65,10 @@ public class MemberController {
     @ApiResponse(description = "보조 출연자 단건 조회 성공", content = @Content(schema = @Schema(implementation = MemberReadServiceResponseDto.class)))
     @GetMapping("")
     public ResponseEntity<MemberReadServiceResponseDto> readOnce(
-        @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @NotNull HttpServletRequest request
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         MemberReadServiceResponseDto serviceResponseDto =
-            memberService.readOnce(
-                userDetails.getAccount(),
-                request
-            );
+            memberService.readOnce(userDetails.getAccount());
 
         return ResponseEntity
             .status(OK)

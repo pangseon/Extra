@@ -19,7 +19,6 @@ import com.example.extra.domain.tattoo.exception.TattooErrorCode;
 import com.example.extra.domain.tattoo.exception.TattooException;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
 import com.example.extra.global.s3.S3Provider;
-import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -98,10 +97,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(readOnly = true)
-    public MemberReadServiceResponseDto readOnce(
-        final Account account,
-        final HttpServletRequest request
-    ) {
+    public MemberReadServiceResponseDto readOnce(final Account account) {
         Member member = findByAccount(account);
         return MemberReadServiceResponseDto.from(member);
     }
