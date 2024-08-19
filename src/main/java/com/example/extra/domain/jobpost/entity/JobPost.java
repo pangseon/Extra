@@ -48,7 +48,7 @@ public class JobPost extends BaseEntity {
     private String gatheringTime;
 
     @Column(nullable = false)
-    private Boolean status = false;
+    private Boolean status = true;
 
     @Column(nullable = false)
     private Category category;
