@@ -38,7 +38,13 @@ public record MemberCreateControllerRequestDto(
     @Schema(description = "체중", example = "59.3")
     @NotBlank(message = "체중은 필수 입력 정보입니다")
     float weight,
+    @Schema(description = "은행", example = "하나")
+    @NotBlank(message = "은행은 필수 입력 정보입니다")
+    @Size(max = 10)
     String bank,
+    @Schema(description = "계좌 번호", example = "123-456-78901234")
+    @NotBlank(message = "계좌 번호는 필수 입력 정보입니다")
+    @Size(max = 30)
     String accountNumber,
     @Schema(description = "타투")
     @NotNull(message = "타투는 필수 입력 정보입니다")
