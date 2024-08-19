@@ -34,7 +34,7 @@ public class Member extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    @Size(max = 10)
+    @Size(min = 2, max = 10)
     private String name;
 
     @Column(nullable = false)
@@ -53,7 +53,7 @@ public class Member extends BaseEntity {
     private Float weight;
 
     @Column(nullable = false)
-    @Size(max = 15)
+    @Size(min = 10, max = 11)
     private String phone;
 
     @Column(columnDefinition = "TEXT")
@@ -119,9 +119,6 @@ public class Member extends BaseEntity {
         this.height = height;
         this.weight = weight;
         this.phone = phone;
-        this.introduction = null;
-        this.license = null;
-        this.pros = null;
         this.bank = bank;
         this.accountNumber = accountNumber;
         this.tattoo = tattoo;
