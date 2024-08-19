@@ -2,6 +2,7 @@ package com.example.extra.global.exception.handler;
 
 
 import com.example.extra.global.exception.CustomException;
+import com.example.extra.global.exception.CustomValidationException;
 import com.example.extra.global.exception.ErrorCode;
 import com.example.extra.global.exception.dto.BeanValidationExceptionResponseDto;
 import com.example.extra.global.exception.dto.CustomExceptionResponseDto;
@@ -23,8 +24,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<CustomExceptionResponseDto> customExceptionHandler(
         CustomException exception) {
         ErrorCode errorCode = exception.getErrorCode();
-        log.error("커스텀 예외 발생 {} {}: {}", exception.getClass().getSimpleName(), errorCode.name(),
-            errorCode.getMessage());
+        log.error(
+            "커스텀 예외 발생 {} {}: {}",
+            exception.getClass().getSimpleName(),
+            errorCode.name(),
+            errorCode.getMessage()
+        );
         return ResponseEntity
             .status(errorCode.getStatus())
             .body(CustomExceptionResponseDto.builder()
@@ -32,6 +37,22 @@ public class GlobalExceptionHandler {
                 .name(errorCode.name())
                 .message(errorCode.getMessage())
                 .build());
+    }
+    // query string, path variable에 대한 validation 시 발생시킬 에러
+    @ExceptionHandler(CustomValidationException.class)
+    public ResponseEntity<FieldErrorResponseDto> CustomValidationExceptionHandler(CustomValidationException exception) {
+        FieldErrorResponseDto fieldError = exception.getError();
+
+        log.error(
+            "커스텀 예외 발생 {} {}: {}",
+            exception.getClass().getSimpleName(),
+            fieldError.name(),
+            fieldError.message()
+        );
+
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(fieldError);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

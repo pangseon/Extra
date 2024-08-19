@@ -7,11 +7,13 @@ import com.example.extra.domain.account.dto.service.response.AccountLoginService
 import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.account.exception.AccountErrorCode;
 import com.example.extra.domain.account.exception.AccountException;
-import com.example.extra.domain.account.mapper.entity.AccountEntityMapper;
 import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.domain.account.service.AccountService;
+import com.example.extra.domain.company.repository.CompanyRepository;
+import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.refreshtoken.repository.RefreshTokenRepository;
 import com.example.extra.domain.refreshtoken.token.RefreshToken;
+import com.example.extra.global.enums.UserRole;
 import com.example.extra.global.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +28,8 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-
-    // mapper
-    private final AccountEntityMapper accountEntityMapper;
+    private final MemberRepository memberRepository;
+    private final CompanyRepository companyRepository;
 
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
@@ -39,10 +40,11 @@ public class AccountServiceImpl implements AccountService {
         final AccountCreateServiceRequestDto serviceRequestDto
     ) {
         checkEmailDuplication(serviceRequestDto); // 이메일 중복 검사
+
         Account account = Account.builder()
             .email(serviceRequestDto.email())
             .password(passwordEncoder.encode(serviceRequestDto.password()))
-            .userRole(serviceRequestDto.userRole())
+            .userRole(UserRole.valueOf(serviceRequestDto.userRole()))
             .folderUrl(serviceRequestDto.email())
             .build();
 
@@ -61,15 +63,13 @@ public class AccountServiceImpl implements AccountService {
     public AccountLoginServiceResponseDto login(
         final AccountLoginServiceRequestDto serviceRequestDto
     ) {
-        Account account = accountRepository.findByEmail(serviceRequestDto.email())
-            .orElseThrow(() -> new AccountException(AccountErrorCode.INVALID_EMAIL));
+        // 이메일, 비밀번호 확인
+        Account account = checkEmail(serviceRequestDto.email());
+        checkPassword(serviceRequestDto.password(), account);
 
-        if (!passwordEncoder.matches(
-            serviceRequestDto.password(),
-            account.getPassword()
-        )) {
-            throw new AccountException(AccountErrorCode.INVALID_PASSWORD);
-        }
+        // member, company 회원 가입 검증
+        // account만 만들었는지, member & company까지 만들었는지
+        checkSignUp(account);
 
         // jwt 토큰 생성
         String accessToken = jwtUtil.createToken(
@@ -89,6 +89,30 @@ public class AccountServiceImpl implements AccountService {
             )
         );
 
-        return new AccountLoginServiceResponseDto(accessToken, refreshToken);
+        return new AccountLoginServiceResponseDto(
+            accessToken,
+            refreshToken
+        );
+    }
+
+    private void checkSignUp(final Account account) {
+        if (memberRepository.findByAccount(account).isEmpty() &&
+            companyRepository.findByAccount(account).isEmpty()) {
+            throw new AccountException(AccountErrorCode.NOT_FINISHED_SIGN_UP);
+        }
+    }
+
+    private void checkPassword(final String password, final Account account) {
+        if (!passwordEncoder.matches(
+            password,
+            account.getPassword()
+        )) {
+            throw new AccountException(AccountErrorCode.INVALID_PASSWORD);
+        }
+    }
+
+    private Account checkEmail(final String email) {
+        return accountRepository.findByEmail(email)
+            .orElseThrow(() -> new AccountException(AccountErrorCode.INVALID_EMAIL));
     }
 }

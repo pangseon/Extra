@@ -19,6 +19,7 @@ public record TattooCreateControllerRequestDto(
     boolean hand,
     @Schema(defaultValue = "false")
     boolean feet
+
 ) {
 
 }
