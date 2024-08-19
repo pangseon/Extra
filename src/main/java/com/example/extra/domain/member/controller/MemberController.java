@@ -38,7 +38,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class MemberController {
 
+    // service
     private final MemberService memberService;
+
+    // mapper
     private final MemberDtoMapper memberDtoMapper;
 
     @Operation(
@@ -83,7 +86,7 @@ public class MemberController {
     @PutMapping("")
     public ResponseEntity<Void> update(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @Nullable @RequestPart(name = "member") MemberUpdateControllerRequestDto controllerRequestDto,
+        @Valid @RequestPart(name = "member") MemberUpdateControllerRequestDto controllerRequestDto,
         @Nullable @RequestPart(name = "image") MultipartFile multipartFile
     ) throws IOException {
         MemberUpdateServiceRequestDto serviceRequestDto =
