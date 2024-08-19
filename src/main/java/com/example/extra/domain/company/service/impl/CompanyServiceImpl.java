@@ -10,12 +10,9 @@ import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.company.mapper.entity.CompanyEntityMapper;
 import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.company.service.CompanyService;
-import com.example.extra.domain.refreshtoken.repository.RefreshTokenRepository;
-import com.example.extra.global.security.JwtUtil;
 import com.example.extra.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,18 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class CompanyServiceImpl implements CompanyService {
 
+    // repository
     private final CompanyRepository companyRepository;
     private final AccountRepository accountRepository;
 
     // mapper
     private final CompanyEntityMapper companyEntityMapper;
-
-    // security
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
-    private final RefreshTokenRepository refreshTokenRepository;
-
-    private final String ADMIN_TOKEN = "admintoken";
 
     @Override
     @Transactional
