@@ -48,17 +48,20 @@ public class MemberServiceImpl implements MemberService {
         checkAlreadySignUp(account);    // 이미 회원 가입한 계정
         checkUserRole(account);         // Account 권한이 개인 회원자가 아닌 경우 -> throw error
 
-        Tattoo tattoo = memberCreateServiceRequestDto.tattoo() == null ?
-            getDefaultTattoo() :
-            getTattooByDto(memberCreateServiceRequestDto.tattoo());
-
+        Tattoo tattoo = checkTattooDto(memberCreateServiceRequestDto.tattoo());
         Member member = memberEntityMapper.toMember(
             memberCreateServiceRequestDto,
             account
         );
         member.updateTattoo(tattoo);
-        
+
         memberRepository.save(member);
+    }
+
+    private Tattoo checkTattooDto(final TattooCreateControllerRequestDto tattooDto) {
+        return tattooDto == null ?
+            getDefaultTattoo() :
+            getTattooByDto(tattooDto);
     }
 
     private Tattoo getTattooByDto(
