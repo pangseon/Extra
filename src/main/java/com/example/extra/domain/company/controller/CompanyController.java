@@ -5,7 +5,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 import com.example.extra.domain.company.dto.controller.CompanyCreateControllerRequestDto;
 import com.example.extra.domain.company.dto.service.request.CompanyCreateServiceRequestDto;
-import com.example.extra.domain.company.dto.service.response.CompanyReadOnceServiceResponseDto;
+import com.example.extra.domain.company.dto.service.response.CompanyReadServiceResponseDto;
 import com.example.extra.domain.company.mapper.dto.CompanyDtoMapper;
 import com.example.extra.domain.company.service.CompanyService;
 import com.example.extra.global.security.UserDetailsImpl;
@@ -46,8 +46,8 @@ public class CompanyController {
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         CompanyReadServiceResponseDto serviceResponseDto =
-            companyService.readOnce(userDetails);
-        
+            companyService.readOnce(userDetails.getAccount());
+
         return ResponseEntity
             .status(OK)
             .body(serviceResponseDto);
