@@ -8,10 +8,12 @@ import com.example.extra.domain.applicationrequest.mapper.dto.ApplicationRequest
 import com.example.extra.domain.applicationrequest.service.ApplicationRequestMemberService;
 import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.global.enums.ApplyStatus;
-import com.example.extra.global.exception.dto.CustomExceptionResponseDto;
+import com.example.extra.global.exception.CustomValidationException;
+import com.example.extra.global.exception.dto.FieldErrorResponseDto;
 import com.example.extra.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +48,20 @@ public class ApplicationRequestMemberController {
         @RequestParam(required = false) Integer year,
         @RequestParam(required = false) Integer month
     ) {
+        // year 검증
+        if (year != null && (year < 2024 || year > LocalDate.now().getYear())) {
+            throw new CustomValidationException(FieldErrorResponseDto.builder()
+                .name("year")
+                .message(String.format("연도는 2024년과 %d년 사이여야 합니다.", LocalDate.now().getYear()))
+                .build());
+        }
+        // month 검증
+        if (month != null && (month < 1 || month > 12)) {
+            throw new CustomValidationException(FieldErrorResponseDto.builder()
+                .name("month")
+                .message("달은 1월부터 12월까지여야 합니다.")
+                .build());
+        }
         List<ApplicationRequestMemberReadServiceResponseDto> serviceResponseDtoList =
             applicationRequestMemberService.getAppliedRoles(
                 userDetails.getAccount(),
@@ -67,13 +83,10 @@ public class ApplicationRequestMemberController {
     ) {
         ApplyStatus applyStatus = ApplyStatus.fromString(applyStatusString);
         if (applyStatus == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(CustomExceptionResponseDto.builder()
-                    .status(HttpStatus.BAD_REQUEST.value())
+            throw new CustomValidationException(FieldErrorResponseDto.builder()
                     .name("applyStatus")
-                    .message("유효하지 않은 apply status입니다.")
-                    .build());
-
+                    .message("유효한 applyStatus 값을 입력해주세요. 가능한 값: 'APPLIED', 'REJECTED', 'APPROVED'")
+                .build());
         }
         List<ApplicationRequestMemberReadServiceResponseDto> serviceResponseDtoList =
             applicationRequestMemberService.getAppliedRolesByStatus(
