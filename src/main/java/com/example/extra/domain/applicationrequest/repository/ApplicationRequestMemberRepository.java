@@ -1,6 +1,7 @@
 package com.example.extra.domain.applicationrequest.repository;
 
 import com.example.extra.domain.applicationrequest.entity.ApplicationRequestMember;
+import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.role.entity.Role;
 import com.example.extra.global.enums.ApplyStatus;
@@ -48,5 +49,9 @@ public interface ApplicationRequestMemberRepository extends
     Optional<ApplicationRequestMember> findByMemberAndRole(
         Member member,
         Role role
+    );
+    Optional<ApplicationRequestMember> findByMemberAndRole_jobPostId(
+        Member member,
+        Long jobPostId
     );
 }

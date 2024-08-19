@@ -25,6 +25,7 @@ import com.example.extra.domain.role.entity.Role;
 import com.example.extra.domain.role.exception.RoleErrorCode;
 import com.example.extra.domain.role.exception.RoleException;
 import com.example.extra.domain.role.repository.RoleRepository;
+import com.example.extra.domain.schedule.entity.Schedule;
 import com.example.extra.global.enums.ApplyStatus;
 import java.util.List;
 import java.util.Objects;
@@ -55,20 +56,36 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
     ) {
         Member member = getMemberByAccount(account);
         Role role = getRoleById(roleId);
-        // 이미 지원한 경우 지원 불가
-        Optional<ApplicationRequestMember> applicationRequestMemberOptional =
-            applicationRequestMemberRepository.findByMemberAndRole(
-                member,
-                role
-            );
-        if (applicationRequestMemberOptional.isPresent()) {
-            throw new ApplicationRequestException(ApplicationRequestErrorCode.ALREADY_EXIST);
-        }
-        Boolean isStillRecruiting = role.getJobPost().getStatus();
+
+        // 이미 해당 공고에 지원한 경우 지원 불가
+        applicationRequestMemberRepository.findByMemberAndRole_jobPostId(member, role.getJobPost().getId())
+            .ifPresent(a -> {
+                throw new ApplicationRequestException(ApplicationRequestErrorCode.ALREADY_EXIST);
+            });
+
         // 모집이 마감된 경우 지원 불가
+        Boolean isStillRecruiting = role.getJobPost().getStatus();
         if (!isStillRecruiting) {
-            throw new ApplicationRequestException(ApplicationRequestErrorCode.NOT_ABLE_TO_APPLY_TO_JOB_POST);
+            throw new ApplicationRequestException(ApplicationRequestErrorCode.NOT_ABLE_TO_APPLY_TO_JOB_POST_DUE_TO_STATUS);
         }
+
+        // 촬영 날짜가 겹치는 다른 공고 역할에 지원한 경우 지원 불가
+        List<ApplicationRequestMember> existingApplicationRequestMemberList =
+            applicationRequestMemberRepository.findAllByMember(getMemberByAccount(account));
+        List<Schedule> newRoleScheduleList = role.getJobPost().getScheduleList();
+        for (ApplicationRequestMember existingRequest : existingApplicationRequestMemberList) {
+            List<Schedule> existingScheduleList = existingRequest.getRole().getJobPost().getScheduleList();
+            boolean isOverlap = existingScheduleList.stream()
+                .anyMatch(existingSchedule ->
+                    newRoleScheduleList.stream().anyMatch(newSchedule ->
+                            existingSchedule.getCalender().equals(newSchedule.getCalender())
+                    )
+                );
+            if (isOverlap) {
+                throw new ApplicationRequestException(ApplicationRequestErrorCode.NOT_ABLE_TO_APPLY_TO_JOB_POST_DUE_TO_DATE);
+            }
+        }
+
         applicationRequestMemberRepository.save(
             ApplicationRequestMember.builder()
                 .applyStatus(ApplyStatus.APPLIED)
@@ -90,12 +107,12 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
     ) {
         Slice<ApplicationRequestMember> applicationRequestMemberSlice;
         if (year != null && month != null) {
-            List<ApplicationRequestMember> userApplicationRequests =
+            List<ApplicationRequestMember> applicationRequestMemberList =
                 applicationRequestMemberRepository.findAllByMember(getMemberByAccount(account));
 
-            return userApplicationRequests.stream()
-                .filter(arm -> {
-                    Role role = arm.getRole();
+            return applicationRequestMemberList.stream()
+                .filter(applicationRequestMember -> {
+                    Role role = applicationRequestMember.getRole();
                     JobPost jobPost = role.getJobPost();
                     return jobPost.getScheduleList().stream()
                         .anyMatch(schedule ->
