@@ -6,8 +6,6 @@ public record JobPostCreateServiceRequestDto(
     String title,
     String gatheringLocation,
     String gatheringTime,
-    String imageUrl,
-    Boolean status,
     Integer hourPay,
     Category category
 ) {
