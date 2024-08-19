@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 public record MemberUpdateControllerRequestDto(
-    @Schema(description = "이름")
+    @Schema(description = "이름", example = "홍길동")
     @Size(min = 2, max = 10, message = "최소 2글자, 최대 10글자를 입력해주세요")
     @NotNull(message = "이름은 필수 입력 정보입니다")
     String name,
@@ -44,7 +44,7 @@ public record MemberUpdateControllerRequestDto(
     String bank,
     @Schema(description = "계좌 번호", example = "123-456-78901234")
     String accountNumber,
-    @Schema(description = "타투", defaultValue = "타투 없음")
+    @Schema(description = "타투")
     TattooCreateControllerRequestDto tattoo,
     @Schema(description = "이미지 변경 여부", defaultValue = "false")
     boolean isImageChange

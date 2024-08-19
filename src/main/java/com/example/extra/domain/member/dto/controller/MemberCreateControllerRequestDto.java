@@ -18,7 +18,7 @@ public record MemberCreateControllerRequestDto(
         message = "전화번호 형식을 지켜주세요. \'-\' 입력 없이 최소 10, 최대 11글자의 숫자만 입력해주세요"
     )
     String phone,
-    @Schema(description = "이름")
+    @Schema(description = "이름", example = "홍길동")
     @Size(min = 2, max = 10, message = "최소 2글자, 최대 10글자를 입력해주세요")
     @NotNull(message = "이름은 필수 입력 정보입니다")
     String name,
@@ -39,7 +39,7 @@ public record MemberCreateControllerRequestDto(
     float weight,
     String bank,
     String accountNumber,
-    @Schema(description = "타투", defaultValue = "타투 없음")
+    @Schema(description = "타투")
     TattooCreateControllerRequestDto tattoo
     /**
      * 약관 동의 내용 필요
