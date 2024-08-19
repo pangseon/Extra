@@ -14,8 +14,9 @@ import com.example.extra.domain.member.mapper.entity.MemberEntityMapper;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.member.service.MemberService;
 import com.example.extra.domain.tattoo.dto.controller.TattooCreateControllerRequestDto;
-import com.example.extra.domain.tattoo.dto.service.request.TattooCreateServiceRequestDto;
 import com.example.extra.domain.tattoo.entity.Tattoo;
+import com.example.extra.domain.tattoo.exception.TattooErrorCode;
+import com.example.extra.domain.tattoo.exception.TattooException;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
 import com.example.extra.global.s3.S3Provider;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,27 +44,53 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public void signup(final MemberCreateServiceRequestDto memberCreateServiceRequestDto) {
-        Account account = accountRepository.findById(memberCreateServiceRequestDto.accountId())
-            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
+        Account account = getAccountById(memberCreateServiceRequestDto.accountId()); // 계정 찾기
+        checkAlreadySignUp(account);    // 이미 회원 가입한 계정
+        checkUserRole(account);         // Account 권한이 개인 회원자가 아닌 경우 -> throw error
 
-        // 이미 회원 가입한 계정
+        Tattoo tattoo = memberCreateServiceRequestDto.tattoo() == null ?
+            getDefaultTattoo() :
+            getTattooByDto(memberCreateServiceRequestDto.tattoo());
+
+        Member member = memberEntityMapper.toMember(
+            memberCreateServiceRequestDto,
+            account
+        );
+        member.updateTattoo(tattoo);
+        
+        memberRepository.save(member);
+    }
+
+    private Tattoo getTattooByDto(
+        final TattooCreateControllerRequestDto tattooCreateControllerRequestDto
+    ) {
+        return tattooRepository.findByTattooCreateControllerRequestDto(
+                tattooCreateControllerRequestDto
+            )
+            .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_TATTOO));
+    }
+
+    private Tattoo getDefaultTattoo() {
+        return tattooRepository.findById(1L)
+            .orElseThrow(() -> new TattooException(TattooErrorCode.NOT_FOUND_TATTOO));
+    }
+
+    private void checkUserRole(final Account account) {
+        if (!account.getUserRole().getAuthority().equals("ROLE_USER")) {
+            throw new AccountException(AccountErrorCode.INVALID_ROLE_USER);
+        }
+    }
+
+    private void checkAlreadySignUp(final Account account) {
         memberRepository.findByAccount(account)
             .ifPresent(a -> {
                 throw new AccountException(AccountErrorCode.DUPLICATION_ACCOUNT);
             });
+    }
 
-        // Account 권한이 개인 회원자가 아닌 경우 -> throw error
-        if (!account.getUserRole().getAuthority().equals("ROLE_USER")) {
-            throw new AccountException(AccountErrorCode.INVALID_ROLE_USER);
-        }
-
-        Member member = memberEntityMapper.toMember(memberCreateServiceRequestDto, account);
-        Tattoo tattoo = tattooRepository.findByTattooCreateControllerRequestDto(
-                memberCreateServiceRequestDto.tattoo())
-            .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_TATTOO));
-
-        member.updateTattoo(tattoo);
-        memberRepository.save(member);
+    private Account getAccountById(final Long accountId) {
+        return accountRepository.findById(accountId)
+            .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
     }
 
     @Override
@@ -89,7 +116,7 @@ public class MemberServiceImpl implements MemberService {
             member.update(memberUpdateServiceRequestDto);
 
             // tattoo update
-            if (memberUpdateServiceRequestDto.tattoo() != null){
+            if (memberUpdateServiceRequestDto.tattoo() != null) {
                 member.updateTattoo(getTattoo(memberUpdateServiceRequestDto.tattoo()));
             }
 
@@ -105,8 +132,10 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
-    private Tattoo getTattoo(final TattooCreateControllerRequestDto tattooCreateControllerRequestDto) {
-        return tattooRepository.findByTattooCreateControllerRequestDto(tattooCreateControllerRequestDto)
+    private Tattoo getTattoo(
+        final TattooCreateControllerRequestDto tattooCreateControllerRequestDto) {
+        return tattooRepository.findByTattooCreateControllerRequestDto(
+                tattooCreateControllerRequestDto)
             .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND_TATTOO));
     }
 
