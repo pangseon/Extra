@@ -7,21 +7,21 @@ import lombok.Builder;
 @Builder
 public record TattooReadServiceResponseDto(
     @Schema(defaultValue = "false")
-    Boolean face,
+    boolean face,
     @Schema(defaultValue = "false")
-    Boolean chest,
+    boolean chest,
     @Schema(defaultValue = "false")
-    Boolean arm,
+    boolean arm,
     @Schema(defaultValue = "false")
-    Boolean leg,
+    boolean leg,
     @Schema(defaultValue = "false")
-    Boolean shoulder,
+    boolean shoulder,
     @Schema(defaultValue = "false")
-    Boolean back,
+    boolean back,
     @Schema(defaultValue = "false")
-    Boolean hand,
+    boolean hand,
     @Schema(defaultValue = "false")
-    Boolean feet
+    boolean feet
 ) {
 
     public static TattooReadServiceResponseDto from(Tattoo tattoo) {
