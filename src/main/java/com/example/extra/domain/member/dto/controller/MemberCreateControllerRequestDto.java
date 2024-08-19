@@ -27,16 +27,16 @@ public record MemberCreateControllerRequestDto(
     LocalDate birthday,
     @Schema(description = "성별, true(1) : 남자 / false(0) : 여자")
     @NotNull(message = "성별은 필수 입력 정보입니다")
-    Boolean sex,
+    boolean sex,
     @Schema(description = "거주지")
     @NotNull(message = "거주지는 필수 입력 정보입니다")
     String home,
     @Schema(description = "키", example = "176.4")
     @NotNull(message = "키는 필수 입력 정보입니다")
-    Float height,
+    float height,
     @Schema(description = "체중", example = "59.3")
     @NotNull(message = "체중은 필수 입력 정보입니다")
-    Float weight,
+    float weight,
     String bank,
     String accountNumber,
     @Schema(description = "타투", defaultValue = "타투 없음")
