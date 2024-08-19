@@ -46,11 +46,6 @@ public interface ApplicationRequestMemberService {
         final ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
     );
 
-    void createAttendanceManagementIfApproved(
-        final Long applicationRequestMemberId,
-        final ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
-    );
-
     MemberReadServiceResponseDto readOnceApplicationRequestMember(
         Account account,
         Long applicationRequestId

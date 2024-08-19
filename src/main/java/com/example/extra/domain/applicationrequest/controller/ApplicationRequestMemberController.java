@@ -147,10 +147,10 @@ public class ApplicationRequestMemberController {
     }
 
     // 요청 승인 및 거절(지원현황 화면)
-    @PutMapping("/company/application-requests/{applicationRequestId}")
+    @PutMapping("/company/application-requests/{applicationRequestMemberId}")
     public ResponseEntity<?> updateApplicationRequestMemberStatusToRejected(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @PathVariable(name = "applicationRequestId") Long applicationRequestId,
+        @PathVariable(name = "applicationRequestMemberId") Long applicationRequestMemberId,
         @Valid @RequestBody ApplicationRequestMemberUpdateControllerRequestDto controllerRequestDto
     ) {
         ApplicationRequestMemberUpdateServiceRequestDto serviceRequestDto =
@@ -159,15 +159,9 @@ public class ApplicationRequestMemberController {
             );
         applicationRequestMemberService.updateStatus(
             userDetails.getAccount(),
-            applicationRequestId,
+            applicationRequestMemberId,
             serviceRequestDto
         );
-        if (serviceRequestDto.applyStatus() == ApplyStatus.APPROVED) {
-            applicationRequestMemberService.createAttendanceManagementIfApproved(
-                applicationRequestId,
-                serviceRequestDto
-            );
-        }
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
