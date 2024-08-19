@@ -1,6 +1,5 @@
 package com.example.extra.domain.account.dto.controller;
 
-import com.example.extra.global.enums.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -23,7 +22,7 @@ public record AccountCreateControllerRequestDto(
         regexp = "^(USER|COMPANY|ADMIN)$",
         message = "USER, COMPANY, ADMIN 중 하나를 입력해주세요"
     )
-    UserRole userRole
+    String userRole
 ) {
 
 }
