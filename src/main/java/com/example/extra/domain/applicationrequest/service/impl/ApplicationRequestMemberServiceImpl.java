@@ -12,6 +12,8 @@ import com.example.extra.domain.applicationrequest.exception.ApplicationRequestE
 import com.example.extra.domain.applicationrequest.repository.ApplicationRequestMemberRepository;
 import com.example.extra.domain.applicationrequest.service.ApplicationRequestMemberService;
 import com.example.extra.domain.attendancemanagement.entity.AttendanceManagement;
+import com.example.extra.domain.attendancemanagement.exception.AttendanceManagementErrorCode;
+import com.example.extra.domain.attendancemanagement.exception.AttendanceManagementException;
 import com.example.extra.domain.attendancemanagement.repository.AttendanceManagementRepository;
 import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.company.repository.CompanyRepository;
@@ -194,37 +196,38 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
         final ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
     ) {
         Company company = getCompanyByAccount(account);
-        ApplicationRequestMember applicationRequestMember = getApplicationRequestMemberById(
-            applicationRequestMemberId);
+        ApplicationRequestMember applicationRequestMember = getApplicationRequestMemberById(applicationRequestMemberId);
+        JobPost jobpost = applicationRequestMember.getRole().getJobPost();
 
         // 업체가 작성한 공고의 역할만 승인/거절 가능
-        if (!Objects.equals(applicationRequestMember.getRole().getJobPost().getCompany().getId(),
-            company.getId())) {
+        if (!company.equals(jobpost.getCompany())) {
             throw new ApplicationRequestException(
                 ApplicationRequestErrorCode.NOT_ABLE_TO_ACCESS_APPLICATION_REQUEST_MEMBER);
         }
         ApplyStatus applyStatus = applicationRequestMemberUpdateServiceRequestDto.applyStatus();
         applicationRequestMember.updateStatusTo(applyStatus);
-    }
 
-    // 업체가 해당 역할에 지원한 출연자들에 대해 승인할 때 attendance management 추가
-    @Override
-    @Transactional
-    public void createAttendanceManagementIfApproved(
-        final Long applicationRequestMemberId,
-        final ApplicationRequestMemberUpdateServiceRequestDto applicationRequestMemberUpdateServiceRequestDto
-    ) {
-        ApplicationRequestMember applicationRequestMember = getApplicationRequestMemberById(
-            applicationRequestMemberId);
-        attendanceManagementRepository.save(
-            AttendanceManagement.builder()
-                .member(applicationRequestMember.getMember())
-                .jobPost(applicationRequestMember.getRole().getJobPost())
-                .clockInTime(null)
-                .clockOutTime(null)
-                .mealCount(0)
-                .build()
-        );
+        // 업체가 해당 역할에 지원한 출연자들에 대해 승인할 때 attendance management 추가
+        if (applyStatus == ApplyStatus.APPROVED) {
+            Member member = applicationRequestMember.getMember();
+            // 이미 승인된 출연자에 대해 승인할 때 예외 처리
+            Optional<AttendanceManagement> attendanceManagementOptional = attendanceManagementRepository.findByMemberAndJobPost(
+                member,
+                jobpost
+            );
+            if (attendanceManagementOptional.isPresent()) {
+                throw new AttendanceManagementException(AttendanceManagementErrorCode.ALREADY_EXIST);
+            }
+            attendanceManagementRepository.save(
+                AttendanceManagement.builder()
+                        .member(member)
+                        .jobPost(applicationRequestMember.getRole().getJobPost())
+                        .clockInTime(null)
+                        .clockOutTime(null)
+                        .mealCount(0)
+                    .build()
+            );
+        }
     }
 
     @Override
