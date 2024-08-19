@@ -7,7 +7,6 @@ import com.example.extra.domain.account.dto.service.response.AccountLoginService
 import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.account.exception.AccountErrorCode;
 import com.example.extra.domain.account.exception.AccountException;
-import com.example.extra.domain.account.mapper.entity.AccountEntityMapper;
 import com.example.extra.domain.account.repository.AccountRepository;
 import com.example.extra.domain.account.service.AccountService;
 import com.example.extra.domain.refreshtoken.repository.RefreshTokenRepository;
@@ -27,9 +26,6 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    // mapper
-    private final AccountEntityMapper accountEntityMapper;
-
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
@@ -39,6 +35,7 @@ public class AccountServiceImpl implements AccountService {
         final AccountCreateServiceRequestDto serviceRequestDto
     ) {
         checkEmailDuplication(serviceRequestDto); // 이메일 중복 검사
+
         Account account = Account.builder()
             .email(serviceRequestDto.email())
             .password(passwordEncoder.encode(serviceRequestDto.password()))
@@ -61,15 +58,8 @@ public class AccountServiceImpl implements AccountService {
     public AccountLoginServiceResponseDto login(
         final AccountLoginServiceRequestDto serviceRequestDto
     ) {
-        Account account = accountRepository.findByEmail(serviceRequestDto.email())
-            .orElseThrow(() -> new AccountException(AccountErrorCode.INVALID_EMAIL));
-
-        if (!passwordEncoder.matches(
-            serviceRequestDto.password(),
-            account.getPassword()
-        )) {
-            throw new AccountException(AccountErrorCode.INVALID_PASSWORD);
-        }
+        Account account = checkEmail(serviceRequestDto.email());
+        checkPassword(serviceRequestDto.password(), account);
 
         // jwt 토큰 생성
         String accessToken = jwtUtil.createToken(
@@ -89,6 +79,23 @@ public class AccountServiceImpl implements AccountService {
             )
         );
 
-        return new AccountLoginServiceResponseDto(accessToken, refreshToken);
+        return new AccountLoginServiceResponseDto(
+            accessToken,
+            refreshToken
+        );
+    }
+
+    private void checkPassword(final String password, final Account account) {
+        if (!passwordEncoder.matches(
+            password,
+            account.getPassword()
+        )) {
+            throw new AccountException(AccountErrorCode.INVALID_PASSWORD);
+        }
+    }
+
+    private Account checkEmail(final String email) {
+        return accountRepository.findByEmail(email)
+            .orElseThrow(() -> new AccountException(AccountErrorCode.INVALID_EMAIL));
     }
 }
