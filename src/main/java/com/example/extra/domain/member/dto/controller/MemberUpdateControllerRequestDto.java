@@ -47,12 +47,12 @@ public record MemberUpdateControllerRequestDto(
     @Schema(description = "장점", example = "외국어를 할 수 있습니다.")
     String pros,
     @Schema(description = "은행", example = "하나")
-    @NotBlank(message = "은행은 필수 입력 정보입니다")
     @Size(max = 10, message = "최대 10글자 입니다")
+    @NotBlank(message = "은행은 필수 입력 정보입니다")
     String bank,
-    @NotBlank(message = "계좌 번호는 필수 입력 정보입니다")
     @Schema(description = "계좌 번호", example = "123-456-78901234")
     @Size(max = 30, message = "최대 30글자 입니다")
+    @NotBlank(message = "계좌 번호는 필수 입력 정보입니다")
     String accountNumber,
     @Schema(description = "타투")
     @NotNull(message = "타투는 필수 입력 정보입니다")
