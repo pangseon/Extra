@@ -30,6 +30,7 @@ import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.role.entity.Role;
 import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.global.enums.ApplyStatus;
+import com.example.extra.global.s3.S3Provider;
 import java.text.Collator;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
     private final ApplicationRequestMemberRepository applicationRequestMemberRepository;
     private final AttendanceManagementEntityMapper attendanceManagementEntityMapper;
     private final CompanyRepository companyRepository;
+    private final S3Provider s3Provider;
 
     @Override
     @Transactional(readOnly = true)
@@ -93,7 +95,10 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
         // 해당 회사의 공고 검증
         validateCompanyOwnJobPost(account, attendanceManagement.getJobPost().getId());
 
-        return MemberReadServiceResponseDto.from(attendanceManagement.getMember());
+        return MemberReadServiceResponseDto.from(
+            attendanceManagement.getMember(),
+            s3Provider.getProfileImagePresignedUrl(attendanceManagement.getMember().getAccount().getId())
+        );
     }
 
     @Override
@@ -249,7 +254,8 @@ public class AttendanceManagementServiceImpl implements AttendanceManagementServ
                         .Id(attendanceManagement.getId())
                         .memberId(applicationRequestMember.getMember().getId())
                         .memberName(applicationRequestMember.getMember().getName())
-                        .imageUrl(applicationRequestMember.getMember().getAccount().getImageUrl())
+                        .imageUrl(s3Provider.getProfileImagePresignedUrl(
+                            applicationRequestMember.getMember().getAccount().getId()))
                         .roleName(role.getRoleName())
                         .isAttended(isAttended)
                         .build()

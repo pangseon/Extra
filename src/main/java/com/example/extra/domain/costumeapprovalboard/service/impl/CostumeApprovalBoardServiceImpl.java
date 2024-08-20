@@ -11,32 +11,28 @@ import com.example.extra.domain.applicationrequest.repository.ApplicationRequest
 import com.example.extra.domain.applicationrequest.repository.ApplicationRequestMemberRepository;
 import com.example.extra.domain.company.entity.Company;
 import com.example.extra.domain.company.repository.CompanyRepository;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardApplyStatusUpdateServiceRequestDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadServiceResponseDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCreateServiceDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardExplainUpdateServiceRequestDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.request.CostumeApprovalBoardApplyStatusUpdateServiceRequestDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.request.CostumeApprovalBoardExplainCreateServiceRequestDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.request.CostumeApprovalBoardUpdateServiceRequestDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardCompanyReadServiceResponseDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardMemberReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.entity.CostumeApprovalBoard;
 import com.example.extra.domain.costumeapprovalboard.exception.CostumeApprovalBoardErrorCode;
 import com.example.extra.domain.costumeapprovalboard.exception.CostumeApprovalBoardException;
 import com.example.extra.domain.costumeapprovalboard.repository.CostumeApprovalBoardRepository;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
-import com.example.extra.domain.jobpost.exception.JobPostErrorCode;
-import com.example.extra.domain.jobpost.exception.NotFoundJobPostException;
 import com.example.extra.domain.member.entity.Member;
 import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.role.entity.Role;
-import com.example.extra.domain.role.exception.RoleException;
 import com.example.extra.domain.role.exception.RoleErrorCode;
+import com.example.extra.domain.role.exception.RoleException;
 import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.global.enums.ApplyStatus;
 import com.example.extra.global.s3.S3Provider;
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -55,8 +51,6 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     private final MemberRepository memberRepository;
     private final CompanyRepository companyRepository;
     private final S3Provider s3Provider;
-    private final String s3url = "https://light-house-ai.s3.ap-northeast-2.amazonaws.com/";
-    private final String SEPARATOR = "/";
 
     private Member getMemberByAccount(final Account account) {
         return memberRepository.findByAccount(account)
@@ -78,7 +72,10 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             .orElseThrow(() -> new CostumeApprovalBoardException(
                 CostumeApprovalBoardErrorCode.NOT_FOUND_COSTUME_APPROVAL_BOARD)
             );
-        return CostumeApprovalBoardMemberReadServiceResponseDto.from(costumeApprovalBoard);
+        return CostumeApprovalBoardMemberReadServiceResponseDto.from(
+            costumeApprovalBoard,
+            s3Provider.getCostumeImagePresignedUrl(account.getId(), costumeApprovalBoard.getId())
+        );
     }
 
     @Override
@@ -103,8 +100,10 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             : costumeApprovalBoardRepository.findAllByRole(role, pageable);
 
         return costumeApprovalBoardSlice.stream()
-            .map(CostumeApprovalBoardCompanyReadServiceResponseDto::from)
-            .toList();
+            .map(costumeApprovalBoard -> CostumeApprovalBoardCompanyReadServiceResponseDto.from(
+                costumeApprovalBoard,
+                s3Provider.getCostumeImagePresignedUrl(costumeApprovalBoard.getMember().getAccount().getId(), costumeApprovalBoard.getId()))
+            ).toList();
     }
 
     @Override
@@ -123,7 +122,10 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             throw new CostumeApprovalBoardException(
                 CostumeApprovalBoardErrorCode.NOT_ABLE_TO_READ_COSTUME_APPROVAL_BOARD);
         }
-        return CostumeApprovalBoardCompanyReadDetailServiceResponseDto.from(costumeApprovalBoard);
+        return CostumeApprovalBoardCompanyReadDetailServiceResponseDto.from(
+            costumeApprovalBoard,
+            s3Provider.getCostumeImagePresignedUrl(costumeApprovalBoard.getMember().getAccount().getId(), costumeApprovalBoard.getId())
+        );
     }
 
     @Override
@@ -169,17 +171,17 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     public void createCostumeApprovalBoard(
         Long roleId,
         final Account account,
-        CostumeApprovalBoardCreateServiceDto costumeApprovalBoardCreateServiceDto,
+        CostumeApprovalBoardExplainCreateServiceRequestDto costumeApprovalBoardExplainCreateServiceRequestDto,
         MultipartFile multipartFile
-    ) throws IOException {
+    ) {
         Member member = getMemberByAccount(account);
         Role role = roleRepository.findById(roleId)
             .orElseThrow(() -> new RoleException(RoleErrorCode.NOT_FOUND_ROLE));
         // 이미 의상 승인 글을 작성한 경우
         costumeApprovalBoardRepository.findByMemberAndRole(
                 member,
-                role)
-            .ifPresent(c -> {
+                role
+            ).ifPresent(c -> {
                 throw new CostumeApprovalBoardException(
                     CostumeApprovalBoardErrorCode.ALREADY_EXIST_COSTUME_APPROVAL_BOARD);
             });
@@ -194,25 +196,26 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             throw new ApplicationRequestException(
                 ApplicationRequestErrorCode.NOT_APPROVED_REQUEST);
         }
-        String fileName;
-        String fileUrl;
-        String folderName = member.getName() + UUID.randomUUID();
 
-        // 이미지 저장 후 경로 가져오기 (메서드 추출, 추후 작성)
-        fileName = s3Provider.originalFileName(multipartFile);
-        fileUrl = s3url + folderName + SEPARATOR + fileName;
-
-        // 의상 승인 게시판 생성하기
+        // 의상 승인 게시판 생성
         CostumeApprovalBoard costumeApprovalBoard = CostumeApprovalBoard.builder()
-            .costumeImageUrl(fileUrl)
-            .member(member)
-            .role(role)
-            .imageExplain(costumeApprovalBoardCreateServiceDto.imageExplain())
-            .folderName(folderName)
+                .costumeImageUrl("temp") // TODO - 삭제
+                .member(member)
+                .role(role)
+                .imageExplain(costumeApprovalBoardExplainCreateServiceRequestDto.imageExplain())
+                .folderName("temp") // TODO - 삭제
             .build();
-        costumeApprovalBoardRepository.save(costumeApprovalBoard);
-        fileUrl = folderName + SEPARATOR + fileName;
-        s3Provider.saveFile(multipartFile, fileUrl);
+        Long costumeApprovalBoardId =
+            costumeApprovalBoardRepository.save(costumeApprovalBoard)
+                .getId();
+
+        // S3 이미지 업로드
+        Long accountId = member.getAccount().getId();
+        s3Provider.saveCostumeApprovalBoardImage(
+            accountId.toString(),
+            costumeApprovalBoardId.toString(),
+            multipartFile
+        );
     }
 
     @Override
@@ -220,23 +223,19 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
     public void updateCostumeApprovalBoardByMember(
         final Long costumeApprovalBoardId,
         final Account account,
-        final CostumeApprovalBoardExplainUpdateServiceRequestDto serviceRequestDto,
+        final CostumeApprovalBoardUpdateServiceRequestDto serviceRequestDto,
         final MultipartFile multipartFile
-    ) throws IOException {
+    ) {
         Member member = getMemberByAccount(account);
         CostumeApprovalBoard costumeApprovalBoard =
             costumeApprovalBoardRepository.findByIdAndMember(costumeApprovalBoardId,member)
                 .orElseThrow(()->new CostumeApprovalBoardException(CostumeApprovalBoardErrorCode.NOT_ABLE_TO_ACCESS_COSTUME_APPROVAL_BOARD));
-        if (!serviceRequestDto.imageChange()){
-            costumeApprovalBoard.updateImageExplain(serviceRequestDto.imageExplain());
-            costumeApprovalBoard.updateCostumeImageUrl(costumeApprovalBoard.getCostumeImageUrl());
-        }else{
-            String imageName = s3Provider.updateImage(costumeApprovalBoard.getCostumeImageUrl(),
-                costumeApprovalBoard.getFolderName(),multipartFile);
-            costumeApprovalBoard.updateImageExplain(serviceRequestDto.imageExplain());
-            costumeApprovalBoard.updateCostumeImageUrl(imageName);
+        // 의상 이미지 수정
+        if (serviceRequestDto.isImageUpdate()){
+            s3Provider.updateCostumeApprovalBoardImage(serviceRequestDto.imageUrl(), multipartFile);
         }
-
+        // imageExplain 수정
+        costumeApprovalBoard.updateImageExplain(serviceRequestDto.imageExplain());
     }
 
     @Override
@@ -306,10 +305,5 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
         } else {
             return requestMemberOptional.get().getApplyStatus();
         }
-    }
-
-    private String saveImage(MultipartFile multipartFile) {
-        String url = multipartFile.getOriginalFilename();
-        return url;
     }
 }
