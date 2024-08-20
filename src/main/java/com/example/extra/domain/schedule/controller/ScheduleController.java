@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +52,7 @@ public class ScheduleController {
     public ResponseEntity<ScheduleCreateServiceResponseDto> createSchedule(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "jobPost_id") Long jobPostId,
-        @RequestBody ScheduleCreateControllerRequestDto controllerRequestDto
+        @Valid @RequestBody ScheduleCreateControllerRequestDto controllerRequestDto
     ) {
         ScheduleCreateServiceRequestDto serviceRequestDto =
             scheduleDtoMapper.toScheduleCreateServiceDto(controllerRequestDto);
@@ -76,7 +77,7 @@ public class ScheduleController {
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "jobPost_id") Long jobPostId,
         @PathVariable(name = "schedule_id") Long scheduleId,
-        @RequestBody ScheduleUpdateControllerRequestDto controllerRequestDto
+        @Valid @RequestBody ScheduleUpdateControllerRequestDto controllerRequestDto
     ) {
         ScheduleUpdateServiceRequestDto serviceRequestDto =
             scheduleDtoMapper.toScheduleUpdateServiceDto(controllerRequestDto);
