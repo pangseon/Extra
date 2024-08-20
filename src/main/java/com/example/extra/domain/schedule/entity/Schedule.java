@@ -20,10 +20,11 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "TB_SCHEDULE")
 @Entity
+@Table(name = "TB_SCHEDULE")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Schedule extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,7 +34,7 @@ public class Schedule extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "jobpost_id",nullable = false)
+    @JoinColumn(name = "jobpost_id", nullable = false)
     private JobPost jobPost;
 
 
@@ -41,11 +42,12 @@ public class Schedule extends BaseEntity {
     public Schedule(
         final LocalDate calender,
         final JobPost jobPost
-    ){
+    ) {
         this.calender = calender;
         this.jobPost = jobPost;
     }
-    public void updateSchedule(LocalDate calender){
+
+    public void updateSchedule(LocalDate calender) {
         this.calender = calender;
     }
 }
