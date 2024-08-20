@@ -8,6 +8,7 @@ public record AttendanceManagementReadServiceResponseDto(
     Long Id,
     Long memberId,
     String memberName,
+    String imageUrl,
     String roleName,
     Boolean isAttended // AttendanceMangement의 출근 유무
 )
