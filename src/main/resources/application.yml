@@ -1,3 +1,4 @@
 spring:
     profiles:
         active: dev
+        #dev 파일 작성 필요
