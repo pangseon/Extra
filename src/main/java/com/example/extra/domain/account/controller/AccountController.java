@@ -32,12 +32,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AccountController {
 
+    public static final String AUTHORIZATION_HEADER = "Authorization";
     private final AccountService accountService;
-
     // mapper
     private final AccountDtoMapper accountDtoMapper;
-
-    public static final String AUTHORIZATION_HEADER = "Authorization";
 
     @Operation(
         summary = "계정 회원 가입",

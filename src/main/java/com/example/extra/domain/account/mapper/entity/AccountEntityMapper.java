@@ -6,5 +6,5 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = SPRING)
 public interface AccountEntityMapper {
-    
+
 }
