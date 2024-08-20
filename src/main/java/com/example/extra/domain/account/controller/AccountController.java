@@ -70,11 +70,7 @@ public class AccountController {
         AccountLoginServiceResponseDto serviceResponseDto =
             accountService.login(serviceRequestDto);
 
-        if (serviceResponseDto.isLogin()) {
-            return ResponseEntity
-                .status(BAD_REQUEST)
-                .body(new AccountCreateServiceResponseDto(serviceResponseDto.accountId()));
-        } else {
+        if (serviceResponseDto.isLoginPossible()) {
             return ResponseEntity
                 .status(OK)
                 .header(
@@ -82,7 +78,10 @@ public class AccountController {
                     serviceResponseDto.accessToken()
                 )
                 .body(new RefreshTokenCreateServiceResponseDto(serviceResponseDto.refreshToken()));
-
+        } else {
+            return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(new AccountCreateServiceResponseDto(serviceResponseDto.accountId()));
         }
     }
 }
