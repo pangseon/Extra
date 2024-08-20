@@ -24,8 +24,8 @@ import com.example.extra.domain.role.exception.RoleException;
 import com.example.extra.domain.role.exception.RoleErrorCode;
 import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.domain.schedule.entity.Schedule;
-import com.example.extra.domain.schedule.exception.NotFoundScheduleException;
 import com.example.extra.domain.schedule.exception.ScheduleErrorCode;
+import com.example.extra.domain.schedule.exception.ScheduleException;
 import com.example.extra.domain.schedule.repository.ScheduleRepository;
 import com.example.extra.domain.tattoo.dto.service.response.TattooReadServiceResponseDto;
 import com.example.extra.global.enums.Category;
@@ -213,6 +213,6 @@ public class JobPostServiceImpl implements JobPostService {
 
     private List<Schedule> scheduleList(Long jobPost_id) {
         return scheduleRepository.findByJobPostId(jobPost_id)
-            .orElseThrow(() -> new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+            .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
     }
 }
