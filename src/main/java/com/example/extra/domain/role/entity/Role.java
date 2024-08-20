@@ -1,5 +1,7 @@
 package com.example.extra.domain.role.entity;
 
+import static java.time.temporal.ChronoUnit.YEARS;
+
 import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.domain.tattoo.entity.Tattoo;
 import com.example.extra.global.entity.BaseEntity;
@@ -114,13 +116,22 @@ public class Role extends BaseEntity {
         this.season = season;
         this.tattoo = tattoo;
     }
+
     public void updateTattoo(Tattoo tattoo) {
         this.tattoo = tattoo;
     }
+
     public void addOneToCurrentPersonnel() {
         this.currentPersonnel += 1;
     }
+
     public void subtractOneToCurrentPersonnel() {
         this.currentPersonnel -= 1;
+    }
+
+    public String getAgeToString() {
+        long min = this.minAge.until(LocalDate.now(), YEARS);
+        long max = this.maxAge.until(LocalDate.now(), YEARS);
+        return String.valueOf(min) + " ~ " + String.valueOf(max);
     }
 }

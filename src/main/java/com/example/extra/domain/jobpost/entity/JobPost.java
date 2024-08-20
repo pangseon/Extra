@@ -59,10 +59,10 @@ public class JobPost extends BaseEntity {
     private Company company;
 
     @OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Schedule> scheduleList = new ArrayList<>();
+    private final List<Schedule> scheduleList = new ArrayList<>();
 
     @OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Role> roleList = new ArrayList<>();
+    private final List<Role> roleList = new ArrayList<>();
 
     @Builder
     public JobPost(
@@ -80,13 +80,13 @@ public class JobPost extends BaseEntity {
     }
 
     public void updateJobPost(
-        String dramaTitle,
+        String title,
         String gatheringLocation,
         String gatheringTime,
         Boolean status,
         Category category
     ) {
-        this.title = dramaTitle;
+        this.title = title;
         this.gatheringLocation = gatheringLocation;
         this.gatheringTime = gatheringTime;
         this.status = status;

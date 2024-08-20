@@ -12,8 +12,9 @@ import org.mapstruct.Mapper;
 public interface JobPostDtoMapper {
 
     JobPostCreateServiceRequestDto toJobPostCreateServiceDto(
-      JobPostCreateControllerRequestDto jobPostCreateControllerRequestDto
+        JobPostCreateControllerRequestDto jobPostCreateControllerRequestDto
     );
+
     JobPostUpdateServiceRequestDto toJobPostUpdateServiceDto(
         JobPostUpdateControllerRequestDto jobPostUpdateControllerRequestDto
     );
