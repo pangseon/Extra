@@ -1,5 +1,6 @@
 package com.example.extra.domain.account.controller;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -31,12 +32,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AccountController {
 
+    public static final String AUTHORIZATION_HEADER = "Authorization";
     private final AccountService accountService;
-
     // mapper
     private final AccountDtoMapper accountDtoMapper;
-
-    public static final String AUTHORIZATION_HEADER = "Authorization";
 
     @Operation(
         summary = "계정 회원 가입",
@@ -60,8 +59,9 @@ public class AccountController {
         description = "로그인 : 가입한 이메일과 비밀번호를 입력해 access token과 refresh token을 받습니다. access token은 header에 refresh token은 body에 존재합니다."
     )
     @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(schema = @Schema(implementation = RefreshTokenCreateServiceResponseDto.class)))
+    @ApiResponse(responseCode = "400", description = "보조 출연자 및 업체 회원가입을 마저 진행해주세요", content = @Content(schema = @Schema(implementation = AccountCreateServiceResponseDto.class)))
     @PostMapping("/login")
-    public ResponseEntity<RefreshTokenCreateServiceResponseDto> login(
+    public ResponseEntity<?> login(
         @Valid @RequestBody AccountLoginControllerRequestDto controllerRequestDto
     ) {
         AccountLoginServiceRequestDto serviceRequestDto =
@@ -70,12 +70,19 @@ public class AccountController {
         AccountLoginServiceResponseDto serviceResponseDto =
             accountService.login(serviceRequestDto);
 
-        return ResponseEntity
-            .status(OK)
-            .header(
-                AUTHORIZATION_HEADER,
-                serviceResponseDto.accessToken()
-            )
-            .body(new RefreshTokenCreateServiceResponseDto(serviceResponseDto.refreshToken()));
+        if (serviceResponseDto.isLogin()) {
+            return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(new AccountCreateServiceResponseDto(serviceResponseDto.accountId()));
+        } else {
+            return ResponseEntity
+                .status(OK)
+                .header(
+                    AUTHORIZATION_HEADER,
+                    serviceResponseDto.accessToken()
+                )
+                .body(new RefreshTokenCreateServiceResponseDto(serviceResponseDto.refreshToken()));
+
+        }
     }
 }

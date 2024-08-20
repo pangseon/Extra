@@ -69,7 +69,14 @@ public class AccountServiceImpl implements AccountService {
 
         // member, company 회원 가입 검증
         // account만 만들었는지, member & company까지 만들었는지
-        checkSignUp(account);
+        if (!isSignUp(account)) {
+            return new AccountLoginServiceResponseDto(
+                false,
+                account.getId(),
+                null,
+                null
+            );
+        }
 
         // jwt 토큰 생성
         String accessToken = jwtUtil.createToken(
@@ -90,16 +97,16 @@ public class AccountServiceImpl implements AccountService {
         );
 
         return new AccountLoginServiceResponseDto(
+            true,
+            account.getId(),
             accessToken,
             refreshToken
         );
     }
 
-    private void checkSignUp(final Account account) {
-        if (memberRepository.findByAccount(account).isEmpty() &&
-            companyRepository.findByAccount(account).isEmpty()) {
-            throw new AccountException(AccountErrorCode.NOT_FINISHED_SIGN_UP);
-        }
+    private boolean isSignUp(final Account account) {
+        return memberRepository.findByAccount(account).isEmpty() &&
+            companyRepository.findByAccount(account).isEmpty();
     }
 
     private void checkPassword(final String password, final Account account) {
