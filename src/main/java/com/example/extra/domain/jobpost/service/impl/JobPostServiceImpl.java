@@ -176,6 +176,7 @@ public class JobPostServiceImpl implements JobPostService {
             .gatheringLocation(jobPost.getGatheringLocation())
             .gatheringTime(jobPost.getGatheringTime())
             .status(jobPost.getStatus())
+            .hourPay(9860)      // 추후 수정, 현재 최저 시급
             .category(jobPost.getCategory())
             .companyName(jobPost.getCompany().getName())
             .calenderList(scheduleList(jobPost.getId())
@@ -202,6 +203,10 @@ public class JobPostServiceImpl implements JobPostService {
                 .stream()
                 .map(Role::getSex)
                 .toList())
+            .roleAgeList(roleList(jobPost.getId())
+                .stream()
+                .map(Role::getAgeToString)
+                .toList())
             .tattooList(roleList(jobPost.getId())
                 .stream()
                 .map(Role::getTattoo)
@@ -221,7 +226,7 @@ public class JobPostServiceImpl implements JobPostService {
                 .toList())
             .build();
     }
-
+    
     private Company getCompanyByAccount(final Account account) {
         return companyRepository.findByAccount(account)
             .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
