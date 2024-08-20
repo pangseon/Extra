@@ -25,20 +25,20 @@ public record MemberUpdateControllerRequestDto(
     )
     String phone,
     @Schema(description = "생년월일(생일)", example = "2001-01-01")
-    @NotBlank(message = "생년월일은 필수 입력 정보입니다")
+    @NotNull(message = "생년월일은 필수 입력 정보입니다")
     LocalDate birthday,
     @Schema(description = "성별, true(1) : 남자 / false(0) : 여자")
-    @NotBlank(message = "성별은 필수 입력 정보입니다")
+    @NotNull(message = "성별은 필수 입력 정보입니다")
     boolean sex,
     @Schema(description = "거주지")
     @Size(max = 255, message = "최대 255글자 입니다")
     @NotBlank(message = "거주지는 필수 입력 정보입니다")
     String home,
     @Schema(description = "키", example = "176.4")
-    @NotBlank(message = "키는 필수 입력 정보입니다")
+    @NotNull(message = "키는 필수 입력 정보입니다")
     float height,
     @Schema(description = "체중", example = "59.3")
-    @NotBlank(message = "체중은 필수 입력 정보입니다")
+    @NotNull(message = "체중은 필수 입력 정보입니다")
     float weight,
     @Schema(description = "자기소개", example = "안녕하세요. 외국어를 잘하는 남자 대학생입니다.")
     String introduction,
@@ -58,7 +58,7 @@ public record MemberUpdateControllerRequestDto(
     @NotNull(message = "타투는 필수 입력 정보입니다")
     TattooCreateControllerRequestDto tattoo,
     @Schema(description = "이미지 변경 여부", defaultValue = "false")
-    @NotBlank(message = "이미지 변경 여부는 필수 입력 정보입니다")
+    @NotNull(message = "이미지 변경 여부는 필수 입력 정보입니다")
     boolean isImageChange
 ) {
 
