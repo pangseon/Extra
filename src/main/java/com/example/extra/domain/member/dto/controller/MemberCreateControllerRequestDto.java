@@ -23,7 +23,7 @@ public record MemberCreateControllerRequestDto(
     @Size(min = 2, max = 10, message = "최소 2글자, 최대 10글자를 입력해주세요")
     @NotBlank(message = "이름은 필수 입력 정보입니다")
     @Pattern(
-        regexp = "^[^\s][\\uAC00-\\uD7AFa-zA-Z\\s]*$",
+        regexp = "^[^ ][\\uAC00-\\uD7AFa-zA-Z\\s]*$",
         message = "이름은 한글, 알파벳, 공백만 가능하고, 공백으로 시작할 수 없습니다."
     )
     String name,
