@@ -69,7 +69,7 @@ public class AccountServiceImpl implements AccountService {
 
         // member, company 회원 가입 검증
         // account만 만들었는지, member & company까지 만들었는지
-        if (!isSignUp(account)) {
+        if (didNotSignUp(account)) {
             return new AccountLoginServiceResponseDto(
                 false,
                 account.getId(),
@@ -104,7 +104,7 @@ public class AccountServiceImpl implements AccountService {
         );
     }
 
-    private boolean isSignUp(final Account account) {
+    private boolean didNotSignUp(final Account account) {
         return memberRepository.findByAccount(account).isEmpty() &&
             companyRepository.findByAccount(account).isEmpty();
     }
