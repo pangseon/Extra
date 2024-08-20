@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,10 +72,7 @@ public class JobPostServiceImpl implements JobPostService {
         final Long jobPostId,
         final JobPostUpdateServiceRequestDto jobPostUpdateServiceRequestDto
     ) {
-        JobPost jobPost = jobPostRepository.findByIdAndCompany(
-            jobPostId,
-            getCompanyByAccount(account)
-        ).orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        JobPost jobPost = getJobPostByAccountAndId(account, jobPostId);
 
         jobPost.updateJobPost(
             jobPostUpdateServiceRequestDto.title(),
@@ -95,10 +91,7 @@ public class JobPostServiceImpl implements JobPostService {
         final Account account,
         final Long jobPostId
     ) {
-        JobPost jobPost = jobPostRepository.findByIdAndCompany(
-            jobPostId,
-            getCompanyByAccount(account)
-        ).orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        JobPost jobPost = getJobPostByAccountAndId(account, jobPostId);
 
         jobPostRepository.delete(jobPost);
     }
@@ -106,16 +99,15 @@ public class JobPostServiceImpl implements JobPostService {
     @Override
     @Transactional(readOnly = true)
     public JobPostReadServiceResponseDto readOnceJobPost(final Long jobPostId) {
-        return readDto(jobPostRepository.findById(jobPostId)
-            .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST)));
+        return readDto(getJobPostById(jobPostId));
     }
+
 
     @Override
     @Transactional(readOnly = true)
     public List<JobPostReadServiceResponseDto> readAllJobPosts(final int page) {
-        Pageable pageable = PageRequest.of(page, 5);
-
-        return scheduleRepository.findAll(pageable)
+        return scheduleRepository
+            .findAll(getDefaultPageable(page))
             .stream()
             .sorted(Comparator
                 .comparing(Schedule::getCalender)
@@ -133,10 +125,9 @@ public class JobPostServiceImpl implements JobPostService {
         final int year,
         final int month
     ) {
-        Pageable pageable = PageRequest.of(page, 5);
-
         // 특정 연도와 월에 해당하는 Schedule들을 필터링
-        List<Schedule> filteredSchedules = scheduleRepository.findAll(pageable)
+        List<Schedule> filteredScheduleList = scheduleRepository
+            .findAll(getDefaultPageable(page))
             .stream()
             .filter(schedule -> {
                 LocalDate date = schedule.getCalender();
@@ -145,10 +136,10 @@ public class JobPostServiceImpl implements JobPostService {
             .toList();
 
         // 필터링된 Schedule 리스트에서 JobPost 객체들을 추출하여 중복 제거 후 DTO로 변환
-        return filteredSchedules.stream()
-            .map(Schedule::getJobPost) // Schedule에서 JobPost를 추출
-            .distinct() // 중복 제거
-            .map(this::readDto) // DTO로 변환
+        return filteredScheduleList.stream()
+            .map(Schedule::getJobPost)  // Schedule에서 JobPost를 추출
+            .distinct()                 // 중복 제거
+            .map(this::readDto)         // DTO로 변환
             .toList();
     }
 
@@ -163,12 +154,13 @@ public class JobPostServiceImpl implements JobPostService {
         LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
 
         // 특정 월에 해당하는 Schedule들을 필터링하고, 날짜별로 JobPost ID를 매핑
-        return scheduleRepository.findAll() // 페이징이 필요 없으므로 findAll() 사용
+        return scheduleRepository
+            .findAll() // 페이징이 필요 없으므로 findAll() 사용
             .stream()
             .filter(schedule -> {
                 LocalDate date = schedule.getCalender();
-                return !date.isBefore(startOfMonth) && !date.isAfter(
-                    endOfMonth); // 해당 월에 속하는 Schedule만 필터링
+                return !date.isBefore(startOfMonth)
+                    && !date.isAfter(endOfMonth); // 해당 월에 속하는 Schedule만 필터링
             })
             .collect(Collectors.groupingBy(
                 Schedule::getCalender, // LocalDate를 기준으로 그룹화
@@ -233,6 +225,22 @@ public class JobPostServiceImpl implements JobPostService {
     private Company getCompanyByAccount(final Account account) {
         return companyRepository.findByAccount(account)
             .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
+    }
+
+    private JobPost getJobPostById(final Long jobPostId) {
+        return jobPostRepository.findById(jobPostId)
+            .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+    }
+
+    private JobPost getJobPostByAccountAndId(final Account account, final Long jobPostId) {
+        return jobPostRepository.findByIdAndCompany(
+            jobPostId,
+            getCompanyByAccount(account)
+        ).orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+    }
+
+    private PageRequest getDefaultPageable(final int page) {
+        return PageRequest.of(page, 5);
     }
 
     private List<Role> roleList(Long jobPost_id) {
