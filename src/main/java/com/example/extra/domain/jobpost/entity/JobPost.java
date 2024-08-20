@@ -80,13 +80,13 @@ public class JobPost extends BaseEntity {
     }
 
     public void updateJobPost(
-        String dramaTitle,
+        String title,
         String gatheringLocation,
         String gatheringTime,
         Boolean status,
         Category category
     ) {
-        this.title = dramaTitle;
+        this.title = title;
         this.gatheringLocation = gatheringLocation;
         this.gatheringTime = gatheringTime;
         this.status = status;
