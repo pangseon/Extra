@@ -10,8 +10,8 @@ public record CompanyCreateControllerRequestDto(
     @NotNull(message = "계정 id 값은 필수 입력 정보입니다")
     Long accountId,
     @Schema(description = "업체 이름", example = "엑스트라")
+    @Size(max = 30, message = "최대 30글자")
     @NotBlank(message = "업체 이름은 필수 입력 정보입니다")
-    @Size(max = 30)
     String name
 ) {
 
