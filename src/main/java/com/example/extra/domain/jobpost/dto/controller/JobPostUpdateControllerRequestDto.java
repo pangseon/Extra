@@ -2,6 +2,7 @@ package com.example.extra.domain.jobpost.dto.controller;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public record JobPostUpdateControllerRequestDto(
@@ -15,10 +16,10 @@ public record JobPostUpdateControllerRequestDto(
     @NotBlank(message = "집합 시간은 필수 입력 정보입니다")
     String gatheringTime,
     @Schema(description = "마감 상태, ture(1) : 모집 중 / false(0) : 마감")
-    @NotBlank(message = "모집 상태는 필수 입력 정보입니다")
+    @NotNull(message = "모집 상태는 필수 입력 정보입니다")
     boolean status,
     @Schema(description = "시급, 보편적으로 최저 시급이 들어갈 것 같습니다", example = "9860")
-    @NotBlank(message = "시급은 필수 입력 정보입니다")
+    @NotNull(message = "시급은 필수 입력 정보입니다")
     Integer hourPay,
     @Schema(description = "카테고리", example = "DRAMA")
     @NotBlank(message = "카테고리는 필수 입력 정보입니다")
