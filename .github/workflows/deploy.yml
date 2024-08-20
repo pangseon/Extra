@@ -61,3 +61,6 @@ jobs:
               docker-compose down
               docker-compose pull
               docker-compose up -d
+      - name: Remove unused Docker images
+        run: |
+          docker image prune -af --filter "until=24h"
