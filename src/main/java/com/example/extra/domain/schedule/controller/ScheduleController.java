@@ -48,7 +48,7 @@ public class ScheduleController {
         summary = "[업체] 일정 생성",
         description = "job post id와 일정 정보를 입력해서 해당 id를 가지는 공고글에 새로운 일정을 생성합니다."
     )
-    @PostMapping("/{jobPost_id}/schedules/company")
+    @PostMapping("/{jobPost_id}/schedules")
     public ResponseEntity<ScheduleCreateServiceResponseDto> createSchedule(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "jobPost_id") Long jobPostId,
@@ -72,7 +72,7 @@ public class ScheduleController {
         summary = "[업체] 일정 수정",
         description = "공고글 id와 일정 id, 수정 정보를 입력해서 일정을 수정합니다."
     )
-    @PutMapping("/{jobPost_id}/schedules/{schedule_id}/company")
+    @PutMapping("/{jobPost_id}/schedules/{schedule_id}")
     public ResponseEntity<Void> updateSchedule(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "jobPost_id") Long jobPostId,
@@ -98,7 +98,7 @@ public class ScheduleController {
         summary = "[업체] 일정 삭제",
         description = "공고글 id, 일정 id를 사용해서 해당 일정을 삭제합니다."
     )
-    @DeleteMapping("/{jobPost_id}/schedules/{schedule_id}/company")
+    @DeleteMapping("/{jobPost_id}/schedules/{schedule_id}")
     public ResponseEntity<?> deleteSchedule(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "jobPost_id") Long jobPostId,
