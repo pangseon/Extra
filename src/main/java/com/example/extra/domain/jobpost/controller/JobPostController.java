@@ -1,5 +1,8 @@
 package com.example.extra.domain.jobpost.controller;
 
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+
 import com.example.extra.domain.jobpost.dto.controller.JobPostCreateControllerRequestDto;
 import com.example.extra.domain.jobpost.dto.controller.JobPostUpdateControllerRequestDto;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostCreateServiceRequestDto;
@@ -14,7 +17,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,56 +29,75 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequiredArgsConstructor
-@RequestMapping("/api/v1/jobposts")
 @RestController
+@RequestMapping("/api/v1/jobposts")
+@RequiredArgsConstructor
 public class JobPostController {
 
-    private final JobPostDtoMapper jobPostDtoMapper;
+    // service
     private final JobPostService jobPostService;
+
+    // mapper
+    private final JobPostDtoMapper jobPostDtoMapper;
 
     @PostMapping("")
     public ResponseEntity<?> createJobPost(
-        @Valid @RequestBody JobPostCreateControllerRequestDto controllerRequestDto,
-        @AuthenticationPrincipal UserDetailsImpl userDetails
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @Valid @RequestBody JobPostCreateControllerRequestDto controllerRequestDto
     ) {
         JobPostCreateServiceRequestDto serviceRequestDto =
             jobPostDtoMapper.toJobPostCreateServiceDto(controllerRequestDto);
+
         JobPostCreateServiceResponseDto serviceResponseDto = jobPostService.createJobPost(
             userDetails.getAccount(),
             serviceRequestDto
         );
-        return ResponseEntity.status(HttpStatus.CREATED).body(serviceResponseDto);
+
+        return ResponseEntity
+            .status(CREATED)
+            .body(serviceResponseDto);
     }
+
     @PutMapping("/{jobpost_id}")
     public ResponseEntity<?> updateJobPost(
-        @PathVariable(name = "jobpost_id") Long jobpostId,
-        @Valid @RequestBody JobPostUpdateControllerRequestDto controllerRequestDto,
-        @AuthenticationPrincipal UserDetailsImpl userDetails
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PathVariable(name = "jobpost_id") Long jobPostId,
+        @Valid @RequestBody JobPostUpdateControllerRequestDto controllerRequestDto
     ) {
         JobPostUpdateServiceRequestDto serviceRequestDto =
             jobPostDtoMapper.toJobPostUpdateServiceDto(controllerRequestDto);
+
         jobPostService.updateJobPost(
-            jobpostId
-            , serviceRequestDto,
-            userDetails.getAccount());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+            userDetails.getAccount(),
+            jobPostId,
+            serviceRequestDto
+        );
+
+        return ResponseEntity
+            .status(CREATED)
+            .build();
     }
 
     @DeleteMapping("/{jobpost_id}")
     public ResponseEntity<?> deleteJobPost(
-        @PathVariable(name = "jobpost_id") Long jobpostId,
-        @AuthenticationPrincipal UserDetailsImpl userDetails
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PathVariable(name = "jobpost_id") Long jobPostId
     ) {
-        jobPostService.deleteJobPost(jobpostId, userDetails.getAccount());
-        return ResponseEntity.status(HttpStatus.OK).build();
+        jobPostService.deleteJobPost(
+            userDetails.getAccount(),
+            jobPostId
+        );
+
+        return ResponseEntity
+            .status(OK)
+            .build();
     }
 
     @GetMapping("/{jobpost_id}")
     public JobPostReadServiceResponseDto readOnceJobPost(
-        @PathVariable(name = "jobpost_id") Long jobpostId
+        @PathVariable(name = "jobpost_id") Long jobPostId
     ) {
-        return jobPostService.readOnceJobPost(jobpostId);
+        return jobPostService.readOnceJobPost(jobPostId);
     }
 
     @GetMapping("")
@@ -85,23 +106,25 @@ public class JobPostController {
     ) {
         return jobPostService.readAllJobPosts(page);
     }
+
     @GetMapping("/calender")
     public List<JobPostReadServiceResponseDto> readAllByCalenderJobPosts(
         @RequestParam String year,
         @RequestParam String month,
         @RequestParam int page
-    ){
-        int calender_year =Integer.parseInt(year);
+    ) {
+        int calender_year = Integer.parseInt(year);
         int calender_month = Integer.parseInt(month);
-        return jobPostService.readAllByCalenderJobPosts(page,calender_year,calender_month);
+        return jobPostService.readAllByCalenderJobPosts(page, calender_year, calender_month);
     }
+
     @GetMapping("/calenders")
     public Map<LocalDate, List<Long>> readJobPostIdsByMonth(
         @RequestParam String year,
         @RequestParam String month
-    ){
-        int calender_year =Integer.parseInt(year);
+    ) {
+        int calender_year = Integer.parseInt(year);
         int calender_month = Integer.parseInt(month);
-        return jobPostService.readJobPostIdsByMonth(calender_year,calender_month);
+        return jobPostService.readJobPostIdsByMonth(calender_year, calender_month);
     }
 }

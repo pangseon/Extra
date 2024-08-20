@@ -13,27 +13,29 @@ public interface JobPostService {
 
     JobPostCreateServiceResponseDto createJobPost(
         Account account,
-        final JobPostCreateServiceRequestDto jobPostCreateServiceRequestDto
+        JobPostCreateServiceRequestDto jobPostCreateServiceRequestDto
     );
 
     void updateJobPost(
+        Account account,
         Long jobPost_id,
-        final JobPostUpdateServiceRequestDto jobPostUpdateServiceRequestDto,
-        Account account
+        JobPostUpdateServiceRequestDto jobPostUpdateServiceRequestDto
     );
 
     void deleteJobPost(
-        Long jobPost_id,
-        Account account
+        Account account,
+        Long jobPost_id
     );
 
-    JobPostReadServiceResponseDto readOnceJobPost(
-        Long jobPost_id);
+    JobPostReadServiceResponseDto readOnceJobPost(Long jobPost_id);
 
     List<JobPostReadServiceResponseDto> readAllJobPosts(int page);
+
     List<JobPostReadServiceResponseDto> readAllByCalenderJobPosts(
         int page,
         int year,
-        int month);
+        int month
+    );
+
     Map<LocalDate, List<Long>> readJobPostIdsByMonth(int year, int month);
 }

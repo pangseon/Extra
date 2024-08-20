@@ -59,10 +59,10 @@ public class JobPost extends BaseEntity {
     private Company company;
 
     @OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Schedule> scheduleList = new ArrayList<>();
+    private final List<Schedule> scheduleList = new ArrayList<>();
 
     @OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Role> roleList = new ArrayList<>();
+    private final List<Role> roleList = new ArrayList<>();
 
     @Builder
     public JobPost(
