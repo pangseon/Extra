@@ -2,14 +2,14 @@ package com.example.extra.domain.costumeapprovalboard.controller;
 
 import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardApplyStatusUpdateControllerRequestDto;
-import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardExplainCreateRequestDto;
-import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardExplainUpdateControllerRequestDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardApplyStatusUpdateServiceRequestDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadServiceResponseDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCreateServiceDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardExplainUpdateServiceRequestDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
+import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardExplainCreateControllerRequestDto;
+import com.example.extra.domain.costumeapprovalboard.dto.controller.CostumeApprovalBoardUpdateControllerRequestDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.request.CostumeApprovalBoardApplyStatusUpdateServiceRequestDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.request.CostumeApprovalBoardExplainCreateServiceRequestDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.request.CostumeApprovalBoardUpdateServiceRequestDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardCompanyReadServiceResponseDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardMemberReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.mapper.dto.CostumeApprovalBoardDtoMapper;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
 import com.example.extra.global.enums.ApplyStatus;
@@ -19,7 +19,6 @@ import com.example.extra.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -51,8 +50,6 @@ public class CostumeApprovalBoardController {
     private final CostumeApprovalBoardDtoMapper costumeApprovalBoardDtoMapper;
 
     private static final long MAX_FILE_SIZE = 30 * 1024 * 1024; // 30 MB (최신 삼성폰 이미지 크기 30MB. 아이폰 15MB)
-    private static final String IMAGE_CONTENT_TYPE_PREFIX = "image/";
-
 
     // 업체가 의상 승인 게시글 목록 조회
     @GetMapping("/roles/{roleId}")
@@ -144,24 +141,23 @@ public class CostumeApprovalBoardController {
     public ResponseEntity<?> createCostumeApprovalBoard(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "role_id") Long roleId,
-        @RequestPart(name = "explain") CostumeApprovalBoardExplainCreateRequestDto controllerRequestDto,
+        @RequestPart(name = "explain") CostumeApprovalBoardExplainCreateControllerRequestDto controllerRequestDto,
         @RequestPart(name = "image") MultipartFile multipartFile
-    ) throws IOException {
+    ) {
         // 이미지 필수
         if (ObjectUtils.isEmpty(multipartFile)) {
             throw new CustomValidationException(FieldErrorResponseDto.builder()
                     .name("image")
-                    .message("이미지 파일은 필수 입력 사항입니다.")
+                    .message("이미지 파일은 필수입니다.")
                 .build());
         }
         // 이미지 검증
         validateImageFileIfExists(multipartFile);
 
         Account account = userDetails.getAccount();
-        CostumeApprovalBoardCreateServiceDto serviceRequestDto =
-            costumeApprovalBoardDtoMapper.toCostumeApprovalBoardCreateServiceDto(
-                controllerRequestDto,
-                multipartFile
+        CostumeApprovalBoardExplainCreateServiceRequestDto serviceRequestDto =
+            costumeApprovalBoardDtoMapper.toCostumeApprovalBoardExplainCreateServiceRequestDto(
+                controllerRequestDto
             );
 
         costumeApprovalBoardService.createCostumeApprovalBoard(
@@ -189,16 +185,22 @@ public class CostumeApprovalBoardController {
     public ResponseEntity<?> updateCostumeApprovalBoardByMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable(name = "costume_approval_board_id") Long costumeApprovalBoardId,
-        @Nullable @RequestPart(name = "explain") CostumeApprovalBoardExplainUpdateControllerRequestDto controllerRequestDto,
+        @Valid @RequestPart(name = "explain") CostumeApprovalBoardUpdateControllerRequestDto controllerRequestDto,
         @Nullable @RequestPart(name = "image") MultipartFile multipartFile
-    )throws IOException {
-        if (!ObjectUtils.isEmpty(multipartFile)) {
+    ){
+        if (controllerRequestDto.isImageUpdate()) {
+            if (ObjectUtils.isEmpty(multipartFile) || ObjectUtils.isEmpty(controllerRequestDto.imageUrl())) {
+                throw new CustomValidationException(FieldErrorResponseDto.builder()
+                        .name("image")
+                        .message("의상 이미지에 대한 수정 요청 시 기존 이미지 url 및 새 이미지 파일은 필수입니다.")
+                    .build());
+            }
             validateImageFileIfExists(multipartFile);
         }
-        CostumeApprovalBoardExplainUpdateServiceRequestDto serviceRequestDto =
-            costumeApprovalBoardDtoMapper.toCostumeApprovalBoardExplainUpdateServiceRequestDto(
-                controllerRequestDto,
-                multipartFile
+
+        CostumeApprovalBoardUpdateServiceRequestDto serviceRequestDto =
+            costumeApprovalBoardDtoMapper.toCostumeApprovalBoardUpdateServiceRequestDto(
+                controllerRequestDto
             );
 
         costumeApprovalBoardService.updateCostumeApprovalBoardByMember(
@@ -246,10 +248,10 @@ public class CostumeApprovalBoardController {
     private void validateImageFileIfExists(MultipartFile multipartFile) {
         String contentType = multipartFile.getContentType();
         // 파일 타입 검증
-        if (contentType == null || !contentType.startsWith(IMAGE_CONTENT_TYPE_PREFIX)) {
+        if (!("image/jpeg".equals(contentType) || "image/png".equals(contentType))) {
             throw new CustomValidationException(FieldErrorResponseDto.builder()
                     .name("image")
-                    .message("이미지 파일만 허용됩니다.")
+                    .message("image/jpeg, image/png contentType만 허용됩니다.")
                 .build());
         }
         // 이미지 파일 크기 검증
