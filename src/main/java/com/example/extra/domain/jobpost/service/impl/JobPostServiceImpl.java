@@ -78,7 +78,7 @@ public class JobPostServiceImpl implements JobPostService {
             jobPostUpdateServiceRequestDto.gatheringLocation(),
             jobPostUpdateServiceRequestDto.gatheringTime(),
             jobPostUpdateServiceRequestDto.status(),
-            jobPostUpdateServiceRequestDto.category());
+            Category.fromString(jobPostUpdateServiceRequestDto.category()));
         jobPostRepository.save(jobPost);
     }
     @Override

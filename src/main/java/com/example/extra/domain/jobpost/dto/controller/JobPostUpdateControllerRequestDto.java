@@ -26,6 +26,7 @@ public record JobPostUpdateControllerRequestDto(
         regexp = "\\b(?:DRAMA|MOVIE|ADVERTISEMENT|MUSIC_VIDEO|ETC)\\b",
         message = "DRAMA, MOVIE, ADVERTISEMENT, MUSIC_VIDEO, ETC 중 하나를 입력해주세요"
     )
+    String category
 ) {
 
 }
