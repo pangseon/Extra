@@ -12,10 +12,10 @@ import com.example.extra.domain.jobpost.repository.JobPostRepository;
 import com.example.extra.domain.schedule.dto.service.request.ScheduleCreateServiceRequestDto;
 import com.example.extra.domain.schedule.dto.service.request.ScheduleUpdateServiceRequestDto;
 import com.example.extra.domain.schedule.dto.service.response.ScheduleCreateServiceResponseDto;
-import com.example.extra.domain.schedule.dto.service.response.ScheduleServiceResponseDto;
+import com.example.extra.domain.schedule.dto.service.response.ScheduleReadServiceResponseDto;
 import com.example.extra.domain.schedule.entity.Schedule;
-import com.example.extra.domain.schedule.exception.NotFoundScheduleException;
 import com.example.extra.domain.schedule.exception.ScheduleErrorCode;
+import com.example.extra.domain.schedule.exception.ScheduleException;
 import com.example.extra.domain.schedule.mapper.service.ScheduleEntityMapper;
 import com.example.extra.domain.schedule.repository.ScheduleRepository;
 import com.example.extra.domain.schedule.service.ScheduleService;
@@ -37,70 +37,97 @@ public class ScheduleServiceImpl implements ScheduleService {
         return companyRepository.findByAccount(account)
             .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
     }
+
     @Override
     @Transactional
     public ScheduleCreateServiceResponseDto createSchedule(
-        Long jobPost_id,
         final Account account,
-        ScheduleCreateServiceRequestDto scheduleCreateServiceRequestDto
+        final Long jobPost_id,
+        final ScheduleCreateServiceRequestDto scheduleCreateServiceRequestDto
     ) {
         JobPost jobPost = jobPostRepository.findByIdAndCompany(
             jobPost_id,
             getCompanyByAccount(account)
         ).orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
-        Schedule schedule = scheduleEntityMapper.toSchedule(scheduleCreateServiceRequestDto,
-            jobPost);
+
+        Schedule schedule = scheduleEntityMapper.toSchedule(
+            scheduleCreateServiceRequestDto,
+            jobPost
+        );
         schedule = scheduleRepository.save(schedule);
+
         return new ScheduleCreateServiceResponseDto(schedule.getId());
     }
+
     @Override
     @Transactional
     public void updateSchedule(
-        Long jobPost_id,
-        Long schedule_id,
         final Account account,
-        ScheduleUpdateServiceRequestDto scheduleUpdateServiceRequestDto
+        final Long jobPost_id,
+        final Long schedule_id,
+        final ScheduleUpdateServiceRequestDto scheduleUpdateServiceRequestDto
     ) {
-        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id,
-                getCompanyByAccount(account))
-            .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
-        Schedule schedule = scheduleRepository.findByIdAndJobPost(schedule_id, jobPost)
-            .orElseThrow(() -> new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+        JobPost jobPost = jobPostRepository.findByIdAndCompany(
+            jobPost_id,
+            getCompanyByAccount(account)
+        ).orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+
+        Schedule schedule = scheduleRepository.findByIdAndJobPost(
+            schedule_id,
+            jobPost
+        ).orElseThrow(() -> new ScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+
         schedule.updateSchedule(scheduleUpdateServiceRequestDto.calender());
+
         scheduleRepository.save(schedule);
     }
+
     @Override
     @Transactional
     public void deleteSchedule(
-        Long jobPost_id,
-        Long schedule_id,
-        final Account account
+        final Account account,
+        final Long jobPost_id,
+        final Long schedule_id
     ) {
-        JobPost jobPost = jobPostRepository.findByIdAndCompany(jobPost_id,
-                getCompanyByAccount(account))
-            .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
-        Schedule schedule = scheduleRepository.findByIdAndJobPost(schedule_id, jobPost)
-            .orElseThrow(() -> new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+        JobPost jobPost = jobPostRepository.findByIdAndCompany(
+            jobPost_id,
+            getCompanyByAccount(account)
+        ).orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+
+        Schedule schedule = scheduleRepository.findByIdAndJobPost(
+            schedule_id,
+            jobPost
+        ).orElseThrow(() -> new ScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+
         scheduleRepository.delete(schedule);
     }
+
     @Override
     @Transactional(readOnly = true)
-    public ScheduleServiceResponseDto readSchedule(
-        Long jobPost_id,
-        Long schedule_id) {
+    public ScheduleReadServiceResponseDto readSchedule(
+        final Long jobPost_id,
+        final Long schedule_id
+    ) {
         JobPost jobPost = jobPostRepository.findById(jobPost_id)
             .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
-        Schedule schedule = scheduleRepository.findByIdAndJobPost(schedule_id, jobPost)
-            .orElseThrow(() -> new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+
+        Schedule schedule = scheduleRepository.findByIdAndJobPost(
+            schedule_id,
+            jobPost
+        ).orElseThrow(() -> new ScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+
         return scheduleEntityMapper.toScheduleServiceResponseDto(schedule);
     }
+
     @Override
     @Transactional(readOnly = true)
-    public List<ScheduleServiceResponseDto> readAllSchedule(Long jobPost_id) {
+    public List<ScheduleReadServiceResponseDto> readAllSchedule(Long jobPost_id) {
         JobPost jobPost = jobPostRepository.findById(jobPost_id)
             .orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
+        
         List<Schedule> scheduleList = scheduleRepository.findByJobPostId(jobPost.getId())
-            .orElseThrow(() -> new NotFoundScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+            .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+
         return scheduleEntityMapper.toListScheduleServiceResponseDto(scheduleList);
     }
 }

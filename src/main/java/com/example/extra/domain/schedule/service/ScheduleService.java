@@ -4,33 +4,33 @@ import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.schedule.dto.service.request.ScheduleCreateServiceRequestDto;
 import com.example.extra.domain.schedule.dto.service.request.ScheduleUpdateServiceRequestDto;
 import com.example.extra.domain.schedule.dto.service.response.ScheduleCreateServiceResponseDto;
-import com.example.extra.domain.schedule.dto.service.response.ScheduleServiceResponseDto;
+import com.example.extra.domain.schedule.dto.service.response.ScheduleReadServiceResponseDto;
 import java.util.List;
 
 public interface ScheduleService {
 
     ScheduleCreateServiceResponseDto createSchedule(
-        Long jobPost_id,
         Account account,
+        Long jobPost_id,
         ScheduleCreateServiceRequestDto scheduleCreateServiceRequestDto);
 
     void updateSchedule(
+        Account account,
         Long jobPost_id,
         Long schedule_id,
-        Account account,
         ScheduleUpdateServiceRequestDto scheduleUpdateServiceRequestDto
     );
 
     void deleteSchedule(
-        Long jobPost_id,
-        Long schedule_id,
-        Account account
-    );
-
-    ScheduleServiceResponseDto readSchedule(
+        Account account,
         Long jobPost_id,
         Long schedule_id
     );
 
-    List<ScheduleServiceResponseDto> readAllSchedule(Long jobPost_id);
+    ScheduleReadServiceResponseDto readSchedule(
+        Long jobPost_id,
+        Long schedule_id
+    );
+
+    List<ScheduleReadServiceResponseDto> readAllSchedule(Long jobPost_id);
 }
