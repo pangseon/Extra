@@ -5,7 +5,8 @@ import com.example.extra.domain.jobpost.entity.JobPost;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface JobPostRepository extends JpaRepository<JobPost,Long> {
+public interface JobPostRepository extends JpaRepository<JobPost, Long> {
+
     Optional<JobPost> findByIdAndCompany(Long id, Company company);
 
 }
