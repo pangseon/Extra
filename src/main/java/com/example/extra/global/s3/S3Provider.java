@@ -108,7 +108,6 @@ public class S3Provider {
     public String getCostumeImagePresignedUrl(Long accountId, Long costumeApprovalBoardId) {
         // 폴더 경로 생성
         String folderName = accountId.toString() + SEPARATOR + costumeApprovalBoardId.toString() + SEPARATOR;
-        log.info(folderName);
         // 폴더 내 파일 목록을 가져오기 위한 요청 생성
         ListObjectsV2Request listObjectsRequest = new ListObjectsV2Request()
             .withBucketName(bucket)
@@ -117,7 +116,6 @@ public class S3Provider {
 
         // S3에서 파일 목록 가져오기
         ListObjectsV2Result listObjectsResult = amazonS3.listObjectsV2(listObjectsRequest);
-        log.info(String.valueOf(listObjectsResult));
         List<S3ObjectSummary> objectSummaries = listObjectsResult.getObjectSummaries();
 
         // 폴더 내에 파일이 없는 경우 예외 처리
@@ -128,7 +126,11 @@ public class S3Provider {
         // 첫 번째 파일을 선택
         S3ObjectSummary firstObject = objectSummaries.get(0);
         String objectKey = firstObject.getKey();
-
+        // aws s3 콘솔에서 직접 만들면 첫 번째 파일은 폴더. 두 번째 파일부터 이미지가 됨.
+        if (objectKey.equals(folderName)){
+            objectKey = objectSummaries.get(1).getKey();
+        }
+        log.info(objectKey);
         return getPresignedUrl(objectKey);
     }
 
@@ -144,7 +146,6 @@ public class S3Provider {
 
         // Presigned URL 생성 및 반환
         URL presignedUrl = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
-        log.info(String.valueOf(presignedUrl));
         if (Objects.isNull(presignedUrl)){
             return null;
         }
