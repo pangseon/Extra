@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -106,8 +107,10 @@ public class JobPostServiceImpl implements JobPostService {
     @Override
     @Transactional(readOnly = true)
     public List<JobPostReadServiceResponseDto> readAllJobPosts(final int page) {
+        PageRequest pageRequest = PageRequest.of(page, 5);
+
         return scheduleRepository
-            .findAll(getDefaultPageable(page))
+            .findAll(pageRequest)
             .stream()
             .sorted(Comparator
                 .comparing(Schedule::getCalender)
@@ -125,15 +128,24 @@ public class JobPostServiceImpl implements JobPostService {
         final int year,
         final int month
     ) {
+        Pageable pageable = PageRequest.of(page, 5);
+
         // 특정 연도와 월에 해당하는 Schedule들을 필터링
+//        List<Schedule> filteredScheduleList = scheduleRepository
+//            .findAll(pageable)
+//            .stream()
+//            .filter(schedule -> {
+//                LocalDate date = schedule.getCalender();
+//                return date.getYear() == year && date.getMonthValue() == month;
+//            })
+//            .toList();
+
         List<Schedule> filteredScheduleList = scheduleRepository
-            .findAll(getDefaultPageable(page))
-            .stream()
-            .filter(schedule -> {
-                LocalDate date = schedule.getCalender();
-                return date.getYear() == year && date.getMonthValue() == month;
-            })
-            .toList();
+            .findByCalenderYearAndCalenderMonth(
+                year,
+                month,
+                pageable
+            );
 
         // 필터링된 Schedule 리스트에서 JobPost 객체들을 추출하여 중복 제거 후 DTO로 변환
         return filteredScheduleList.stream()
@@ -226,7 +238,7 @@ public class JobPostServiceImpl implements JobPostService {
                 .toList())
             .build();
     }
-    
+
     private Company getCompanyByAccount(final Account account) {
         return companyRepository.findByAccount(account)
             .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
@@ -242,10 +254,6 @@ public class JobPostServiceImpl implements JobPostService {
             jobPostId,
             getCompanyByAccount(account)
         ).orElseThrow(() -> new NotFoundJobPostException(JobPostErrorCode.NOT_FOUND_JOBPOST));
-    }
-
-    private PageRequest getDefaultPageable(final int page) {
-        return PageRequest.of(page, 5);
     }
 
     private List<Role> roleList(Long jobPost_id) {
