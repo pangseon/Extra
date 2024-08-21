@@ -1,9 +1,13 @@
 package com.example.extra.domain.jobpost.service.impl;
 
+import static java.util.Arrays.stream;
+
 import com.example.extra.domain.account.entity.Account;
 import com.example.extra.domain.account.exception.AccountErrorCode;
 import com.example.extra.domain.account.exception.AccountException;
 import com.example.extra.domain.company.entity.Company;
+import com.example.extra.domain.company.exception.CompanyErrorCode;
+import com.example.extra.domain.company.exception.CompanyException;
 import com.example.extra.domain.company.repository.CompanyRepository;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostCreateServiceRequestDto;
 import com.example.extra.domain.jobpost.dto.service.request.JobPostUpdateServiceRequestDto;
@@ -108,7 +112,6 @@ public class JobPostServiceImpl implements JobPostService {
     @Transactional(readOnly = true)
     public List<JobPostReadServiceResponseDto> readAllJobPosts(final int page) {
         PageRequest pageRequest = PageRequest.of(page, 5);
-
         return scheduleRepository
             .findAll(pageRequest)
             .stream()
@@ -117,6 +120,18 @@ public class JobPostServiceImpl implements JobPostService {
                 .reversed()) // LocalDate를 기준으로 최신 날짜 순으로 정렬
             .map(Schedule::getJobPost)
             .distinct()
+            .map(this::readDto)
+            .toList();
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public List<JobPostReadServiceResponseDto> readACompanyJobPosts(final int page,Account account) {
+        PageRequest pageRequest = PageRequest.of(page, 5);
+        Company company = companyRepository.findByAccount(account)
+            .orElseThrow(()->new CompanyException(CompanyErrorCode.NOT_FOUND_COMPANY));
+        return jobPostRepository
+            .findByCompany(pageRequest,company)
+            .stream()
             .map(this::readDto)
             .toList();
     }
