@@ -179,7 +179,6 @@ public class JobPostServiceImpl implements JobPostService {
         // 해당 연도와 월에 해당하는 LocalDate 범위를 생성
         LocalDate startOfMonth = LocalDate.of(year, month, 1);
         LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
-
         // 특정 월에 해당하는 Schedule들을 필터링하고, 날짜별로 JobPost ID를 매핑
         return scheduleRepository
             .findAll() // 페이징이 필요 없으므로 findAll() 사용
@@ -195,6 +194,38 @@ public class JobPostServiceImpl implements JobPostService {
                 // JobPost ID를 리스트로 매핑
             ));
     }
+    @Override
+    @Transactional(readOnly = true)
+    public Map<LocalDate, List<Long>> readJobPostIdsByMonthAndAccount(
+        final int year,
+        final int month,
+        Account account
+    ) {
+        // 해당 연도와 월에 해당하는 LocalDate 범위를 생성
+        LocalDate startOfMonth = LocalDate.of(year, month, 1);
+        LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
+
+        // 특정 Account와 연관된 Company를 찾음
+        Company company = companyRepository.findByAccount(account)
+            .orElseThrow(() -> new CompanyException(CompanyErrorCode.NOT_FOUND_COMPANY));
+
+        // 특정 월에 해당하고 특정 Company와 연관된 Schedule들을 필터링하여 날짜별로 JobPost ID를 매핑
+        return scheduleRepository
+            .findAll() // 페이징이 필요 없으므로 findAll() 사용
+            .stream()
+            .filter(schedule -> {
+                LocalDate date = schedule.getCalender();
+                return !date.isBefore(startOfMonth)
+                    && !date.isAfter(endOfMonth)
+                    && schedule.getJobPost().getCompany().getId().equals(company.getId()); // 해당 월에 속하고 특정 Company의 JobPost인 Schedule만 필터링
+            })
+            .collect(Collectors.groupingBy(
+                Schedule::getCalender, // LocalDate를 기준으로 그룹화
+                Collectors.mapping(schedule -> schedule.getJobPost().getId(), Collectors.toList())
+                // JobPost ID를 리스트로 매핑
+            ));
+    }
+
 
     private JobPostReadServiceResponseDto readDto(final JobPost jobPost) {
         return JobPostReadServiceResponseDto.builder()
