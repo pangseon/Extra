@@ -16,10 +16,7 @@ public record MemberUpdateServiceRequestDto(
     String pros,
     String bank,
     String accountNumber,
-    TattooCreateControllerRequestDto tattoo,
-    boolean isImageUpdate,
-    boolean isImageDelete,
-    String imageUrl
+    TattooCreateControllerRequestDto tattoo
 ) {
 
 }

@@ -56,15 +56,7 @@ public record MemberUpdateControllerRequestDto(
     String accountNumber,
     @Schema(description = "타투")
     @NotNull(message = "타투는 필수 입력 정보입니다")
-    TattooCreateControllerRequestDto tattoo,
-    @Schema(description = "프로필 이미지 수정 여부", defaultValue = "false")
-    @NotNull(message = "isImageUpdate는 필수 입력 정보입니다")
-    boolean isImageUpdate,
-    @Schema(description = "프로필 이미지 삭제 여부", defaultValue = "false")
-    @NotNull(message = "isImageDelete는 필수 입력 정보입니다")
-    boolean isImageDelete,
-    @Schema(description = "프로필 이미지 수정 혹은 삭제 시 기존 이미지 url")
-    String imageUrl
+    TattooCreateControllerRequestDto tattoo
 ) {
 
 }
