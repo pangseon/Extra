@@ -10,6 +10,7 @@ import com.example.extra.domain.costumeapprovalboard.dto.service.request.Costume
 import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardCompanyReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardMemberReadServiceResponseDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardMemberReadUrlServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.mapper.dto.CostumeApprovalBoardDtoMapper;
 import com.example.extra.domain.costumeapprovalboard.service.CostumeApprovalBoardService;
 import com.example.extra.global.enums.ApplyStatus;
@@ -126,6 +127,26 @@ public class CostumeApprovalBoardController {
             );
         }
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * 의상 승인 게시글 작성(이미지 등록) 시 해당 api로 요청을 보내면
+     * 유효성 검증 후 S3에 PUT 요청을 보낼 수 있는 url을 반환함
+     * 해당 url을 받은 프론트가 url에 put 요청을 하면 S3에 저장됨
+     * @param userDetails
+     * @param roleId
+     * @return
+     */
+    @GetMapping("/member/roles/{role_id}/url")
+    public ResponseEntity<?> getPresignedUrlForCostumeImage(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PathVariable(name = "role_id") Long roleId
+    ){
+        Account account = userDetails.getAccount();
+        CostumeApprovalBoardMemberReadUrlServiceResponseDto serviceResponseDto =
+            costumeApprovalBoardService.getPresignedUrl(account, roleId);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(serviceResponseDto);
     }
 
     /**
