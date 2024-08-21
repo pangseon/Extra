@@ -17,6 +17,7 @@ import com.example.extra.domain.costumeapprovalboard.dto.service.request.Costume
 import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardCompanyReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardMemberReadServiceResponseDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardMemberReadUrlServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.entity.CostumeApprovalBoard;
 import com.example.extra.domain.costumeapprovalboard.exception.CostumeApprovalBoardErrorCode;
 import com.example.extra.domain.costumeapprovalboard.exception.CostumeApprovalBoardException;
@@ -61,6 +62,7 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
         return companyRepository.findByAccount(account)
             .orElseThrow(() -> new AccountException(AccountErrorCode.NOT_FOUND_ACCOUNT));
     }
+    @Override
     @Transactional(readOnly = true)
     public CostumeApprovalBoardMemberReadServiceResponseDto getCostumeApprovalBoardForMember(
         final Account account,
@@ -76,6 +78,21 @@ public class CostumeApprovalBoardServiceImpl implements CostumeApprovalBoardServ
             costumeApprovalBoard,
             s3Provider.getCostumeImagePresignedUrl(account.getId(), costumeApprovalBoard.getId())
         );
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public CostumeApprovalBoardMemberReadUrlServiceResponseDto getPresignedUrl(
+        final Account account,
+        final Long roleId
+    ){
+        Member member = getMemberByAccount(account);
+        CostumeApprovalBoard costumeApprovalBoard = costumeApprovalBoardRepository.findByMemberAndRoleId(
+                member, roleId)
+            .orElseThrow(() -> new CostumeApprovalBoardException(
+                CostumeApprovalBoardErrorCode.NOT_FOUND_COSTUME_APPROVAL_BOARD)
+            );
+        String url = s3Provider.getCostumeImagePresignedPutUrlForCostumeImage(account.getId(), costumeApprovalBoard.getId());
+        return new CostumeApprovalBoardMemberReadUrlServiceResponseDto(url);
     }
 
     @Override

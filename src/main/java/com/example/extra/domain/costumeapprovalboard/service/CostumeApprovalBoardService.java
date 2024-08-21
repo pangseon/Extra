@@ -7,6 +7,7 @@ import com.example.extra.domain.costumeapprovalboard.dto.service.request.Costume
 import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardCompanyReadServiceResponseDto;
 import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardMemberReadServiceResponseDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardMemberReadUrlServiceResponseDto;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +27,10 @@ public interface CostumeApprovalBoardService {
     );
 
     CostumeApprovalBoardMemberReadServiceResponseDto getCostumeApprovalBoardForMember(
+        final Account account,
+        final Long roleId
+    );
+    CostumeApprovalBoardMemberReadUrlServiceResponseDto getPresignedUrl(
         final Account account,
         final Long roleId
     );
