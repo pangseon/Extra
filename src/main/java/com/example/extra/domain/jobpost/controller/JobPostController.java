@@ -190,4 +190,11 @@ public class JobPostController {
                 calender_month
             ));
     }
+    @GetMapping("/companies/company")
+    public List<JobPostReadServiceResponseDto> readJobPostsByCompany(
+        @RequestParam int page,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        return jobPostService.readACompanyJobPosts(page,userDetails.getAccount());
+    }
 }
