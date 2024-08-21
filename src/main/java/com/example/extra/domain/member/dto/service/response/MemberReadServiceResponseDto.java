@@ -20,7 +20,10 @@ public record MemberReadServiceResponseDto(
     TattooReadServiceResponseDto tattoo
 ) {
 
-    public static MemberReadServiceResponseDto from(Member member) {
+    public static MemberReadServiceResponseDto from(
+        Member member,
+        String imageUrl
+    ) {
         return MemberReadServiceResponseDto.builder()
             .name(member.getName())
             .sex(member.getSex())
@@ -31,7 +34,7 @@ public record MemberReadServiceResponseDto(
             .introduction(member.getIntroduction())
             .license(member.getLicense())
             .pros(member.getPros())
-            .imageUrl(member.getAccount().getImageUrl())
+            .imageUrl(imageUrl)
             .tattoo(TattooReadServiceResponseDto.from(member.getTattoo()))
             .build();
     }

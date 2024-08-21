@@ -27,6 +27,7 @@ import com.example.extra.domain.role.exception.RoleException;
 import com.example.extra.domain.role.repository.RoleRepository;
 import com.example.extra.domain.schedule.entity.Schedule;
 import com.example.extra.global.enums.ApplyStatus;
+import com.example.extra.global.s3.S3Provider;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -46,6 +47,7 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
     private final AttendanceManagementRepository attendanceManagementRepository;
     private final MemberRepository memberRepository;
     private final CompanyRepository companyRepository;
+    private final S3Provider s3Provider;
 
     // 출연자가 특정 역할에 지원할 때
     @Override
@@ -265,7 +267,10 @@ public class ApplicationRequestMemberServiceImpl implements ApplicationRequestMe
             );
         }
 
-        return MemberReadServiceResponseDto.from(applicationRequestMember.getMember());
+        return MemberReadServiceResponseDto.from(
+            applicationRequestMember.getMember(),
+            s3Provider.getProfileImagePresignedUrl(applicationRequestMember.getMember().getAccount().getId())
+        );
     }
 
     private Role getRoleById(final Long roleId) {

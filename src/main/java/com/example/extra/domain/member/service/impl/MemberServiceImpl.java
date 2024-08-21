@@ -19,7 +19,6 @@ import com.example.extra.domain.tattoo.exception.TattooErrorCode;
 import com.example.extra.domain.tattoo.exception.TattooException;
 import com.example.extra.domain.tattoo.repository.TattooRepository;
 import com.example.extra.global.s3.S3Provider;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -99,33 +98,41 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(readOnly = true)
     public MemberReadServiceResponseDto readOnce(final Account account) {
         Member member = findByAccount(account);
-        return MemberReadServiceResponseDto.from(member);
+        return MemberReadServiceResponseDto.from(
+            member,
+            s3Provider.getProfileImagePresignedUrl(account.getId())
+        );
     }
-
     @Override
     @Transactional
     public void update(
         final Account account,
-        final MemberUpdateServiceRequestDto memberUpdateServiceRequestDto,
+        final MemberUpdateServiceRequestDto serviceRequestDto,
         final MultipartFile multipartFile
-    ) throws IOException {
+    ) {
         Member member = findByAccount(account);
 
         // service dto 내부가 전부 존재 - 유효성 검증
-        member.update(memberUpdateServiceRequestDto);
+        member.update(serviceRequestDto);
         member.updateTattoo(
-            checkTattooDto(memberUpdateServiceRequestDto.tattoo())
+            checkTattooDto(serviceRequestDto.tattoo())
         );
 
+        // 프로필 이미지 삭제
+        if (serviceRequestDto.isImageDelete()) {
+            s3Provider.deleteProfileImage(
+                serviceRequestDto.imageUrl()
+            );
+        }
         // 프로필 이미지 수정
-        if (memberUpdateServiceRequestDto.isImageChange()) {
-            String imageUrl = s3Provider.updateImage(
-                account.getImageUrl(),
-                account.getFolderUrl(),
+        else if (serviceRequestDto.isImageUpdate()) {
+            s3Provider.updateProfileImage(
+                serviceRequestDto.imageUrl(),
+                account.getId(),
                 multipartFile
             );
-            account.updateImageUrl(imageUrl);
         }
+
     }
 
     private Tattoo getTattoo(

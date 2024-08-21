@@ -14,6 +14,7 @@ import com.example.extra.domain.member.repository.MemberRepository;
 import com.example.extra.domain.refreshtoken.repository.RefreshTokenRepository;
 import com.example.extra.domain.refreshtoken.token.RefreshToken;
 import com.example.extra.global.enums.UserRole;
+import com.example.extra.global.s3.S3Provider;
 import com.example.extra.global.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ public class AccountServiceImpl implements AccountService {
     private final CompanyRepository companyRepository;
 
     private final JwtUtil jwtUtil;
+    private final S3Provider s3Provider;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -48,7 +50,10 @@ public class AccountServiceImpl implements AccountService {
             .folderUrl(serviceRequestDto.email())
             .build();
 
-        return new AccountCreateServiceResponseDto(accountRepository.save(account).getId());
+        Long accountId = accountRepository.save(account).getId();
+        s3Provider.createFolder(String.valueOf(accountId));
+
+        return new AccountCreateServiceResponseDto(accountId);
     }
 
     private void checkEmailDuplication(final AccountCreateServiceRequestDto serviceRequestDto) {

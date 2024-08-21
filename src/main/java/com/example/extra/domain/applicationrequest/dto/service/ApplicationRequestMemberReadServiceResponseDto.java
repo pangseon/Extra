@@ -1,8 +1,6 @@
 package com.example.extra.domain.applicationrequest.dto.service;
 
 import com.example.extra.domain.applicationrequest.entity.ApplicationRequestMember;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
-import com.example.extra.domain.costumeapprovalboard.entity.CostumeApprovalBoard;
 import com.example.extra.domain.jobpost.entity.JobPost;
 import com.example.extra.domain.schedule.entity.Schedule;
 import com.example.extra.global.enums.ApplyStatus;

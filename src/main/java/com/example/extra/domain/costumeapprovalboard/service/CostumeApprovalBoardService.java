@@ -1,13 +1,12 @@
 package com.example.extra.domain.costumeapprovalboard.service;
 
 import com.example.extra.domain.account.entity.Account;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardApplyStatusUpdateServiceRequestDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCompanyReadServiceResponseDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardCreateServiceDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardExplainUpdateServiceRequestDto;
-import com.example.extra.domain.costumeapprovalboard.dto.service.CostumeApprovalBoardMemberReadServiceResponseDto;
-import java.io.IOException;
+import com.example.extra.domain.costumeapprovalboard.dto.service.request.CostumeApprovalBoardApplyStatusUpdateServiceRequestDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.request.CostumeApprovalBoardExplainCreateServiceRequestDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.request.CostumeApprovalBoardUpdateServiceRequestDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardCompanyReadDetailServiceResponseDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardCompanyReadServiceResponseDto;
+import com.example.extra.domain.costumeapprovalboard.dto.service.response.CostumeApprovalBoardMemberReadServiceResponseDto;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,16 +43,16 @@ public interface CostumeApprovalBoardService {
     void createCostumeApprovalBoard(
         final Long roleId,
         final Account account,
-        final CostumeApprovalBoardCreateServiceDto costumeApprovalBoardCreateServiceDto,
+        final CostumeApprovalBoardExplainCreateServiceRequestDto costumeApprovalBoardExplainCreateServiceRequestDto,
         final MultipartFile multipartFile
-    ) throws IOException;
+    );
 
     void updateCostumeApprovalBoardByMember(
         final Long costumeApprovalBoardId,
         final Account account,
-        final CostumeApprovalBoardExplainUpdateServiceRequestDto serviceRequestDto,
+        final CostumeApprovalBoardUpdateServiceRequestDto serviceRequestDto,
         final MultipartFile multipartFile
-    )throws IOException;
+    );
 
     void updateCostumeApprovalBoardByCompany(
         final Account account,

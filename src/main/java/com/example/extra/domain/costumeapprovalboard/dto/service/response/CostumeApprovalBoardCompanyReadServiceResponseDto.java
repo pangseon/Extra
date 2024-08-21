@@ -1,4 +1,4 @@
-package com.example.extra.domain.costumeapprovalboard.dto.service;
+package com.example.extra.domain.costumeapprovalboard.dto.service.response;
 
 import com.example.extra.domain.costumeapprovalboard.entity.CostumeApprovalBoard;
 import com.example.extra.global.enums.ApplyStatus;
@@ -13,12 +13,14 @@ public record CostumeApprovalBoardCompanyReadServiceResponseDto(
 ) {
 
     public static CostumeApprovalBoardCompanyReadServiceResponseDto from(
-        CostumeApprovalBoard costumeApprovalBoard) {
+        CostumeApprovalBoard costumeApprovalBoard,
+        String imageUrl
+    ) {
         return CostumeApprovalBoardCompanyReadServiceResponseDto
             .builder()
                 .id(costumeApprovalBoard.getId())
                 .memberName(costumeApprovalBoard.getMember().getName())
-                .imageUrl(costumeApprovalBoard.getMember().getAccount().getImageUrl())
+                .imageUrl(imageUrl)
                 .costumeApprove(costumeApprovalBoard.getCostumeApprove())
             .build();
     }

@@ -1,4 +1,4 @@
-package com.example.extra.domain.costumeapprovalboard.dto.service;
+package com.example.extra.domain.costumeapprovalboard.dto.service.request;
 
 import com.example.extra.global.enums.ApplyStatus;
 import lombok.Builder;

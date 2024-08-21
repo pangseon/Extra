@@ -10,6 +10,8 @@ import com.example.extra.domain.member.dto.service.request.MemberUpdateServiceRe
 import com.example.extra.domain.member.dto.service.response.MemberReadServiceResponseDto;
 import com.example.extra.domain.member.mapper.dto.MemberDtoMapper;
 import com.example.extra.domain.member.service.MemberService;
+import com.example.extra.global.exception.CustomValidationException;
+import com.example.extra.global.exception.dto.FieldErrorResponseDto;
 import com.example.extra.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,10 +20,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -88,7 +90,21 @@ public class MemberController {
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @Valid @RequestPart(name = "member") MemberUpdateControllerRequestDto controllerRequestDto,
         @Nullable @RequestPart(name = "image") MultipartFile multipartFile
-    ) throws IOException {
+    ) {
+        if(controllerRequestDto.isImageDelete() || controllerRequestDto.isImageUpdate()){
+            if (ObjectUtils.isEmpty(controllerRequestDto.imageUrl())){
+                throw new CustomValidationException(FieldErrorResponseDto.builder()
+                        .name("image")
+                        .message("프로필 사진 수정 혹은 삭제 요청 시 기존 이미지 url은 필수 입니다.")
+                    .build());
+            }
+        }
+        if (controllerRequestDto.isImageUpdate() && ObjectUtils.isEmpty(multipartFile)){
+            throw new CustomValidationException(FieldErrorResponseDto.builder()
+                    .name("image")
+                    .message("프로필 사진 수정 요청 시 새 이미지 파일은 필수 입니다.")
+                .build());
+        }
         MemberUpdateServiceRequestDto serviceRequestDto =
             memberDtoMapper.toMemberUpdateServiceRequestDto(controllerRequestDto);
 
