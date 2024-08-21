@@ -23,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -107,8 +106,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public void update(
         final Account account,
-        final MemberUpdateServiceRequestDto serviceRequestDto,
-        final MultipartFile multipartFile
+        final MemberUpdateServiceRequestDto serviceRequestDto
     ) {
         Member member = findByAccount(account);
 
@@ -117,22 +115,6 @@ public class MemberServiceImpl implements MemberService {
         member.updateTattoo(
             checkTattooDto(serviceRequestDto.tattoo())
         );
-
-        // 프로필 이미지 삭제
-        if (serviceRequestDto.isImageDelete()) {
-            s3Provider.deleteProfileImage(
-                serviceRequestDto.imageUrl()
-            );
-        }
-        // 프로필 이미지 수정
-        else if (serviceRequestDto.isImageUpdate()) {
-            s3Provider.updateProfileImage(
-                serviceRequestDto.imageUrl(),
-                account.getId(),
-                multipartFile
-            );
-        }
-
     }
 
     private Tattoo getTattoo(
@@ -152,5 +134,10 @@ public class MemberServiceImpl implements MemberService {
     public void delete(final Account account) {
         Member member = findByAccount(account);
         memberRepository.delete(member);
+    }
+
+    @Override
+    public String getUpdateImageUrl(final Account account){
+        return s3Provider.getCostumeImagePresignedPutUrlForProfile(account.getId());
     }
 }

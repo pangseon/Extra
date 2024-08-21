@@ -102,7 +102,16 @@ public class S3Provider {
     public String getProfileImagePresignedUrl(Long accountId){
         String folderName = accountId.toString();
         String objectKey = folderName + SEPARATOR + PROFILE_IMAGE_NAME;
-        return getPresignedUrl(objectKey);
+        return getPresignedUrl(objectKey, HttpMethod.GET);
+    }
+    public String getCostumeImagePresignedPutUrlForCostumeImage(Long accountId, Long costumeApprovalBoardId){
+        String newImageName = "costume.jpg";
+        String objectKey = accountId.toString() + SEPARATOR + costumeApprovalBoardId.toString() + SEPARATOR + newImageName;
+        return getPresignedUrl(objectKey, HttpMethod.PUT);
+    }
+    public String getCostumeImagePresignedPutUrlForProfile(Long accountId){
+        String objectKey = accountId.toString() + SEPARATOR + PROFILE_IMAGE_NAME;
+        return getPresignedUrl(objectKey, HttpMethod.PUT);
     }
     // 의상 사진 프론트에 전달(API 테스트 완료)
     public String getCostumeImagePresignedUrl(Long accountId, Long costumeApprovalBoardId) {
@@ -131,17 +140,16 @@ public class S3Provider {
             objectKey = objectSummaries.get(1).getKey();
         }
         log.info(objectKey);
-        return getPresignedUrl(objectKey);
+        return getPresignedUrl(objectKey, HttpMethod.GET);
     }
-
-    private String getPresignedUrl(String objectKey){
+    private String getPresignedUrl(String objectKey, HttpMethod httpMethod){
         // Presigned URL 유효 기간 설정
         Date expiration = new Date(System.currentTimeMillis() + VALID_TIME);
 
         // Presigned URL 생성 요청
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
             new GeneratePresignedUrlRequest(bucket, objectKey)
-                .withMethod(HttpMethod.GET) // 읽기 작업 가능.
+                .withMethod(httpMethod)
                 .withExpiration(expiration);
 
         // Presigned URL 생성 및 반환
