@@ -36,6 +36,7 @@ public interface JobPostService {
         int year,
         int month
     );
-
     Map<LocalDate, List<Long>> readJobPostIdsByMonth(int year, int month);
+    Map<LocalDate, List<Long>> readJobPostIdsByMonthAndAccount(int year, int month,Account account);
+    List<JobPostReadServiceResponseDto> readACompanyJobPosts(int page,Account account);
 }

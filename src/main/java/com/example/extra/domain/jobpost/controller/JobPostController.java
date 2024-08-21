@@ -190,4 +190,27 @@ public class JobPostController {
                 calender_month
             ));
     }
+    @GetMapping("/companies/company")
+    public List<JobPostReadServiceResponseDto> readJobPostsByCompany(
+        @RequestParam int page,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        return jobPostService.readACompanyJobPosts(page,userDetails.getAccount());
+    }
+    @GetMapping("/company/calenders")
+    public ResponseEntity<Map<LocalDate, List<Long>>> readJobPostIdsByMonth(
+        @RequestParam String year,
+        @RequestParam String month,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        int calender_year = Integer.parseInt(year);
+        int calender_month = Integer.parseInt(month);
+        return ResponseEntity
+            .status(OK)
+            .body(jobPostService.readJobPostIdsByMonthAndAccount(
+                calender_year,
+                calender_month,
+                userDetails.getAccount()
+            ));
+    }
 }
